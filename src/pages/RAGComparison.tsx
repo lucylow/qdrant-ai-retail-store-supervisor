@@ -963,6 +963,329 @@ Total demo cost: $0 (all open-source)
   );
 }
 
+// ─── Audio RAG Data ───────────────────────────────────────────────────────
+
+const AUDIO_PIPELINE_STEPS = [
+  { label: "Voice Input", desc: "User speaks in any language (incl. Swiss German)", icon: Mic, color: "text-primary" },
+  { label: "Audio Embedding", desc: "Direct audio → vector (NVmix-8B / Qwen2-Audio)", icon: AudioLines, color: "text-accent" },
+  { label: "Language Detection", desc: "Auto-detect de-CH, fr, it, en", icon: Globe, color: "text-status-warning" },
+  { label: "Qdrant Retrieval", desc: "Search goals + products by audio vector", icon: Database, color: "text-accent" },
+  { label: "Episode Matching", desc: "Find similar voice queries from episodic memory", icon: BookOpen, color: "text-status-info" },
+  { label: "LLM Synthesis", desc: "Voice-optimized bundle with speakable response", icon: Brain, color: "text-primary" },
+  { label: "Voice Response", desc: "Conversational result with audio product demos", icon: Volume2, color: "text-status-online" },
+];
+
+const AUDIO_COMPARISON = [
+  { feature: "Swiss German", textOnly: "❌ Requires translation", audioRag: "✅ Native support" },
+  { feature: "Processing Speed", textOnly: "Whisper (5s) + embed", audioRag: "Direct audio (0.5s)" },
+  { feature: "Emotion Detection", textOnly: "None", audioRag: "Prosody & urgency" },
+  { feature: "Product Demos", textOnly: "Static text", audioRag: "Play 10s audio previews" },
+  { feature: "Multilingual", textOnly: "Single language per query", audioRag: "Code-switching supported" },
+];
+
+const AUDIO_DEMO_STEPS = [
+  {
+    screen: "Voice Input",
+    icon: Mic,
+    content: 'User speaks Swiss German:\n"Ich brauche ein Zelt für zwei Personen unter 200 Franken bis Freitag"',
+    detail: "Live waveform + Processing...",
+    color: "border-primary/30 bg-primary/5",
+  },
+  {
+    screen: "Audio RAG",
+    icon: Search,
+    content: "Found 3 similar voice requests (92% match)\nREI Kingdom 2 → plays 10s audio demo",
+    detail: "Episodic memory retrieval from goal_solution_links",
+    color: "border-accent/30 bg-accent/5",
+  },
+  {
+    screen: "Voice Confirmation",
+    icon: Volume2,
+    content: 'Agent: "Das Zelt kostet 178CHF, Lieferung Donnerstag. Okay?"\nUser: "Ja, bestellen"',
+    detail: "Conversational confirmation flow",
+    color: "border-status-online/30 bg-status-online/5",
+  },
+];
+
+const AUDIO_VECTORS = [
+  { name: "text_vector", size: 1536, model: "bge-m3 (multilingual)", purpose: "Semantic text similarity" },
+  { name: "image_vector", size: 512, model: "CLIP ViT-B/32", purpose: "Visual product matching" },
+  { name: "audio_vector", size: 512, model: "NVmix-8B / Qwen2-Audio", purpose: "Voice query & product audio demos", isNew: true },
+];
+
+const AUDIO_METRICS = [
+  { label: "Voice Processing", value: "0.5s", compare: "vs 5s (ASR)", color: "text-status-online" },
+  { label: "Language Support", value: "99+", compare: "auto-detect", color: "text-primary" },
+  { label: "Swiss German", value: "Native", compare: "no translation", color: "text-accent" },
+  { label: "Emotion Detection", value: "Prosody", compare: "urgency + tone", color: "text-status-warning" },
+  { label: "Episode Reuse", value: "67%", compare: "voice queries", color: "text-primary" },
+  { label: "Conversion Lift", value: "+42%", compare: "vs text-only", color: "text-status-online" },
+];
+
+function AudioRAGSection() {
+  const [pipelineStep, setPipelineStep] = useState<number | null>(null);
+  const [simRunning, setSimRunning] = useState(false);
+  const [wavePhase, setWavePhase] = useState(0);
+
+  const runSim = useCallback(async () => {
+    setSimRunning(true);
+    setPipelineStep(null);
+    for (let i = 0; i < AUDIO_PIPELINE_STEPS.length; i++) {
+      await new Promise(r => setTimeout(r, 550));
+      setPipelineStep(i);
+    }
+    setSimRunning(false);
+  }, []);
+
+  // Simple waveform animation
+  useState(() => {
+    const interval = setInterval(() => setWavePhase(p => p + 1), 200);
+    return () => clearInterval(interval);
+  });
+
+  return (
+    <div className="space-y-6">
+      {/* Hero */}
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Mic className="h-4 w-4 text-primary" />
+            Audio RAG — Voice-Native Product Search
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground mb-4">
+            Process voice queries directly without ASR for faster multilingual support.
+            Raw audio embeddings enable native Swiss German, emotion detection, and 10× faster processing.
+          </p>
+
+          {/* Voice waveform visualization */}
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
+              <Mic className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1 flex items-center gap-0.5 h-8">
+              {Array.from({ length: 40 }).map((_, i) => {
+                const height = 20 + Math.sin((i + wavePhase) * 0.5) * 15 + Math.random() * 10;
+                return (
+                  <div key={i} className="flex-1 bg-primary/40 rounded-full transition-all duration-200" style={{ height: `${height}%` }} />
+                );
+              })}
+            </div>
+            <Badge variant="outline" className="text-[10px] text-primary shrink-0">de-CH detected</Badge>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Audio Pipeline */}
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Zap className="h-4 w-4 text-primary" />
+              Audio RAG Pipeline
+            </CardTitle>
+            <Button size="sm" variant="outline" onClick={runSim} disabled={simRunning}>
+              {simRunning ? <><Activity className="h-3 w-3 animate-pulse mr-1" /> Running…</> : <><Zap className="h-3 w-3 mr-1" /> Simulate</>}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+            {AUDIO_PIPELINE_STEPS.map((step, i) => {
+              const active = pipelineStep !== null && pipelineStep >= i;
+              const current = pipelineStep === i;
+              const Icon = step.icon;
+              return (
+                <div key={i} className={cn(
+                  "rounded-lg border p-2.5 text-center transition-all duration-300 space-y-1",
+                  current ? "border-primary/50 bg-primary/10 scale-[1.03] shadow-md" :
+                  active ? "border-status-online/30 bg-status-online/5" :
+                  "border-border bg-muted/20"
+                )}>
+                  <Icon className={cn("h-4 w-4 mx-auto", active ? step.color : "text-muted-foreground")} />
+                  <div className="text-[10px] font-semibold leading-tight">{step.label}</div>
+                  <div className="text-[9px] text-muted-foreground leading-tight">{step.desc}</div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Demo Flow */}
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Radio className="h-4 w-4 text-primary" />
+            Hackathon Demo Flow
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {AUDIO_DEMO_STEPS.map((step, i) => {
+            const Icon = step.icon;
+            return (
+              <div key={i} className={cn("rounded-lg border p-4 space-y-2", step.color)}>
+                <div className="flex items-center gap-2">
+                  <Icon className="h-4 w-4 text-foreground" />
+                  <span className="text-xs font-semibold">Screen {i + 1}: {step.screen}</span>
+                </div>
+                <pre className="text-xs text-muted-foreground font-mono whitespace-pre-wrap leading-relaxed">{step.content}</pre>
+                <p className="text-[10px] text-muted-foreground italic">{step.detail}</p>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+
+      {/* Tri-Vector Config */}
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Database className="h-4 w-4 text-accent" />
+            Qdrant Tri-Vector Products Collection
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid md:grid-cols-3 gap-3">
+            {AUDIO_VECTORS.map((v) => (
+              <div key={v.name} className={cn(
+                "rounded-lg border p-3 space-y-1.5",
+                v.isNew ? "border-status-online/30 bg-status-online/5" : "border-border bg-muted/20"
+              )}>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="font-mono text-[10px]">{v.name}</Badge>
+                  {v.isNew && <Badge className="text-[9px] bg-status-online/20 text-status-online border-status-online/30">NEW</Badge>}
+                </div>
+                <div className="text-[10px] text-muted-foreground">dim={v.size} · {v.model}</div>
+                <p className="text-[10px] text-muted-foreground">{v.purpose}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-lg bg-muted/20 border border-border p-3">
+            <p className="text-[10px] text-muted-foreground font-semibold mb-1.5">Voice Goal RAG Code:</p>
+            <pre className="text-[10px] text-muted-foreground font-mono whitespace-pre-wrap leading-relaxed">{`def voice_goal_rag(audio_file: bytes, language: str = "de"):
+    # Embed raw audio directly (bypasses Whisper ASR)
+    audio_vector = audio_embedder.encode(audio_file)
+    
+    # Hybrid retrieval: voice goals + text translations
+    similar_goals = qdrant.search(
+        collection="goals",
+        query_vector=audio_vector,
+        query_filter={"language": language}
+    )
+    
+    # Multilingual extraction via multimodal LLM
+    structured_goal = multimodal_llm.extract_goal(
+        audio=audio_file,
+        rag_context=similar_goals,
+        language=language
+    )
+    return structured_goal`}</pre>
+          </div>
+
+          <div className="rounded-lg bg-muted/20 border border-border p-3">
+            <p className="text-[10px] text-muted-foreground font-semibold mb-1.5">Qdrant Schema Extension:</p>
+            <pre className="text-[10px] text-muted-foreground font-mono whitespace-pre-wrap leading-relaxed">{`# goals collection audio provenance
+{
+  "goal_id": "g-123",
+  "voice_confidence": 0.92,
+  "language_detected": "de-CH",
+  "prosody": {"urgency": 0.7, "emotion": "neutral"}
+}
+
+# Payload indexes
+client.create_payload_index("products", "language", "keyword")
+client.create_payload_index("products", "audio_duration", "float")`}</pre>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Comparison table */}
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <BarChart3 className="h-4 w-4 text-primary" />
+            Text-Only RAG vs Audio RAG
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-lg border border-border overflow-hidden">
+            <div className="grid grid-cols-3 bg-muted/30 text-[10px] font-semibold uppercase tracking-wider">
+              <div className="px-3 py-2 border-r border-border">Feature</div>
+              <div className="px-3 py-2 border-r border-border flex items-center gap-1">
+                <XCircle className="w-3 h-3 text-destructive" /> Text-Only
+              </div>
+              <div className="px-3 py-2 flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-status-online" /> Audio RAG
+              </div>
+            </div>
+            {AUDIO_COMPARISON.map((row, i) => (
+              <div key={i} className={cn("grid grid-cols-3 text-xs", i % 2 === 0 ? "bg-card" : "bg-card/50")}>
+                <div className="px-3 py-2.5 font-medium border-r border-border">{row.feature}</div>
+                <div className="px-3 py-2.5 text-muted-foreground border-r border-border">{row.textOnly}</div>
+                <div className="px-3 py-2.5 text-status-online font-medium">{row.audioRag}</div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Metrics */}
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-status-online" />
+            Audio RAG Impact Metrics
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {AUDIO_METRICS.map((m, i) => (
+              <div key={i} className="rounded-lg border border-border bg-muted/20 p-3 text-center space-y-1">
+                <div className={cn("text-lg font-bold", m.color)}>{m.value}</div>
+                <div className="text-xs font-medium">{m.label}</div>
+                <div className="text-[10px] text-muted-foreground">{m.compare}</div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Multimodal integration */}
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Layers className="h-4 w-4 text-accent" />
+            Full Multimodal RAG Stack
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            {[
+              { label: "Text RAG", icon: MessageSquare, desc: "bge-m3 embeddings", color: "text-primary" },
+              { label: "Visual RAG", icon: Camera, desc: "CLIP image vectors", color: "text-accent" },
+              { label: "Audio RAG", icon: Mic, desc: "NVmix-8B audio vectors", color: "text-status-online" },
+            ].map((m) => (
+              <div key={m.label} className="rounded-lg border border-border bg-muted/20 p-3 text-center space-y-1">
+                <m.icon className={cn("h-5 w-5 mx-auto", m.color)} />
+                <div className="text-xs font-semibold">{m.label}</div>
+                <div className="text-[10px] text-muted-foreground">{m.desc}</div>
+              </div>
+            ))}
+          </div>
+          <div className="rounded-lg bg-primary/5 border border-primary/20 p-3 text-center">
+            <p className="text-xs text-primary italic font-medium">
+              "Speak, snap, or type — our tri-modal RAG finds 92% matching products in stock with 2-day Swiss delivery. 10× faster than ASR pipelines."
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */

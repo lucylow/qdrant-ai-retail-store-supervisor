@@ -195,6 +195,7 @@ export default function AgentsPage() {
           <TabsTrigger value="guardrails">Guardrails</TabsTrigger>
           <TabsTrigger value="metrics">Metrics</TabsTrigger>
           <TabsTrigger value="live">Live Monitor</TabsTrigger>
+          <TabsTrigger value="hitl">Human-in-the-Loop</TabsTrigger>
         </TabsList>
 
         {/* ─── Overview ─── */}

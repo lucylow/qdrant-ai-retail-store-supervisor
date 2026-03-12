@@ -55,6 +55,7 @@ export type Solution = {
 
 export type Product = {
   id?: string;
+  sku?: string;
   name?: string;
   title?: string;
   description?: string;
@@ -62,6 +63,14 @@ export type Product = {
   image_url?: string;
   category?: string;
   score?: number;
+  stock?: number;
+  stock_status?: "in_stock" | "low_stock" | "out_of_stock";
+  shipping_zone?: "CH" | "EU" | "WORLD";
+  brand?: string;
+  rating?: number;
+  reviews_count?: number;
+  shipping_days?: number;
+  updated_at?: string;
 };
 
 export type Episode = {

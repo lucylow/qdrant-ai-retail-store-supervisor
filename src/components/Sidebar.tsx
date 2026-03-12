@@ -3,7 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, MessageSquare, Target, BookOpen,
   ShoppingBag, Activity, BarChart3, PlayCircle,
-  Settings, Award, Menu, X, Database, Zap, Layers, Shield, Sparkles, Brain, Cloud, FolderOpen, ShieldCheck, Code2,
+  Settings, Award, Menu, X, Database, Zap, Layers, Shield, Sparkles, Brain, Cloud, FolderOpen, ShieldCheck, Code2, Link2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 

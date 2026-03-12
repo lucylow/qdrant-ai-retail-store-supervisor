@@ -28,6 +28,7 @@ import ArchitecturePage from "./pages/Architecture";
 import RAGComparisonPage from "./pages/RAGComparison";
 import SemanticCachePage from "./pages/SemanticCache";
 import LangChainRAGPage from "./pages/LangChainRAG";
+import AgenticAIPage from "./pages/AgenticAI";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -72,6 +73,7 @@ const App = () => (
             <Route path="/rag-comparison" element={<RAGComparisonPage />} />
             <Route path="/semantic-cache" element={<SemanticCachePage />} />
             <Route path="/langchain-rag" element={<LangChainRAGPage />} />
+            <Route path="/agentic-ai" element={<AgenticAIPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />

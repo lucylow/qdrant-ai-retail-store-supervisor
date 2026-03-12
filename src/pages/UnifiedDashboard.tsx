@@ -81,6 +81,9 @@ export default function UnifiedDashboard() {
           <TabsContent value="analytics" className="mt-0">
             <AIAnalyticsPage />
           </TabsContent>
+          <TabsContent value="anomaly" className="mt-0">
+            <AnomalyDetectionPage />
+          </TabsContent>
           <TabsContent value="rag" className="mt-0">
             <RAGComparisonPage />
           </TabsContent>

@@ -143,7 +143,7 @@ export default function LandingPage() {
           </div>
 
           {/* GenAI ↔ Qdrant Interaction */}
-          <div className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-blue-50/30 p-6 mb-8">
+          <div className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-muted p-6 mb-8">
             <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
               <Database className="w-5 h-5 text-primary" />
               GenAI ↔ Qdrant: Retrieval-Augmented Reasoning
@@ -165,9 +165,9 @@ export default function LandingPage() {
           </div>
 
           {/* Guardrails */}
-          <div className="rounded-xl border border-amber-200/50 bg-amber-50/30 p-6 mb-8">
+          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 mb-8">
             <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-amber-600" />
+              <ShieldCheck className="w-5 h-5 text-destructive" />
               Guardrails: Where We Don't Use GenAI
             </h3>
             <p className="text-sm text-muted-foreground mb-4">

@@ -27,6 +27,7 @@ import GDPRPage from "./pages/GDPR";
 import ArchitecturePage from "./pages/Architecture";
 import RAGComparisonPage from "./pages/RAGComparison";
 import SemanticCachePage from "./pages/SemanticCache";
+import LangChainRAGPage from "./pages/LangChainRAG";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({

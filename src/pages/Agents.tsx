@@ -3,7 +3,8 @@ import {
   Activity, Clock, Zap, GitMerge, Lock, CheckCircle, ArrowRight,
   Brain, Database, ShoppingCart, Package, Eye, MessageSquare,
   RefreshCw, Shield, Server, Layers, TrendingUp, FileText,
-  ArrowDown, ArrowUp, Circle, Search, Settings
+  ArrowDown, ArrowUp, Circle, Search, Settings, UserCheck,
+  AlertTriangle, ThumbsUp, ThumbsDown, Edit3, RotateCcw
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";

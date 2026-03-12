@@ -614,6 +614,11 @@ export default function RAGComparisonPage() {
           <MemoryIntegrationSection />
         </TabsContent>
 
+        {/* --- Visual RAG --- */}
+        <TabsContent value="visual" className="space-y-4">
+          <VisualRAGSection />
+        </TabsContent>
+
         {/* --- Comparison Table --- */}
         <TabsContent value="comparison" className="space-y-4">
           <div className="rounded-xl border border-border overflow-hidden">

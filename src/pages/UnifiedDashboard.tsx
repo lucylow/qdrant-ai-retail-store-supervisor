@@ -16,6 +16,7 @@ import AgenticAIPage from "./AgenticAI";
 import AIAnalyticsPage from "./AIAnalytics";
 import ArchitecturePage from "./Architecture";
 import AnomalyDetectionPage from "./AnomalyDetection";
+import QdrantCollectionsPage from "./QdrantCollections";
 
 const DASHBOARD_TABS = [
   { id: "overview", label: "Overview" },
@@ -25,6 +26,7 @@ const DASHBOARD_TABS = [
   { id: "products", label: "Products" },
   { id: "metrics", label: "Metrics" },
   { id: "qdrant", label: "Qdrant" },
+  { id: "collections", label: "Collections" },
   { id: "analytics", label: "Analytics" },
   { id: "anomaly", label: "Anomaly Detection" },
   { id: "rag", label: "RAG" },
@@ -77,6 +79,9 @@ export default function UnifiedDashboard() {
           </TabsContent>
           <TabsContent value="qdrant" className="mt-0">
             <QdrantPage />
+          </TabsContent>
+          <TabsContent value="collections" className="mt-0">
+            <QdrantCollectionsPage />
           </TabsContent>
           <TabsContent value="analytics" className="mt-0">
             <AIAnalyticsPage />

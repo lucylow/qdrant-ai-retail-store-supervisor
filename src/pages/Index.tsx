@@ -111,11 +111,11 @@ export default function LandingPage() {
               </div>
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li className="flex gap-2">
-                  <span className="text-blue-500">→</span>
+                  <span className="text-primary">→</span>
                   <span><strong className="text-foreground">Natural-language understanding:</strong> LLM parses messy, multi-constraint requests into structured "goal" objects. Example: "I need two lightweight hiking backpacks, under 150 each, delivered to Zurich before next Saturday, not neon colors." → structured fields (category, quantity, budget, deadline, location, color preferences).</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-blue-500">→</span>
+                  <span className="text-primary">→</span>
                   <span><strong className="text-foreground">Clarifying questions:</strong> When constraints conflict (e.g., budget too low for required delivery date), the LLM asks targeted follow-ups instead of failing—leveraging conversational AI while driving toward a structured spec.</span>
                 </li>
               </ul>

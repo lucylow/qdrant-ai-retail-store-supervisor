@@ -20,12 +20,14 @@ import QdrantCollectionsPage from "./QdrantCollections";
 import RoutingOrchestrationPage from "./RoutingOrchestration";
 import AIModelsPage from "./AIModels";
 import MCPToolsPage from "./MCPTools";
+import AdvancedSearchPage from "./AdvancedSearch";
 
 const DASHBOARD_TABS = [
   { id: "overview", label: "Overview" },
   { id: "agents", label: "Agents" },
   { id: "routing", label: "Routing" },
   { id: "models", label: "AI Models" },
+  { id: "search", label: "Advanced Search" },
   { id: "mcp", label: "MCP Tools" },
   { id: "goals", label: "Goals" },
   { id: "episodes", label: "Memory" },
@@ -76,6 +78,9 @@ export default function UnifiedDashboard() {
           </TabsContent>
           <TabsContent value="models" className="mt-0">
             <AIModelsPage />
+          </TabsContent>
+          <TabsContent value="search" className="mt-0">
+            <AdvancedSearchPage />
           </TabsContent>
           <TabsContent value="mcp" className="mt-0">
             <MCPToolsPage />

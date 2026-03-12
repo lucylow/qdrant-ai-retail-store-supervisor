@@ -987,6 +987,7 @@ export default function RAGComparisonPage() {
           <TabsTrigger value="memory">Memory Integration</TabsTrigger>
           <TabsTrigger value="comparison">Traditional vs Agentic</TabsTrigger>
           <TabsTrigger value="visual">Visual RAG</TabsTrigger>
+          <TabsTrigger value="audio">Audio RAG</TabsTrigger>
           <TabsTrigger value="flows">Data Flows</TabsTrigger>
           <TabsTrigger value="agents">Agent Roles</TabsTrigger>
           <TabsTrigger value="metrics">Metrics</TabsTrigger>

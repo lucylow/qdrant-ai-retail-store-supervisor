@@ -87,10 +87,10 @@ export default function LandingPage() {
       </section>
 
       {/* Appropriate & Effective Use of Generative AI */}
-      <section className="py-20 px-6 bg-gradient-to-b from-blue-50/30 via-blue-50/10 to-transparent">
+      <section className="py-20 px-6 bg-muted/50">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-sm font-medium mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-4">
               <Sparkles className="w-3.5 h-3.5" />
               Generative AI Integration
             </div>

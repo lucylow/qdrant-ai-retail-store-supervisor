@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Database, Zap, ArrowRight, Bot, BookOpen, ShoppingBag, BarChart3, Award } from "lucide-react";
+import { Database, Zap, ArrowRight, Bot, BookOpen, ShoppingBag, BarChart3, Award, Sparkles, Brain, ShieldCheck, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FEATURES = [

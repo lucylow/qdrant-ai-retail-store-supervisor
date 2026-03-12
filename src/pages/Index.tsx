@@ -114,7 +114,7 @@ export default function LandingPage() {
               <Link to="/chat">Start Chat <Zap className="w-4 h-4" /></Link>
             </Button>
             <Button variant="outline" className="gap-2" asChild>
-              <Link to="/hackathon"><Award className="w-4 h-4" /> Hackathon Info</Link>
+              <Link to="/dashboard"><BarChart3 className="w-4 h-4" /> Dashboard</Link>
             </Button>
           </div>
         </div>

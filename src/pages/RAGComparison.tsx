@@ -1338,6 +1338,11 @@ export default function RAGComparisonPage() {
           <AudioRAGSection />
         </TabsContent>
 
+        {/* --- Video RAG --- */}
+        <TabsContent value="video" className="space-y-4">
+          <VideoRAGSection />
+        </TabsContent>
+
         {/* --- Comparison Table --- */}
         <TabsContent value="comparison" className="space-y-4">
           <div className="rounded-xl border border-border overflow-hidden">

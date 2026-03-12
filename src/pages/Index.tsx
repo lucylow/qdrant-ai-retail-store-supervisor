@@ -122,20 +122,20 @@ export default function LandingPage() {
             </div>
 
             {/* Inventory Agent: Explanation & Planning */}
-            <div className="rounded-xl border border-blue-200/50 bg-white p-6 shadow-sm">
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <Brain className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Brain className="w-5 h-5 text-primary" />
                 </div>
                 <h3 className="font-semibold text-lg">Inventory Agent: Explanation & Planning</h3>
               </div>
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li className="flex gap-2">
-                  <span className="text-blue-500">→</span>
+                  <span className="text-primary">→</span>
                   <span><strong className="text-foreground">Explanation generation:</strong> Calls real inventory APIs for SKUs, prices, lead times. Then LLM ranks options and explains trade-offs ("Option A is cheaper but arrives 2 days later; Option B costs 15 more but meets your trip date.").</span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-blue-500">→</span>
+                  <span className="text-primary">→</span>
                   <span><strong className="text-foreground">Constraint-aware decisions:</strong> Optimizes for composite objectives (margin, satisfaction, shipping speed), with constraints injected from Qdrant payloads and inventory APIs. The model acts as a planner/explainer, not a black-box optimizer.</span>
                 </li>
               </ul>

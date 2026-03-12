@@ -3,7 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, MessageSquare, Target, BookOpen,
   ShoppingBag, Activity, BarChart3, PlayCircle,
-  Settings, Award, Menu, X, Database, Zap, Layers, Shield, Sparkles, Brain, Cloud, FolderOpen, ShieldCheck, Code2,
+  Settings, Award, Menu, X, Database, Zap, Layers, Shield, Sparkles, Brain, Cloud, FolderOpen, ShieldCheck, Code2, Link2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +27,7 @@ const NAV_ITEMS = [
   { to: "/architecture", label: "Architecture v13 🏗️", icon: Code2 },
   { to: "/rag-comparison", label: "RAG Comparison 🧠", icon: Brain },
   { to: "/semantic-cache", label: "Semantic Cache ⚡", icon: Zap },
+  { to: "/langchain-rag", label: "LangChain RAG 🔗", icon: Link2 },
   { to: "/demo", label: "Demo", icon: PlayCircle },
   { to: "/hackathon", label: "Hackathon", icon: Award },
   { to: "/settings", label: "Settings", icon: Settings },

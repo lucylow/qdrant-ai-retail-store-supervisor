@@ -18,11 +18,13 @@ import ArchitecturePage from "./Architecture";
 import AnomalyDetectionPage from "./AnomalyDetection";
 import QdrantCollectionsPage from "./QdrantCollections";
 import RoutingOrchestrationPage from "./RoutingOrchestration";
+import AIModelsPage from "./AIModels";
 
 const DASHBOARD_TABS = [
   { id: "overview", label: "Overview" },
   { id: "agents", label: "Agents" },
   { id: "routing", label: "Routing" },
+  { id: "models", label: "AI Models" },
   { id: "goals", label: "Goals" },
   { id: "episodes", label: "Memory" },
   { id: "products", label: "Products" },

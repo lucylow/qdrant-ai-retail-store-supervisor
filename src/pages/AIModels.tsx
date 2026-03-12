@@ -9,7 +9,9 @@ import {
   Brain, Cpu, Zap, DollarSign, Globe, Layers, ArrowRight,
   CheckCircle2, XCircle, Clock, BarChart3, Shield, Users,
   Database, Target, Activity, Sparkles, Server, Mic,
-  Volume2, Package, Terminal, Star, Eye,
+  Volume2, Package, Terminal, Star, Eye, GitBranch,
+  Workflow, Image, MessageSquare, Box, Gauge, HardDrive,
+  Network, Play, Code2, Settings2, Boxes, Search,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */

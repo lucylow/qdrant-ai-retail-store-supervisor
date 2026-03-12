@@ -16,6 +16,7 @@ import AgenticAIPage from "./AgenticAI";
 import AIAnalyticsPage from "./AIAnalytics";
 import ArchitecturePage from "./Architecture";
 import AnomalyDetectionPage from "./AnomalyDetection";
+import QdrantCollectionsPage from "./QdrantCollections";
 
 const DASHBOARD_TABS = [
   { id: "overview", label: "Overview" },
@@ -25,6 +26,7 @@ const DASHBOARD_TABS = [
   { id: "products", label: "Products" },
   { id: "metrics", label: "Metrics" },
   { id: "qdrant", label: "Qdrant" },
+  { id: "collections", label: "Collections" },
   { id: "analytics", label: "Analytics" },
   { id: "anomaly", label: "Anomaly Detection" },
   { id: "rag", label: "RAG" },

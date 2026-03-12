@@ -18,11 +18,13 @@ import ArchitecturePage from "./Architecture";
 import AnomalyDetectionPage from "./AnomalyDetection";
 import QdrantCollectionsPage from "./QdrantCollections";
 import RoutingOrchestrationPage from "./RoutingOrchestration";
+import AIModelsPage from "./AIModels";
 
 const DASHBOARD_TABS = [
   { id: "overview", label: "Overview" },
   { id: "agents", label: "Agents" },
   { id: "routing", label: "Routing" },
+  { id: "models", label: "AI Models" },
   { id: "goals", label: "Goals" },
   { id: "episodes", label: "Memory" },
   { id: "products", label: "Products" },
@@ -69,6 +71,9 @@ export default function UnifiedDashboard() {
           </TabsContent>
           <TabsContent value="routing" className="mt-0">
             <RoutingOrchestrationPage />
+          </TabsContent>
+          <TabsContent value="models" className="mt-0">
+            <AIModelsPage />
           </TabsContent>
           <TabsContent value="goals" className="mt-0">
             <GoalsPage />

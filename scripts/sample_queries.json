@@ -1,0 +1,10 @@
+[
+  {
+    "query": "What's the return policy for tent TENT_221?",
+    "gold_docs": [],
+    "user": {
+      "region": "Zurich"
+    }
+  }
+]
+

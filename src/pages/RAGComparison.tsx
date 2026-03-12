@@ -5,7 +5,8 @@ import {
   ShieldCheck, BarChart3, GitBranch, MessageSquare,
   Search, Package, Server, Activity, Eye, RefreshCw,
   Shield, TrendingUp, Clock, User, ImageIcon, Upload,
-  Camera, ScanEye, Palette, Sparkles,
+  Camera, ScanEye, Palette, Sparkles, Mic, Volume2,
+  Globe, AudioLines, Radio, Headphones,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

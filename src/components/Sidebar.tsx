@@ -25,6 +25,7 @@ const NAV_ITEMS = [
   { to: "/datasets", label: "Datasets v11 📊", icon: FolderOpen },
   { to: "/gdpr", label: "GDPR v12 🇪🇺", icon: ShieldCheck },
   { to: "/architecture", label: "Architecture v13 🏗️", icon: Code2 },
+  { to: "/rag-comparison", label: "RAG Comparison 🧠", icon: Brain },
   { to: "/demo", label: "Demo", icon: PlayCircle },
   { to: "/hackathon", label: "Hackathon", icon: Award },
   { to: "/settings", label: "Settings", icon: Settings },

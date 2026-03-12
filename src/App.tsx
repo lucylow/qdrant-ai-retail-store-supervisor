@@ -67,6 +67,7 @@ const App = () => (
             <Route path="/datasets" element={<DatasetsPage />} />
             <Route path="/gdpr" element={<GDPRPage />} />
             <Route path="/architecture" element={<ArchitecturePage />} />
+            <Route path="/rag-comparison" element={<RAGComparisonPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />

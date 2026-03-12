@@ -25,6 +25,7 @@ import QdrantCloudPage from "./pages/QdrantCloud";
 import DatasetsPage from "./pages/Datasets";
 import GDPRPage from "./pages/GDPR";
 import ArchitecturePage from "./pages/Architecture";
+import RAGComparisonPage from "./pages/RAGComparison";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -66,6 +67,7 @@ const App = () => (
             <Route path="/datasets" element={<DatasetsPage />} />
             <Route path="/gdpr" element={<GDPRPage />} />
             <Route path="/architecture" element={<ArchitecturePage />} />
+            <Route path="/rag-comparison" element={<RAGComparisonPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />

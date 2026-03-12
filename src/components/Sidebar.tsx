@@ -27,6 +27,7 @@ const NAV_ITEMS = [
   { to: "/architecture", label: "Architecture v13 🏗️", icon: Code2 },
   { to: "/rag-comparison", label: "RAG Comparison 🧠", icon: Brain },
   { to: "/semantic-cache", label: "Semantic Cache ⚡", icon: Zap },
+  { to: "/langchain-rag", label: "LangChain RAG 🔗", icon: Link2 },
   { to: "/demo", label: "Demo", icon: PlayCircle },
   { to: "/hackathon", label: "Hackathon", icon: Award },
   { to: "/settings", label: "Settings", icon: Settings },

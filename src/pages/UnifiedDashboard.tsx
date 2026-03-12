@@ -72,6 +72,9 @@ export default function UnifiedDashboard() {
           <TabsContent value="routing" className="mt-0">
             <RoutingOrchestrationPage />
           </TabsContent>
+          <TabsContent value="models" className="mt-0">
+            <AIModelsPage />
+          </TabsContent>
           <TabsContent value="goals" className="mt-0">
             <GoalsPage />
           </TabsContent>

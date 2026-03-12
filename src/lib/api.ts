@@ -55,6 +55,7 @@ export type Solution = {
 
 export type Product = {
   id?: string;
+  sku?: string;
   name?: string;
   title?: string;
   description?: string;
@@ -62,6 +63,14 @@ export type Product = {
   image_url?: string;
   category?: string;
   score?: number;
+  stock?: number;
+  stock_status?: "in_stock" | "low_stock" | "out_of_stock";
+  shipping_zone?: "CH" | "EU" | "WORLD";
+  brand?: string;
+  rating?: number;
+  reviews_count?: number;
+  shipping_days?: number;
+  updated_at?: string;
 };
 
 export type Episode = {
@@ -127,12 +136,18 @@ export const MOCK_EPISODES: Episode[] = [
 ];
 
 export const MOCK_PRODUCTS: Product[] = [
-  { id: "p1", name: "MSR Hubba Hubba NX 2", description: "2-person backpacking tent, 1.72kg", price: 189, category: "Tents" },
-  { id: "p2", name: "Big Agnes Copper Spur HV UL2", description: "Ultralight 2-person tent", price: 249, category: "Tents" },
-  { id: "p3", name: "Salomon X Ultra 4 GTX", description: "Men's hiking shoes, Gore-Tex", price: 179, category: "Footwear" },
-  { id: "p4", name: "MSR PocketRocket 2", description: "Ultralight backpacking stove", price: 49, category: "Cooking" },
-  { id: "p5", name: "Sea to Summit Spark SP1", description: "Sleeping bag, comfort -3°C", price: 239, category: "Sleeping" },
-  { id: "p6", name: "Black Diamond Distance FLZ", description: "Carbon trekking poles, pair", price: 169, category: "Poles" },
+  { id: "p1", sku: "TENT-001", name: "MSR Hubba Hubba NX 2", description: "2-person backpacking tent, 1.72kg, freestanding", price: 189, category: "Tents", stock: 47, stock_status: "in_stock", shipping_zone: "CH", brand: "MSR", rating: 4.7, reviews_count: 1284, shipping_days: 2 },
+  { id: "p2", sku: "TENT-002", name: "Big Agnes Copper Spur HV UL2", description: "Ultralight 2-person tent, 1.13kg, 3-season", price: 249, category: "Tents", stock: 12, stock_status: "in_stock", shipping_zone: "CH", brand: "Big Agnes", rating: 4.8, reviews_count: 892, shipping_days: 2 },
+  { id: "p3", sku: "FOOT-001", name: "Salomon X Ultra 4 GTX", description: "Men's hiking shoes, Gore-Tex waterproof", price: 179, category: "Footwear", stock: 34, stock_status: "in_stock", shipping_zone: "CH", brand: "Salomon", rating: 4.6, reviews_count: 2341, shipping_days: 1 },
+  { id: "p4", sku: "COOK-001", name: "MSR PocketRocket 2", description: "Ultralight backpacking stove, 73g", price: 49, category: "Cooking", stock: 89, stock_status: "in_stock", shipping_zone: "EU", brand: "MSR", rating: 4.9, reviews_count: 3102, shipping_days: 3 },
+  { id: "p5", sku: "SLEEP-001", name: "Sea to Summit Spark SP1", description: "Sleeping bag, comfort -3°C, 850+ down", price: 239, category: "Sleeping", stock: 5, stock_status: "low_stock", shipping_zone: "CH", brand: "Sea to Summit", rating: 4.5, reviews_count: 567, shipping_days: 2 },
+  { id: "p6", sku: "POLE-001", name: "Black Diamond Distance FLZ", description: "Carbon trekking poles, 3-section, pair", price: 169, category: "Poles", stock: 0, stock_status: "out_of_stock", shipping_zone: "CH", brand: "Black Diamond", rating: 4.4, reviews_count: 891, shipping_days: 5 },
+  { id: "p7", sku: "TENT-003", name: "REI Co-op Kingdom 2", description: "2-person camping tent, spacious, easy setup", price: 198, category: "Tents", stock: 23, stock_status: "in_stock", shipping_zone: "CH", brand: "REI", rating: 4.6, reviews_count: 1567, shipping_days: 2 },
+  { id: "p8", sku: "CLOTH-001", name: "Patagonia Nano Puff", description: "Insulated jacket, PrimaLoft, packable", price: 229, category: "Clothing", stock: 67, stock_status: "in_stock", shipping_zone: "EU", brand: "Patagonia", rating: 4.8, reviews_count: 4521, shipping_days: 3 },
+  { id: "p9", sku: "SLEEP-002", name: "Marmot Trestles Elite 15", description: "Sleeping bag, comfort -9°C, synthetic", price: 159, category: "Sleeping", stock: 8, stock_status: "low_stock", shipping_zone: "CH", brand: "Marmot", rating: 4.3, reviews_count: 723, shipping_days: 2 },
+  { id: "p10", sku: "FOOT-002", name: "La Sportiva TX4", description: "Approach shoes, Vibram sole, leather", price: 165, category: "Footwear", stock: 41, stock_status: "in_stock", shipping_zone: "CH", brand: "La Sportiva", rating: 4.7, reviews_count: 1102, shipping_days: 1 },
+  { id: "p11", sku: "COOK-002", name: "Jetboil Flash", description: "Integrated cooking system, 1L, rapid boil", price: 119, category: "Cooking", stock: 56, stock_status: "in_stock", shipping_zone: "CH", brand: "Jetboil", rating: 4.6, reviews_count: 2890, shipping_days: 2 },
+  { id: "p12", sku: "TENT-004", name: "Marmot Tungsten 2P", description: "2-person tent, DAC press-fit poles, waterproof", price: 219, category: "Tents", stock: 3, stock_status: "low_stock", shipping_zone: "EU", brand: "Marmot", rating: 4.2, reviews_count: 445, shipping_days: 4 },
 ];
 
 // ─── Backend health singleton (prevents hammering dead endpoint) ──────────────

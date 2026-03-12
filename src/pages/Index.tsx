@@ -102,10 +102,10 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             {/* Shopper Agent: Understanding & Structuring */}
-            <div className="rounded-xl border border-blue-200/50 bg-white p-6 shadow-sm">
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                  <MessageSquare className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <MessageSquare className="w-5 h-5 text-primary" />
                 </div>
                 <h3 className="font-semibold text-lg">Shopper Agent: Understanding & Structuring</h3>
               </div>

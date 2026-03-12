@@ -15,6 +15,7 @@ import LangChainRAGPage from "./LangChainRAG";
 import AgenticAIPage from "./AgenticAI";
 import AIAnalyticsPage from "./AIAnalytics";
 import ArchitecturePage from "./Architecture";
+import AnomalyDetectionPage from "./AnomalyDetection";
 
 const DASHBOARD_TABS = [
   { id: "overview", label: "Overview" },
@@ -25,6 +26,7 @@ const DASHBOARD_TABS = [
   { id: "metrics", label: "Metrics" },
   { id: "qdrant", label: "Qdrant" },
   { id: "analytics", label: "Analytics" },
+  { id: "anomaly", label: "Anomaly Detection" },
   { id: "rag", label: "RAG" },
   { id: "cache", label: "Cache" },
   { id: "langchain", label: "LangChain" },

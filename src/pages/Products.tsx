@@ -1132,11 +1132,3 @@ async def ingest_catalog():
     </div>
   );
 }
-        client.upsert("products", points)`}</pre>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-}

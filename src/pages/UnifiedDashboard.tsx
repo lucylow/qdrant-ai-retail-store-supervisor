@@ -77,6 +77,9 @@ export default function UnifiedDashboard() {
           <TabsContent value="models" className="mt-0">
             <AIModelsPage />
           </TabsContent>
+          <TabsContent value="mcp" className="mt-0">
+            <MCPToolsPage />
+          </TabsContent>
           <TabsContent value="goals" className="mt-0">
             <GoalsPage />
           </TabsContent>

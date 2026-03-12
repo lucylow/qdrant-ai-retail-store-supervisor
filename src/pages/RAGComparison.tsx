@@ -4,7 +4,8 @@ import {
   CheckCircle2, XCircle, RotateCcw, Layers, BookOpen,
   ShieldCheck, BarChart3, GitBranch, MessageSquare,
   Search, Package, Server, Activity, Eye, RefreshCw,
-  Shield, TrendingUp, Clock, User,
+  Shield, TrendingUp, Clock, User, ImageIcon, Upload,
+  Camera, ScanEye, Palette, Sparkles,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

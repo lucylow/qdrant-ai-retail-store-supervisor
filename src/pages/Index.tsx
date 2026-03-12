@@ -183,7 +183,7 @@ export default function LandingPage() {
           </div>
 
           {/* Summary Quote */}
-          <div className="rounded-xl bg-gradient-to-r from-primary/10 to-blue-100/50 p-6 border border-primary/20">
+          <div className="rounded-xl bg-gradient-to-r from-primary/10 to-muted p-6 border border-primary/20">
             <blockquote className="text-sm text-foreground leading-relaxed">
               "We use LLMs where human-like understanding is needed: the Shopper Agent turns messy natural language into structured goals and asks clarifying questions when constraints conflict. The Inventory Agent uses GenAI to synthesize explanations and trade-offs from hard inventory data. Qdrant provides retrieval-augmented memory—before planning, the Inventory Agent fetches similar successful episodes and feeds them into the LLM, so generative decisions are grounded in what has historically worked. Critical business logic—stock checks, pricing, shipping feasibility—remains deterministic. GenAI never overrides those systems; it orchestrates and explains them. This division of labor makes the generative component both appropriate and reliable."
             </blockquote>

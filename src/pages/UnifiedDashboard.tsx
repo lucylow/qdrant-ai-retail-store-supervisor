@@ -80,6 +80,9 @@ export default function UnifiedDashboard() {
           <TabsContent value="qdrant" className="mt-0">
             <QdrantPage />
           </TabsContent>
+          <TabsContent value="collections" className="mt-0">
+            <QdrantCollectionsPage />
+          </TabsContent>
           <TabsContent value="analytics" className="mt-0">
             <AIAnalyticsPage />
           </TabsContent>

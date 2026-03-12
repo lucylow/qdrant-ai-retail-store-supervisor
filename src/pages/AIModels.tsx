@@ -732,8 +732,9 @@ export default function AIModels() {
         </p>
       </div>
 
-      <Tabs defaultValue="selection" className="space-y-4">
+      <Tabs defaultValue="hf" className="space-y-4">
         <TabsList className="bg-muted/50 h-auto flex-wrap gap-1">
+          <TabsTrigger value="hf" className="text-xs gap-1"><Sparkles className="h-3 w-3" /> HF Stack</TabsTrigger>
           <TabsTrigger value="selection" className="text-xs gap-1"><Cpu className="h-3 w-3" /> Model Selection</TabsTrigger>
           <TabsTrigger value="routing" className="text-xs gap-1"><Layers className="h-3 w-3" /> Routing Matrix</TabsTrigger>
           <TabsTrigger value="embeddings" className="text-xs gap-1"><Globe className="h-3 w-3" /> Embeddings</TabsTrigger>
@@ -742,6 +743,7 @@ export default function AIModels() {
           <TabsTrigger value="cost" className="text-xs gap-1"><DollarSign className="h-3 w-3" /> Cost & Fallbacks</TabsTrigger>
         </TabsList>
 
+        <TabsContent value="hf"><HFStackTab /></TabsContent>
         <TabsContent value="selection"><ModelSelectionTab /></TabsContent>
         <TabsContent value="routing"><RoutingMatrixTab /></TabsContent>
         <TabsContent value="embeddings"><EmbeddingsTab /></TabsContent>

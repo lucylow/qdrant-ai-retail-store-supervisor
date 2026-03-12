@@ -29,6 +29,7 @@ const NAV_ITEMS = [
   { to: "/semantic-cache", label: "Semantic Cache ⚡", icon: Zap },
   { to: "/langchain-rag", label: "LangChain RAG 🔗", icon: Link2 },
   { to: "/agentic-ai", label: "Agentic AI 🧩", icon: Network },
+  { to: "/ai-analytics", label: "AI Analytics 📊", icon: BarChart3 },
   { to: "/demo", label: "Demo", icon: PlayCircle },
   { to: "/hackathon", label: "Hackathon", icon: Award },
   { to: "/settings", label: "Settings", icon: Settings },

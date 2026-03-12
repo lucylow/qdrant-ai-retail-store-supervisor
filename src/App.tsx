@@ -69,6 +69,7 @@ const App = () => (
             <Route path="/gdpr" element={<GDPRPage />} />
             <Route path="/architecture" element={<ArchitecturePage />} />
             <Route path="/rag-comparison" element={<RAGComparisonPage />} />
+            <Route path="/semantic-cache" element={<SemanticCachePage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />

@@ -5,31 +5,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Layout } from "@/components/Layout";
 import Index from "./pages/Index";
-import DashboardPage from "./pages/Dashboard";
 import ChatPage from "./pages/Chat";
-import GoalsPage from "./pages/Goals";
-import EpisodesPage from "./pages/Episodes";
-import ProductsPage from "./pages/Products";
-import AgentsPage from "./pages/Agents";
-import MetricsPage from "./pages/Metrics";
-import ScalePage from "./pages/Scale";
-import QdrantPage from "./pages/Qdrant";
-import DemoPage from "./pages/Demo";
-import HackathonPage from "./pages/Hackathon";
-import SettingsPage from "./pages/Settings";
-import SolutionsPage from "./pages/Solutions";
-import EnterprisePage from "./pages/Enterprise";
-import GenAIPage from "./pages/GenAI";
-import EvolvePage from "./pages/Evolve";
-import QdrantCloudPage from "./pages/QdrantCloud";
-import DatasetsPage from "./pages/Datasets";
-import GDPRPage from "./pages/GDPR";
-import ArchitecturePage from "./pages/Architecture";
-import RAGComparisonPage from "./pages/RAGComparison";
-import SemanticCachePage from "./pages/SemanticCache";
-import LangChainRAGPage from "./pages/LangChainRAG";
-import AgenticAIPage from "./pages/AgenticAI";
-import AIAnalyticsPage from "./pages/AIAnalytics";
+import UnifiedDashboard from "./pages/UnifiedDashboard";
+import UnifiedSettings from "./pages/UnifiedSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -51,32 +29,9 @@ const App = () => (
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Index />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/chat" element={<ChatPage />} />
-            <Route path="/goals" element={<GoalsPage />} />
-            <Route path="/solutions/:goalId" element={<SolutionsPage />} />
-            <Route path="/solutions" element={<SolutionsPage />} />
-            <Route path="/episodes" element={<EpisodesPage />} />
-            <Route path="/products" element={<ProductsPage />} />
-            <Route path="/agents" element={<AgentsPage />} />
-            <Route path="/metrics" element={<MetricsPage />} />
-            <Route path="/scale" element={<ScalePage />} />
-            <Route path="/qdrant" element={<QdrantPage />} />
-            <Route path="/demo" element={<DemoPage />} />
-            <Route path="/hackathon" element={<HackathonPage />} />
-            <Route path="/enterprise" element={<EnterprisePage />} />
-            <Route path="/genai" element={<GenAIPage />} />
-            <Route path="/evolve" element={<EvolvePage />} />
-            <Route path="/qdrant-cloud" element={<QdrantCloudPage />} />
-            <Route path="/datasets" element={<DatasetsPage />} />
-            <Route path="/gdpr" element={<GDPRPage />} />
-            <Route path="/architecture" element={<ArchitecturePage />} />
-            <Route path="/rag-comparison" element={<RAGComparisonPage />} />
-            <Route path="/semantic-cache" element={<SemanticCachePage />} />
-            <Route path="/langchain-rag" element={<LangChainRAGPage />} />
-            <Route path="/agentic-ai" element={<AgenticAIPage />} />
-            <Route path="/ai-analytics" element={<AIAnalyticsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/dashboard" element={<UnifiedDashboard />} />
+            <Route path="/settings" element={<UnifiedSettings />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

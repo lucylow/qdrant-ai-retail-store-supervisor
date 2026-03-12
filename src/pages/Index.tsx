@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Database, Zap, ArrowRight, Bot, BookOpen, ShoppingBag, BarChart3, Award } from "lucide-react";
+import { Database, Zap, ArrowRight, Bot, BookOpen, ShoppingBag, BarChart3, Award, Sparkles, Brain, ShieldCheck, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const FEATURES = [
@@ -83,6 +83,112 @@ export default function LandingPage() {
               <div className="text-sm text-muted-foreground mt-1">{label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Appropriate & Effective Use of Generative AI */}
+      <section className="py-20 px-6 bg-muted/50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-4">
+              <Sparkles className="w-3.5 h-3.5" />
+              Generative AI Integration
+            </div>
+            <h2 className="text-3xl font-bold">🎯 Appropriate & Effective Use of Generative AI</h2>
+            <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
+              We deploy LLMs only where they add unique value—language understanding, explanation, and planning—while keeping core business logic deterministic and grounded in real data.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            {/* Shopper Agent: Understanding & Structuring */}
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <MessageSquare className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="font-semibold text-lg">Shopper Agent: Understanding & Structuring</h3>
+              </div>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li className="flex gap-2">
+                  <span className="text-primary">→</span>
+                  <span><strong className="text-foreground">Natural-language understanding:</strong> LLM parses messy, multi-constraint requests into structured "goal" objects. Example: "I need two lightweight hiking backpacks, under 150 each, delivered to Zurich before next Saturday, not neon colors." → structured fields (category, quantity, budget, deadline, location, color preferences).</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-primary">→</span>
+                  <span><strong className="text-foreground">Clarifying questions:</strong> When constraints conflict (e.g., budget too low for required delivery date), the LLM asks targeted follow-ups instead of failing—leveraging conversational AI while driving toward a structured spec.</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Inventory Agent: Explanation & Planning */}
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Brain className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="font-semibold text-lg">Inventory Agent: Explanation & Planning</h3>
+              </div>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li className="flex gap-2">
+                  <span className="text-primary">→</span>
+                  <span><strong className="text-foreground">Explanation generation:</strong> Calls real inventory APIs for SKUs, prices, lead times. Then LLM ranks options and explains trade-offs ("Option A is cheaper but arrives 2 days later; Option B costs 15 more but meets your trip date.").</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-primary">→</span>
+                  <span><strong className="text-foreground">Constraint-aware decisions:</strong> Optimizes for composite objectives (margin, satisfaction, shipping speed), with constraints injected from Qdrant payloads and inventory APIs. The model acts as a planner/explainer, not a black-box optimizer.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* GenAI ↔ Qdrant Interaction */}
+          <div className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-muted p-6 mb-8">
+            <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+              <Database className="w-5 h-5 text-primary" />
+              GenAI ↔ Qdrant: Retrieval-Augmented Reasoning
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-6 text-sm">
+              <div>
+                <h4 className="font-medium text-foreground mb-2">📥 Turning generative outputs into memory</h4>
+                <p className="text-muted-foreground">
+                  User goals, solution summaries, and outcomes are embedded and stored in Qdrant. Each "episode" pairs goal_text + solution_summary + outcome—creating a long-term, searchable memory of what worked.
+                </p>
+              </div>
+              <div>
+                <h4 className="font-medium text-foreground mb-2">🔍 Retrieval-augmented generation</h4>
+                <p className="text-muted-foreground">
+                  Before proposing a bundle, Inventory Agent retrieves similar past goal–solution pairs from Qdrant and feeds them into the LLM prompt—grounding the model in prior successes, avoiding hallucinated strategies.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Guardrails */}
+          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-6 mb-8">
+            <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-destructive" />
+              Guardrails: Where We Don't Use GenAI
+            </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Critical business logic remains deterministic—ensuring reliability: GenAI handles fuzzy language and high-level planning; deterministic systems enforce business rules.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {["Stock availability", "Exact prices", "Shipping constraints", "Structured goal validation", "Qdrant payload updates"].map((item) => (
+                <span key={item} className="text-xs px-3 py-1.5 rounded-full bg-background border border-border text-foreground">
+                  ✓ {item}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Summary Quote */}
+          <div className="rounded-xl bg-gradient-to-r from-primary/10 to-muted p-6 border border-primary/20">
+            <blockquote className="text-sm text-foreground leading-relaxed">
+              "We use LLMs where human-like understanding is needed: the Shopper Agent turns messy natural language into structured goals and asks clarifying questions when constraints conflict. The Inventory Agent uses GenAI to synthesize explanations and trade-offs from hard inventory data. Qdrant provides retrieval-augmented memory—before planning, the Inventory Agent fetches similar successful episodes and feeds them into the LLM, so generative decisions are grounded in what has historically worked. Critical business logic—stock checks, pricing, shipping feasibility—remains deterministic. GenAI never overrides those systems; it orchestrates and explains them. This division of labor makes the generative component both appropriate and reliable."
+            </blockquote>
+            <p className="text-xs text-muted-foreground mt-3">— Appropriate & Effective Use of GenAI</p>
+          </div>
         </div>
       </section>
 

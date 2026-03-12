@@ -709,7 +709,421 @@ bundle = llm.generate(prompt, tools=[inventory_api, pricing_engine])`}
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* ─── Human-in-the-Loop ─── */}
+        <TabsContent value="hitl" className="space-y-6">
+          <HITLSection />
+        </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+// ─── HITL Data ────────────────────────────────────────────────────────────────
+
+const HITL_TRIGGERS = [
+  { trigger: "Low Confidence Bundle", desc: "Inventory Agent proposes bundles with <80% confidence score", icon: AlertTriangle, threshold: "<0.80", frequency: "~12% of goals" },
+  { trigger: "Ambiguous Goal", desc: "Shopper Agent detects conflicting constraints (e.g., budget vs. delivery speed)", icon: MessageSquare, threshold: "conflict_score > 0.6", frequency: "~8% of goals" },
+  { trigger: "High-Margin Order", desc: "Orders above margin threshold requiring pricing approval from merchant", icon: TrendingUp, threshold: "margin > 40%", frequency: "~5% of goals" },
+  { trigger: "No Episodic Match", desc: "No similar successful episodes found in goal_solution_links collection", icon: Brain, threshold: "similarity < 0.5", frequency: "~15% of goals" },
+  { trigger: "Stock Conflict", desc: "Reservation race condition or partial stock availability across warehouses", icon: Package, threshold: "stock_risk > 0.7", frequency: "~3% of goals" },
+  { trigger: "New Category", desc: "Goal maps to a category with fewer than 5 historical episodes", icon: Database, threshold: "episode_count < 5", frequency: "~6% of goals" },
+];
+
+type ReviewItem = {
+  id: string;
+  goalText: string;
+  userId: string;
+  region: string;
+  trigger: string;
+  confidence: number;
+  proposals: { sku: string; name: string; price: number; match: number }[];
+  status: "pending" | "approved" | "rejected" | "edited";
+  timestamp: string;
+  agentNotes: string;
+};
+
+const MOCK_REVIEW_QUEUE: ReviewItem[] = [
+  {
+    id: "goal-8821", goalText: "2-person tent under 200CHF, Zurich by Friday", userId: "user_7832",
+    region: "Zurich", trigger: "Low Confidence", confidence: 0.67,
+    proposals: [
+      { sku: "TENT-MSR-NX2", name: "MSR Hubba Hubba NX2", price: 178, match: 92 },
+      { sku: "TENT-NF-STORM", name: "NorthFace Stormbreak 2", price: 199, match: 91 },
+      { sku: "TENT-BIG-COP", name: "Big Agnes Copper Spur", price: 195, match: 85 },
+    ],
+    status: "pending", timestamp: "14:32:01",
+    agentNotes: "Bundle confidence below threshold (0.67 < 0.80). Two products near budget ceiling. No strong episodic match for Zurich + Friday deadline combo.",
+  },
+  {
+    id: "goal-8834", goalText: "Premium sleeping bag for -20°C Alpine expedition", userId: "user_2190",
+    region: "Bern", trigger: "High Margin", confidence: 0.89,
+    proposals: [
+      { sku: "BAG-WM-KODIAK", name: "Western Mountaineering Kodiak", price: 589, match: 96 },
+      { sku: "BAG-FF-SNOW", name: "Feathered Friends Snowbunting", price: 549, match: 94 },
+    ],
+    status: "pending", timestamp: "14:28:45",
+    agentNotes: "High-margin order (52% margin). Confidence is good but requires merchant pricing approval per policy.",
+  },
+  {
+    id: "goal-8847", goalText: "Camping stove that works above 3000m, budget flexible", userId: "user_4401",
+    region: "Geneva", trigger: "No Episodes", confidence: 0.52,
+    proposals: [
+      { sku: "STOVE-MSR-WLI", name: "MSR WhisperLite International", price: 129, match: 78 },
+      { sku: "STOVE-JB-FLASH", name: "Jetboil Flash", price: 109, match: 71 },
+    ],
+    status: "pending", timestamp: "14:25:12",
+    agentNotes: "No successful episodes found for high-altitude stove queries. Category has only 2 historical episodes. Agent cannot rank with confidence.",
+  },
+];
+
+const HITL_FLOW_STEPS = [
+  { step: 1, label: "Agent Detects Trigger", desc: "Inventory or Shopper agent identifies a condition requiring human review", icon: AlertTriangle, color: "text-status-warning" },
+  { step: 2, label: "Status → pending_human_review", desc: "Goal status updated in Qdrant goals collection via set_payload", icon: Database, color: "text-accent" },
+  { step: 3, label: "Dashboard Polls Queue", desc: "Merchant dashboard scrolls goals with status='pending_human_review'", icon: Search, color: "text-primary" },
+  { step: 4, label: "Merchant Reviews", desc: "Human approves, rejects, or edits proposed bundles with optional feedback", icon: UserCheck, color: "text-status-info" },
+  { step: 5, label: "Outcome Stored", desc: "Decision + feedback written to goal_solution_links as episodic memory", icon: Brain, color: "text-status-online" },
+  { step: 6, label: "Agent Learns", desc: "Future similar goals use this episode — HITL decisions improve agent confidence over time", icon: TrendingUp, color: "text-primary" },
+];
+
+const HITL_METRICS = [
+  { metric: "Review Queue Depth", value: "3", target: "<10", status: "good" },
+  { metric: "Avg Review Time", value: "45s", target: "<120s", status: "good" },
+  { metric: "Approval Rate", value: "72%", target: ">60%", status: "good" },
+  { metric: "Edit Rate", value: "18%", target: "<25%", status: "good" },
+  { metric: "Rejection Rate", value: "10%", target: "<15%", status: "good" },
+  { metric: "Learning Impact", value: "+23%", target: ">15%", status: "good" },
+  { metric: "Auto-Resolve After HITL", value: "89%", target: ">80%", status: "good" },
+  { metric: "Escalation Rate", value: "8.2%", target: "<12%", status: "good" },
+];
+
+// ─── HITL Component ──────────────────────────────────────────────────────────
+
+function HITLSection() {
+  const [reviewQueue, setReviewQueue] = useState<ReviewItem[]>(MOCK_REVIEW_QUEUE);
+  const [selectedItem, setSelectedItem] = useState<ReviewItem | null>(null);
+  const [feedback, setFeedback] = useState("");
+  const [flowStep, setFlowStep] = useState<number | null>(null);
+  const [simRunning, setSimRunning] = useState(false);
+
+  const handleAction = (id: string, action: "approved" | "rejected" | "edited") => {
+    setReviewQueue(prev => prev.map(item =>
+      item.id === id ? { ...item, status: action } : item
+    ));
+    setSelectedItem(null);
+    setFeedback("");
+  };
+
+  const runFlowSim = useCallback(async () => {
+    setSimRunning(true);
+    setFlowStep(null);
+    for (let i = 0; i < HITL_FLOW_STEPS.length; i++) {
+      await new Promise(r => setTimeout(r, 700));
+      setFlowStep(i);
+    }
+    setSimRunning(false);
+  }, []);
+
+  const pendingCount = reviewQueue.filter(r => r.status === "pending").length;
+  const resolvedCount = reviewQueue.filter(r => r.status !== "pending").length;
+
+  return (
+    <div className="space-y-6">
+      {/* Header stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <Card className="border-border">
+          <CardContent className="p-4 text-center">
+            <UserCheck className="h-5 w-5 mx-auto text-primary mb-1" />
+            <div className="text-2xl font-bold">{pendingCount}</div>
+            <div className="text-xs text-muted-foreground">Pending Review</div>
+          </CardContent>
+        </Card>
+        <Card className="border-border">
+          <CardContent className="p-4 text-center">
+            <CheckCircle className="h-5 w-5 mx-auto text-status-online mb-1" />
+            <div className="text-2xl font-bold">{resolvedCount}</div>
+            <div className="text-xs text-muted-foreground">Resolved</div>
+          </CardContent>
+        </Card>
+        <Card className="border-border">
+          <CardContent className="p-4 text-center">
+            <Clock className="h-5 w-5 mx-auto text-status-warning mb-1" />
+            <div className="text-2xl font-bold">45s</div>
+            <div className="text-xs text-muted-foreground">Avg Review Time</div>
+          </CardContent>
+        </Card>
+        <Card className="border-border">
+          <CardContent className="p-4 text-center">
+            <TrendingUp className="h-5 w-5 mx-auto text-accent mb-1" />
+            <div className="text-2xl font-bold">+23%</div>
+            <div className="text-xs text-muted-foreground">Learning Impact</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* HITL Flow Diagram */}
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <RotateCcw className="h-4 w-4 text-primary" />
+              HITL Workflow — Agent → Human → Learning Loop
+            </CardTitle>
+            <Button size="sm" variant="outline" onClick={runFlowSim} disabled={simRunning}>
+              {simRunning ? <><Activity className="h-3 w-3 animate-pulse mr-1" /> Simulating…</> : <><Zap className="h-3 w-3 mr-1" /> Simulate Flow</>}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {HITL_FLOW_STEPS.map((step, i) => {
+              const active = flowStep !== null && flowStep >= i;
+              const current = flowStep === i;
+              const Icon = step.icon;
+              return (
+                <div key={i} className={cn(
+                  "rounded-lg border p-3 text-center transition-all duration-300 space-y-1",
+                  current ? "border-primary/50 bg-primary/10 scale-[1.03] shadow-md" :
+                  active ? "border-status-online/30 bg-status-online/5" :
+                  "border-border bg-muted/20"
+                )}>
+                  <div className="text-xs text-muted-foreground font-mono">Step {step.step}</div>
+                  <Icon className={cn("h-5 w-5 mx-auto", active ? step.color : "text-muted-foreground")} />
+                  <div className="text-xs font-semibold">{step.label}</div>
+                  <div className="text-[10px] text-muted-foreground leading-tight">{step.desc}</div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-4 rounded-lg bg-muted/30 border border-border p-3 text-center">
+            <p className="text-xs text-muted-foreground italic">
+              "Every human decision becomes episodic memory — agents learn from merchant expertise and reduce escalation rate over time."
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Trigger conditions */}
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-status-warning" />
+            HITL Trigger Conditions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {HITL_TRIGGERS.map((t, i) => {
+              const Icon = t.icon;
+              return (
+                <div key={i} className="rounded-lg border border-border bg-muted/20 p-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-4 w-4 text-status-warning shrink-0" />
+                    <span className="text-sm font-semibold">{t.trigger}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{t.desc}</p>
+                  <div className="flex items-center justify-between text-[10px]">
+                    <Badge variant="outline" className="font-mono text-[10px]">{t.threshold}</Badge>
+                    <span className="text-muted-foreground">{t.frequency}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Review Queue */}
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Eye className="h-4 w-4 text-primary" />
+            Merchant Review Queue
+            <Badge variant="secondary" className="text-[10px] ml-2">{pendingCount} pending</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {reviewQueue.map((item) => (
+            <div key={item.id} className={cn(
+              "rounded-lg border p-4 transition-all",
+              item.status === "approved" ? "border-status-online/30 bg-status-online/5" :
+              item.status === "rejected" ? "border-status-error/30 bg-status-error/5" :
+              item.status === "edited" ? "border-status-info/30 bg-status-info/5" :
+              "border-border bg-muted/10 hover:border-primary/30"
+            )}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1 space-y-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge variant="outline" className="text-[10px] font-mono">{item.id}</Badge>
+                    <Badge variant="secondary" className="text-[10px]">{item.trigger}</Badge>
+                    <Badge variant="outline" className="text-[10px]">
+                      {item.region}
+                    </Badge>
+                    <span className="text-[10px] text-muted-foreground">{item.timestamp}</span>
+                  </div>
+                  <p className="text-sm font-medium">{item.goalText}</p>
+                  <p className="text-xs text-muted-foreground">User: {item.userId}</p>
+
+                  {/* Agent notes */}
+                  <div className="rounded-md bg-muted/30 border border-border p-2">
+                    <p className="text-[10px] text-muted-foreground font-semibold mb-1">Agent Notes:</p>
+                    <p className="text-xs text-muted-foreground">{item.agentNotes}</p>
+                  </div>
+
+                  {/* Proposals */}
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] text-muted-foreground font-semibold">Proposed Solutions:</p>
+                    {item.proposals.map((p, pi) => (
+                      <div key={pi} className="flex items-center justify-between rounded-md border border-border bg-background p-2">
+                        <div className="flex items-center gap-2">
+                          <Package className="h-3 w-3 text-muted-foreground" />
+                          <span className="text-xs font-medium">{p.name}</span>
+                          <Badge variant="outline" className="text-[10px] font-mono">{p.sku}</Badge>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs">
+                          <span className="font-mono">{p.price} CHF</span>
+                          <span className={cn("font-semibold", p.match >= 90 ? "text-status-online" : p.match >= 80 ? "text-status-warning" : "text-status-error")}>
+                            {p.match}% match
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Confidence bar */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[10px]">
+                      <span className="text-muted-foreground">Confidence</span>
+                      <span className={cn("font-mono font-semibold",
+                        item.confidence >= 0.8 ? "text-status-online" :
+                        item.confidence >= 0.6 ? "text-status-warning" : "text-status-error"
+                      )}>
+                        {(item.confidence * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                    <Progress value={item.confidence * 100} className="h-1.5" />
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col gap-1.5 shrink-0">
+                  {item.status === "pending" ? (
+                    <>
+                      <Button size="sm" variant="outline" className="text-xs border-status-online/30 text-status-online hover:bg-status-online/10" onClick={() => handleAction(item.id, "approved")}>
+                        <ThumbsUp className="h-3 w-3 mr-1" /> Approve
+                      </Button>
+                      <Button size="sm" variant="outline" className="text-xs border-status-error/30 text-status-error hover:bg-status-error/10" onClick={() => handleAction(item.id, "rejected")}>
+                        <ThumbsDown className="h-3 w-3 mr-1" /> Reject
+                      </Button>
+                      <Button size="sm" variant="outline" className="text-xs" onClick={() => setSelectedItem(item)}>
+                        <Edit3 className="h-3 w-3 mr-1" /> Edit
+                      </Button>
+                    </>
+                  ) : (
+                    <Badge className={cn("text-xs",
+                      item.status === "approved" ? "bg-status-online/20 text-status-online border-status-online/30" :
+                      item.status === "rejected" ? "bg-status-error/20 text-status-error border-status-error/30" :
+                      "bg-status-info/20 text-status-info border-status-info/30"
+                    )}>
+                      {item.status === "approved" ? <ThumbsUp className="h-3 w-3 mr-1" /> :
+                       item.status === "rejected" ? <ThumbsDown className="h-3 w-3 mr-1" /> :
+                       <Edit3 className="h-3 w-3 mr-1" />}
+                      {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+
+              {/* Edit feedback area */}
+              {selectedItem?.id === item.id && (
+                <div className="mt-3 pt-3 border-t border-border space-y-2">
+                  <textarea
+                    className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm outline-none focus:border-primary/50 resize-none"
+                    rows={2}
+                    placeholder="Merchant feedback (e.g., 'Customer prefers lighter weight')"
+                    value={feedback}
+                    onChange={e => setFeedback(e.target.value)}
+                  />
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={() => handleAction(item.id, "edited")} className="text-xs">
+                      <CheckCircle className="h-3 w-3 mr-1" /> Submit Edit
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => { setSelectedItem(null); setFeedback(""); }} className="text-xs">
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Metrics */}
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Activity className="h-4 w-4 text-primary" />
+            HITL Performance Metrics
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {HITL_METRICS.map((m, i) => (
+              <div key={i} className="rounded-lg border border-border bg-muted/20 p-3 text-center space-y-1">
+                <div className="text-lg font-bold">{m.value}</div>
+                <div className="text-xs font-medium">{m.metric}</div>
+                <div className="text-[10px] text-muted-foreground">Target: {m.target}</div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Qdrant Status Transitions */}
+      <Card className="border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Database className="h-4 w-4 text-accent" />
+            Qdrant Status Transitions (HITL Path)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
+            {[
+              { label: "open", color: "bg-status-info/20 text-status-info border-status-info/30" },
+              { label: "→", color: "" },
+              { label: "pending_inventory", color: "bg-status-warning/20 text-status-warning border-status-warning/30" },
+              { label: "→", color: "" },
+              { label: "pending_human_review", color: "bg-primary/20 text-primary border-primary/30" },
+              { label: "→", color: "" },
+              { label: "solved / failed", color: "bg-status-online/20 text-status-online border-status-online/30" },
+            ].map((s, i) => s.label === "→" ? (
+              <ArrowRight key={i} className="h-4 w-4 text-muted-foreground" />
+            ) : (
+              <Badge key={i} variant="outline" className={cn("font-mono", s.color)}>{s.label}</Badge>
+            ))}
+          </div>
+          <div className="mt-4 rounded-lg bg-muted/20 border border-border p-3">
+            <pre className="text-[11px] text-muted-foreground font-mono whitespace-pre-wrap leading-relaxed">{`# Qdrant HITL status flow
+qdrant.set_payload(
+  collection="goals",
+  points=[goal_id],
+  payload={"status": "pending_human_review", "proposed_solutions": [...]}
+)
+
+# Merchant dashboard polls
+goals = qdrant.scroll(
+  collection="goals",
+  filter=Filter(must=[FieldCondition(key="status", match=MatchValue(value="pending_human_review"))]),
+  limit=10
+)
+
+# After merchant decision → episode logged
+qdrant.upsert("goal_solution_links", episode_with_human_feedback)`}</pre>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

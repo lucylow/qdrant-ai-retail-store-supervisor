@@ -73,6 +73,7 @@ const App = () => (
             <Route path="/rag-comparison" element={<RAGComparisonPage />} />
             <Route path="/semantic-cache" element={<SemanticCachePage />} />
             <Route path="/langchain-rag" element={<LangChainRAGPage />} />
+            <Route path="/agentic-ai" element={<AgenticAIPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />

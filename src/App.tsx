@@ -29,6 +29,7 @@ import RAGComparisonPage from "./pages/RAGComparison";
 import SemanticCachePage from "./pages/SemanticCache";
 import LangChainRAGPage from "./pages/LangChainRAG";
 import AgenticAIPage from "./pages/AgenticAI";
+import AIAnalyticsPage from "./pages/AIAnalytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({

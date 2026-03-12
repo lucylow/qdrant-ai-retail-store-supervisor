@@ -25,6 +25,7 @@ import QdrantCloudPage from "./pages/QdrantCloud";
 import DatasetsPage from "./pages/Datasets";
 import GDPRPage from "./pages/GDPR";
 import ArchitecturePage from "./pages/Architecture";
+import RAGComparisonPage from "./pages/RAGComparison";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({

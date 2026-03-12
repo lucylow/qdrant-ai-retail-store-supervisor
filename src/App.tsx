@@ -75,6 +75,7 @@ const App = () => (
             <Route path="/semantic-cache" element={<SemanticCachePage />} />
             <Route path="/langchain-rag" element={<LangChainRAGPage />} />
             <Route path="/agentic-ai" element={<AgenticAIPage />} />
+            <Route path="/ai-analytics" element={<AIAnalyticsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />

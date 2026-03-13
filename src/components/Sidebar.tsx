@@ -3,7 +3,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, MessageSquare, Target, BookOpen,
   ShoppingBag, Activity, BarChart3, PlayCircle,
-  Settings, Award, Menu, X, Database, Zap, Layers, Shield, Sparkles, Brain, Cloud, FolderOpen, ShieldCheck, Code2, Link2, Network, ImageSearch,
+  Settings, Award, Menu, X, Database, Zap, Layers, Shield, Sparkles, Brain, Cloud, FolderOpen, ShieldCheck, Code2, Link2, Network, ScanSearch,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { to: "/", label: "Home", icon: Zap },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/chat", label: "Chat", icon: MessageSquare },
-  { to: "/visual-search", label: "Visual Search", icon: ImageSearch },
+  { to: "/visual-search", label: "Visual Search", icon: ScanSearch },
   { to: "/goals", label: "Goals", icon: Target },
   { to: "/episodes", label: "Memory", icon: BookOpen },
   { to: "/products", label: "Products", icon: ShoppingBag },

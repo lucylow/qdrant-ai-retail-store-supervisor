@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Award, Database, Github, ExternalLink, Cogs, CheckCircle2, Shield, Zap, Layers, Activity, Quote, Video, Mic, Image } from "lucide-react";
+import { Award, Database, Github, ExternalLink, Cog, CheckCircle2, Shield, Zap, Layers, Activity, Quote, Video, Mic, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 /** Production-grade agent quality metrics vs industry benchmarks */
@@ -197,7 +197,7 @@ export default function HackathonPage() {
           {/* Innovation: Novel Architecture (2 pillars) */}
           <div className="rounded-xl border border-border bg-card p-5 space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Cogs className="w-5 h-5 text-primary" /> Innovation (Novel Architecture)
+              <Cog className="w-5 h-5 text-primary" /> Innovation (Novel Architecture)
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
@@ -229,7 +229,7 @@ export default function HackathonPage() {
             <div className="rounded-xl border border-border bg-card p-6 space-y-5">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-xl bg-primary/15">
-                  <Cogs className="w-6 h-6 text-primary" />
+                  <Cog className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold">Innovative Architecture</h3>
               </div>

@@ -507,7 +507,7 @@ export default function LandingPage() {
                 <div><strong>8.2%</strong> conversion</div>
               </div>
             </div>
-            <div className="rounded-xl border border-border bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-6 text-center">
+            <div className="rounded-xl border border-border bg-status-warning/5 p-6 text-center">
               <h3 className="text-xl font-bold mb-4">Qdrant Discovery</h3>
               <div className="grid grid-cols-2 gap-3 text-sm mb-4">
                 <div><strong>92%</strong> precision</div>

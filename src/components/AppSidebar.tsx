@@ -199,7 +199,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="min-w-0">
               <div className="text-sm font-bold text-sidebar-foreground truncate">
-                Retail AI
+                Dynamic Vector
               </div>
               <div className="text-[10px] text-sidebar-foreground/50 truncate">
                 Store Supervisor

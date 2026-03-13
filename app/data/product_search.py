@@ -10,7 +10,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Sequence
 
-from app.config import COLLECTIONS, QDRANT
+from app.config import COLLECTIONS
 from app.embeddings import embed_single
 from app.qdrant_client import get_qdrant_client
 
@@ -56,7 +56,7 @@ def search_products_filtered(
     query: str | list[float],
     limit: int = 12,
     *,
-    stock_gt: int | None = 0,
+    stock_gt: int | None = None,
     region: str | None = None,
     price_lte: float | None = None,
     price_gte: float | None = None,
@@ -91,7 +91,7 @@ def search_products_filtered(
         limit=limit,
         query_filter=query_filter,
         with_payload=True,
-        search_params=params,
+        params=params,
     )
     return [{"id": h.id, "score": h.score, "payload": h.payload or {}} for h in hits]
 
@@ -121,6 +121,12 @@ def recommend_products(
         "with_payload": True,
     }
     if strategy:
-        kwargs["strategy"] = rest.RecommendStrategy(strategy)
+        try:
+            kwargs["strategy"] = getattr(rest.RecommendStrategy, strategy.upper(), rest.RecommendStrategy.AVERAGE_VECTOR)
+        except (AttributeError, TypeError):
+            pass
     hits = client.recommend(**kwargs)
     return [{"id": h.id, "score": h.score, "payload": h.payload or {}} for h in hits]
+
+
+__all__ = ["search_products_filtered", "recommend_products"]

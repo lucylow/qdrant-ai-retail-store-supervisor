@@ -16,7 +16,7 @@ export function StoreMapPage() {
             <CardTitle>Migros stores – Map &amp; navigation</CardTitle>
           </CardHeader>
           <CardContent className="h-[420px] lg:h-[calc(100%-4rem)] p-0">
-            <MapLogistics center={center} />
+            <MapLogistics />
           </CardContent>
         </Card>
         <div className="space-y-4">

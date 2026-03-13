@@ -176,3 +176,7 @@
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
+
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}

@@ -20,6 +20,8 @@ from app.retriever import (
 )
 from app.debug_endpoints import router as debug_router
 from app.multimodal.router import router as multimodal_router
+from app.livemap_api import router as livemap_router
+from app.routers.multilingual import router as multilingual_router
 from app.agents.fashion_visual_agent import VisualFashionAgent
 
 logging.basicConfig(level=logging.INFO)
@@ -39,6 +41,8 @@ def startup_event() -> None:
         logger.warning("Could not ensure collections; continuing")
     app.include_router(debug_router, prefix="/debug")
     app.include_router(multimodal_router)
+    app.include_router(livemap_router)
+    app.include_router(multilingual_router)
 
 
 @app.get("/health")

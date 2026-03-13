@@ -15,6 +15,9 @@ fastapi>=0.100.0
 uvicorn>=0.22.0
 python-dotenv>=1.0.0
 
+# Multilingual NLP for Swiss retail chatbot
+langdetect>=1.0.9
+
 # Knowledge Graph (Neo4j)
 neo4j>=5.0.0
 
@@ -30,6 +33,9 @@ prophet>=1.1.0
 jinja2>=3.1.0
 pydantic>=2.0.0
 pytest-asyncio>=0.23.0
+
+# LiveMap privacy helpers
+cryptography>=42.0.0
 
 # Production external providers (Qdrant Cloud + HF + Whisper + Replicate + Groq + ElevenLabs)
 openai>=1.0.0

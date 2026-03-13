@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapLogistics } from "@/components/MapLogistics";
+import MapLogistics from "@/components/MapLogistics";
 import { LogisticsPanel } from "@/components/LogisticsPanel";
 
 const DEFAULT_CENTER: [number, number] = [47.3769, 8.5417];

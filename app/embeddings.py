@@ -44,6 +44,12 @@ def embed_single(text: str) -> EmbeddingResult:
     return embed_texts([text], batch_size=1)
 
 
+def get_text_embedding_dimension() -> int:
+    """Return vector size of the text embedding model (e.g. 768 for all-mpnet-base-v2)."""
+    model = _load_text_model()
+    return model.get_sentence_embedding_dimension()
+
+
 def normalize_rows(matrix: np.ndarray) -> np.ndarray:
     norms = np.linalg.norm(matrix, axis=1, keepdims=True)
     norms[norms == 0.0] = 1.0
@@ -54,7 +60,7 @@ def as_list(vectors: np.ndarray) -> list[list[float]]:
     return vectors.tolist()
 
 
-__all__ = ["EmbeddingResult", "embed_texts", "embed_single", "normalize_rows", "as_list"]
+__all__ = ["EmbeddingResult", "embed_texts", "embed_single", "get_text_embedding_dimension", "normalize_rows", "as_list"]
 
 from typing import Iterable, List
 import numpy as np

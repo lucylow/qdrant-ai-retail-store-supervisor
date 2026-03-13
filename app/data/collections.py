@@ -5,6 +5,7 @@ from typing import Final, Sequence
 from qdrant_client.http import models as rest
 
 from app.config import COLLECTIONS, FASHION_CLIP_COLLECTION
+from app.embeddings import get_text_embedding_dimension
 from app.qdrant_client import ensure_collection, ensure_named_vectors_collection, get_qdrant_client
 from app.multimodal.schema import (
     PRODUCTS_MULTIMODAL_COLLECTION,
@@ -38,9 +39,10 @@ def ensure_all_collections() -> None:
     Idempotently ensure all Qdrant collections exist with sane defaults.
     """
     client = get_qdrant_client()
-    ensure_collection(client, COLL_GOALS, vector_size=384, distance=rest.Distance.COSINE)
+    goal_vector_size = get_text_embedding_dimension()
+    ensure_collection(client, COLL_GOALS, vector_size=goal_vector_size, distance=rest.Distance.COSINE)
     ensure_collection(client, COLL_PRODUCTS, vector_size=256, distance=rest.Distance.COSINE)
-    ensure_collection(client, COLL_SOLUTIONS, vector_size=384, distance=rest.Distance.COSINE)
+    ensure_collection(client, COLL_SOLUTIONS, vector_size=goal_vector_size, distance=rest.Distance.COSINE)
     ensure_collection(
         client, COLL_REASONING_GRAPHS, vector_size=384, distance=rest.Distance.COSINE
     )

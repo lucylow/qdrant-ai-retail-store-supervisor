@@ -17,6 +17,15 @@ from app.multimodal.schema import (
 logger = logging.getLogger(__name__)
 
 
+# Payload index fields for fast filtering (multimodal store / hackathon production)
+MULTIMODAL_PAYLOAD_INDEX_FIELDS: tuple[str, ...] = (
+    "stock_status",
+    "price_band",
+    "category",
+    "language",
+)
+
+
 def ensure_products_multimodal_collection(client: Any) -> None:
     """Create products_multimodal collection with 4 named vectors if not exists."""
     try:
@@ -28,6 +37,27 @@ def ensure_products_multimodal_collection(client: Any) -> None:
             vectors_config=get_products_multimodal_vectors_config(),
         )
         logger.info("Created collection %s", PRODUCTS_MULTIMODAL_COLLECTION)
+
+
+def ensure_multimodal_payload_indexes(
+    client: Any,
+    collection_name: str = PRODUCTS_MULTIMODAL_COLLECTION,
+) -> None:
+    """Create keyword payload indexes for stock_status, price_band, category, language."""
+    from qdrant_client.http import models as qmodels
+    for field in MULTIMODAL_PAYLOAD_INDEX_FIELDS:
+        try:
+            client.create_payload_index(
+                collection_name=collection_name,
+                field_name=field,
+                field_schema=qmodels.PayloadSchemaType.KEYWORD,
+            )
+            logger.debug("Created payload index %s on %s", field, collection_name)
+        except Exception as e:
+            if "already exists" in str(e).lower() or "exist" in str(e).lower():
+                logger.debug("Payload index %s already exists: %s", field, e)
+            else:
+                logger.warning("Payload index %s failed: %s", field, e)
 
 
 def index_video_product(

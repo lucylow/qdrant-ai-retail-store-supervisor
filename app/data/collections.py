@@ -4,12 +4,24 @@ from typing import Final, Sequence
 
 from qdrant_client.http import models as rest
 
-from app.config import COLLECTIONS
+from app.config import COLLECTIONS, FASHION_CLIP_COLLECTION
 from app.qdrant_client import ensure_collection, ensure_named_vectors_collection, get_qdrant_client
 from app.multimodal.schema import (
     PRODUCTS_MULTIMODAL_COLLECTION,
     get_products_multimodal_vectors_config,
 )
+
+FASHION_CLIP_DIM = 512
+
+
+def get_fashion_clip_vectors_config() -> rest.VectorsConfig:
+    """Named vectors for Fashion-MNIST visual search: image + text (CLIP 512d)."""
+    return rest.VectorsConfig(
+        named_vectors={
+            "image": rest.NamedVectorParams(size=FASHION_CLIP_DIM, distance=rest.Distance.COSINE),
+            "text": rest.NamedVectorParams(size=FASHION_CLIP_DIM, distance=rest.Distance.COSINE),
+        }
+    )
 
 
 COLL_PRODUCTS: Final[str] = COLLECTIONS.products
@@ -36,6 +48,9 @@ def ensure_all_collections() -> None:
     )
     ensure_named_vectors_collection(
         client, PRODUCTS_MULTIMODAL_COLLECTION, get_products_multimodal_vectors_config()
+    )
+    ensure_named_vectors_collection(
+        client, FASHION_CLIP_COLLECTION, get_fashion_clip_vectors_config()
     )
     try:
         from app.data.memory_collections import ensure_memory_collections

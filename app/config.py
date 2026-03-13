@@ -106,6 +106,9 @@ COLLECTIONS: Final[CollectionSettings] = CollectionSettings(
     messages=os.getenv("COLL_MESSAGES", "messages"),
 )
 
+# Fashion-MNIST visual search (70K CLIP-embedded images)
+FASHION_CLIP_COLLECTION: Final[str] = os.getenv("FASHION_CLIP_COLLECTION", "fashion_clip")
+
 CONTEXT: Final[ContextSettings] = ContextSettings(
     max_total_tokens=int(os.getenv("CONTEXT_MAX_TOTAL_TOKENS", "2048")),
     max_context_documents=int(os.getenv("MAX_CONTEXT_DOCS", "8")),
@@ -136,6 +139,38 @@ FEATURES: Final[FeatureToggles] = FeatureToggles(
     self_improve=os.getenv("SELF_IMPROVE", "true").lower() in ("1", "true", "yes"),
 )
 
+
+@dataclass(frozen=True)
+class GenAISettings:
+    """GENAI-HACKATHON: Production-grade GenAI engineering config."""
+
+    max_retries: int
+    cot_steps: int
+    hallucination_block_threshold: float
+    semantic_drift_max: float
+    prompt_cache_ttl_s: int
+    few_shot_k: int
+    lexical_weight: float
+    entailment_weight: float
+    confidence_weight: float
+    temporal_weight: float
+
+
+GENAI: Final[GenAISettings] = GenAISettings(
+    max_retries=int(os.getenv("GENAI_MAX_RETRIES", "3")),
+    cot_steps=int(os.getenv("GENAI_COT_STEPS", "4")),
+    hallucination_block_threshold=float(
+        os.getenv("GENAI_HALLUCINATION_THRESHOLD", "0.25")
+    ),
+    semantic_drift_max=float(os.getenv("GENAI_SEMANTIC_DRIFT_MAX", "0.15")),
+    prompt_cache_ttl_s=int(os.getenv("GENAI_PROMPT_CACHE_TTL", "3600")),
+    few_shot_k=int(os.getenv("GENAI_FEW_SHOT_K", "3")),
+    lexical_weight=float(os.getenv("GENAI_LEXICAL_WEIGHT", "0.4")),
+    entailment_weight=float(os.getenv("GENAI_ENTAILMENT_WEIGHT", "0.4")),
+    confidence_weight=float(os.getenv("GENAI_CONFIDENCE_WEIGHT", "0.1")),
+    temporal_weight=float(os.getenv("GENAI_TEMPORAL_WEIGHT", "0.1")),
+)
+
 # LLM client compatibility (used by app.llm_client)
 GENERATOR_PROVIDER: Final[str] = MODELS.generator_provider
 GENERATOR_MODEL: Final[str] = MODELS.generator_model
@@ -153,8 +188,11 @@ __all__ = [
     "NEO4J",
     "MODELS",
     "COLLECTIONS",
+    "FASHION_CLIP_COLLECTION",
     "CONTEXT",
     "FEATURES",
+    "GENAI",
+    "GenAISettings",
     "GENERATOR_PROVIDER",
     "GENERATOR_MODEL",
     "GENERATOR_MAX_TOKENS",

@@ -8,6 +8,16 @@
 .PHONY: amazon-setup amazon-demo amazon-collections
 .PHONY: retailrocket-setup retailrocket-demo retailrocket-discovery retailrocket-discovery-contexts
 .PHONY: personalization-init personalization-live personalization-collections
+.PHONY: fashion-visual-index fashion-visual-demo
+
+# Fashion-MNIST → Qdrant CLIP visual search (70K images, ~15min)
+fashion-visual-index:
+	cd "$(shell pwd)" && python3 -m scripts.fashion_mnist_qdrant_loader
+	@echo "Fashion visual index done. Run: make fashion-visual-demo"
+
+fashion-visual-demo:
+	uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+	@echo "Open http://localhost:8000 and go to /visual-search (frontend) or POST /api/visual-search"
 
 # Ensure Qdrant collections exist (including competitor_prices)
 ensure-collections:
@@ -107,3 +117,25 @@ retailrocket-discovery-contexts:
 retailrocket-discovery:
 	uvicorn agents.retailrocket_discovery_demo:app --host 0.0.0.0 --port 8002
 	@echo "Judge demo: curl -X POST http://localhost:8002/demo/discovery-recs -H 'Content-Type: application/json' -d '{\"item_ids\": [12345, 67890], \"context\": \"co_purchased\"}'"
+
+# --- GENAI-HACKATHON: Generative AI Enhancements (prompt templates, few-shot, CoT, validation, hallucination) ---
+genai-benchmark:
+	python3 scripts/genai_benchmark.py --samples 50
+	@echo "Full benchmark: python3 scripts/genai_benchmark.py --dataset retail_qa_1000 --output results/genai_benchmark.json"
+
+genai-fewshot-mine:
+	python3 scripts/fewshot_mining.py --goal-count 100
+	@echo "Mined examples for few-shot. Optional: --output demo_data/fewshot_examples.json"
+
+genai-dashboard:
+	@echo "Starting GenAI Dashboard (http://localhost:8501)..."
+	streamlit run demo/genai_dashboard.py
+
+genai-test:
+	pytest tests/test_prompt_engineering.py -v
+
+# One-click GenAI demo: start stack + dashboard (Qdrant + Redis already in docker-compose)
+genai-demo: ensure-collections
+	$(MAKE) genai-fewshot-mine
+	@echo "Launch GenAI Dashboard: make genai-dashboard"
+	@echo "Or: streamlit run demo/genai_dashboard.py"

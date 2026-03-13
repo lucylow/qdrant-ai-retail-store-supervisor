@@ -35,6 +35,33 @@ def rrf_fusion(
     return ranked
 
 
+def build_multimodal_filter(
+    *,
+    stock_status: Optional[str] = "instock",
+    language: Optional[str] = None,
+) -> Any:
+    """Build Qdrant Filter for stock_status and/or language (uses payload indexes)."""
+    from qdrant_client.http import models as qmodels
+    must = []
+    if stock_status is not None:
+        must.append(
+            qmodels.FieldCondition(
+                key="stock_status",
+                match=qmodels.MatchValue(value=stock_status),
+            )
+        )
+    if language is not None:
+        must.append(
+            qmodels.FieldCondition(
+                key="language",
+                match=qmodels.MatchValue(value=language),
+            )
+        )
+    if not must:
+        return None
+    return qmodels.Filter(must=must)
+
+
 def multimodal_search(
     client: Any,
     *,
@@ -45,12 +72,14 @@ def multimodal_search(
     limit: int = 10,
     weights: Optional[Dict[str, float]] = None,
     encoders: Optional[MultimodalProductEncoders] = None,
+    query_filter: Any = None,
 ) -> List[Tuple[Any, float]]:
     """
     Multimodal search: embed text, voice, and/or photo; search each vector name; RRF fuse.
 
     weights: e.g. {"audiovector": 0.6, "imagevector": 0.3, "textvector": 0.1} for visual shopping.
     Default: equal weight for each provided modality.
+    query_filter: optional Qdrant Filter (e.g. stock_status=instock, language=de).
     """
     encoders = encoders or MultimodalProductEncoders()
     # Build query vectors per modality
@@ -75,7 +104,7 @@ def multimodal_search(
             hits = client.search(
                 collection_name=collection_name,
                 query_vector=qvec,
-                query_filter=None,
+                query_filter=query_filter,
                 limit=50,
                 with_payload=True,
                 vector_name=name,
@@ -100,8 +129,11 @@ def multimodal_search_with_payload(
     collection_name: str = PRODUCTS_MULTIMODAL_COLLECTION,
     limit: int = 10,
     weights: Optional[Dict[str, float]] = None,
+    stock_status: Optional[str] = "instock",
+    language: Optional[str] = None,
 ) -> List[Tuple[Any, float, Dict[str, Any]]]:
-    """Like multimodal_search but returns (id, score, payload) by re-fetching or from first hit."""
+    """Like multimodal_search but returns (id, score, payload). Optional stock_status/language filter."""
+    query_filter = build_multimodal_filter(stock_status=stock_status, language=language)
     fused = multimodal_search(
         client,
         text_query=text_query,
@@ -110,6 +142,7 @@ def multimodal_search_with_payload(
         collection_name=collection_name,
         limit=limit,
         weights=weights,
+        query_filter=query_filter,
     )
     if not fused:
         return []
@@ -121,3 +154,29 @@ def multimodal_search_with_payload(
         return [(pid, scores_map.get(pid, 0.0), {}) for pid in ids]
     payload_by_id = {p.id: (p.payload or {}) for p in points}
     return [(pid, scores_map.get(pid, 0.0), payload_by_id.get(pid, {})) for pid in ids]
+
+
+def multimodal_search_production(
+    query_text: str,
+    query_image: Optional[bytes] = None,
+    *,
+    language: str = "de",
+    stock_status: str = "instock",
+    limit: int = 10,
+    collection_name: str = PRODUCTS_MULTIMODAL_COLLECTION,
+) -> List[Tuple[Any, float, Dict[str, Any]]]:
+    """
+    Production multimodal search: text + optional image, with stock_status and language filter.
+    Uses default Qdrant client from app.qdrant_client.
+    """
+    from app.qdrant_client import get_qdrant_client
+    client = get_qdrant_client()
+    return multimodal_search_with_payload(
+        client,
+        text_query=query_text,
+        user_photo=query_image,
+        collection_name=collection_name,
+        limit=limit,
+        stock_status=stock_status,
+        language=language,
+    )

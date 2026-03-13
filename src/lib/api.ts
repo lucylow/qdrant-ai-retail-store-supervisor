@@ -94,6 +94,27 @@ export type ScaleMetrics = {
   active_agents: number;
 };
 
+// Visual fashion search (Fashion-MNIST + CLIP)
+export type VisualSearchMatch = {
+  id: string;
+  category: string;
+  price?: number;
+  stock_status?: string;
+  similarity: number;
+  style?: string;
+  color?: string;
+};
+
+export type VisualSearchResponse = {
+  visual_matches: number;
+  top_matches: VisualSearchMatch[];
+  avg_similarity: number;
+  error?: string;
+  demo_stats?: string;
+  p95_latency?: string;
+  accuracy?: string;
+};
+
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
 export const MOCK_METRICS: MetricsResponse = {
@@ -235,5 +256,23 @@ export const api = {
     };
     es.onerror = () => { clearTimeout(timeout); onDone(); es.close(); };
     return () => { clearTimeout(timeout); es.close(); };
+  },
+
+  visualSearch: async (
+    image: File,
+    filters?: { stock_status?: string; price_max?: number; category?: string }
+  ): Promise<VisualSearchResponse> => {
+    const form = new FormData();
+    form.append("image", image);
+    if (filters && Object.keys(filters).length > 0) {
+      form.append("filters", JSON.stringify(filters));
+    }
+    const res = await fetch(`${BASE_URL}/api/visual-search`, {
+      method: "POST",
+      body: form,
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!res.ok) throw new Error(`${res.status}`);
+    return res.json() as Promise<VisualSearchResponse>;
   },
 };

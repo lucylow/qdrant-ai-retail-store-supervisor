@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import ChatPage from "./pages/Chat";
 import UnifiedDashboard from "./pages/UnifiedDashboard";
 import UnifiedSettings from "./pages/UnifiedSettings";
+import VisualSearch from "./pages/VisualSearch";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/dashboard" element={<UnifiedDashboard />} />
+            <Route path="/visual-search" element={<VisualSearch />} />
             <Route path="/settings" element={<UnifiedSettings />} />
           </Route>
           <Route path="*" element={<NotFound />} />

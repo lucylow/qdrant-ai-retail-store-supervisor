@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 BRAND_POLICIES = {
     "max_discount_pct": 40,
-    "allowed_regions": ["Zurich", "Geneva", "Bern"],
+    "allowed_regions": ["Berlin", "Paris", "Zurich", "London", "Geneva", "Bern"],
     "forbidden_keywords": ["illegal", "hazardous"],
 }
 
@@ -45,7 +45,7 @@ def validate_generated_text_vs_context(
     import re
 
     reasons: List[str] = []
-    numbers = re.findall(r"\\d+(?:[.,]\\d+)?", text)
+    numbers = re.findall(r"\d+(?:[.,]\d+)?", text)
     if numbers:
         context_joined = " ".join(contexts)
         missing = [n for n in numbers if n not in context_joined]

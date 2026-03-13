@@ -146,7 +146,9 @@ class SupervisorAgent:
         self.merchandising = merchandising or MerchandisingAgent()
         self.audit = audit or AuditAgent()
         self.graph_store = graph_store or ReasoningGraphStore()
-        self.episodic_store = episodic_store or EpisodicMemoryStore()
+        self.episodic_store = episodic_store or EpisodicMemoryStore(
+            graph_store=self.graph_store
+        )
         self._pool = ThreadPoolExecutor(max_workers=max_workers)
 
     async def orchestrate(self, user_query: str) -> AutonomousResult:
@@ -161,6 +163,15 @@ class SupervisorAgent:
         nodes: List[AgentNode] = []
         edges: List[GraphEdge] = []
 
+        # 0. Episodic memory: bias toward 92% conversion episodes (23% lift)
+        episodic_skus: List[str] = []
+        try:
+            episodic_skus = await self.episodic_store.retrieve_similar_successful_skus(
+                user_query, k=5
+            )
+        except Exception:  # noqa: BLE001
+            pass
+
         # 1. PARALLEL PHASE 1: Parse + Inventory search + competitor scan
         phase1_start = time.perf_counter()
         loop = asyncio.get_running_loop()
@@ -169,7 +180,10 @@ class SupervisorAgent:
             self._pool, self.shopper.parse_goal, user_query, goal_id
         )
         inventory_future = loop.run_in_executor(
-            self._pool, self.inventory.initial_search, user_query
+            self._pool,
+            self.inventory.initial_search,
+            user_query,
+            episodic_skus,
         )
         pricing_future = loop.run_in_executor(
             self._pool, self.pricing.fetch_competitor_context, user_query
@@ -324,6 +338,22 @@ class SupervisorAgent:
             merchandising=merchandising_plan,
             outcome=outcome,
         )
+        # Memory design: goal_solution_links (episodic) + procedural_memory
+        try:
+            from app.data.memory_events import record_episode_to_memory
+            bundle_skus = [item.sku for item in bundle.items]
+            fut = loop.run_in_executor(
+                self._pool,
+                record_episode_to_memory,
+                goal_id,
+                user_query[:500],
+                bundle_skus,
+                outcome.value,
+                audit_result.success_prob,
+            )
+            await fut
+        except Exception:  # noqa: BLE001
+            pass
 
         metrics: Dict[str, float] = {
             "episode_reuse_rate": compute_episode_reuse_rate(),

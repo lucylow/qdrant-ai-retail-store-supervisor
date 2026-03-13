@@ -10,7 +10,7 @@ import numpy as np
 from qdrant_client.http import models as rest
 
 from app.agents.supervisor import AgentNode
-from app.config import COLL_REASONING_GRAPHS
+from app.data.collections import COLL_REASONING_GRAPHS
 from app.qdrant_client import get_qdrant_client
 
 

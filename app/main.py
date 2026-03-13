@@ -18,6 +18,7 @@ from app.retriever import (
     retrieve_similar_goals_by_text,
 )
 from app.debug_endpoints import router as debug_router
+from app.multimodal.router import router as multimodal_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -31,6 +32,7 @@ def startup_event() -> None:
     global client
     client = get_qdrant_client()
     app.include_router(debug_router, prefix="/debug")
+    app.include_router(multimodal_router)
 
 
 @app.get("/health")

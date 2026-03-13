@@ -54,6 +54,14 @@ class ContextSettings:
 
 
 @dataclass(frozen=True)
+class Neo4jSettings:
+    uri: str
+    user: str
+    password: str
+    max_connection_pool_size: int
+
+
+@dataclass(frozen=True)
 class FeatureToggles:
     enable_multimodal: bool
     enable_reranker: bool
@@ -113,6 +121,13 @@ CONTEXT: Final[ContextSettings] = ContextSettings(
     provenance_weight=float(os.getenv("PROVENANCE_WEIGHT", "1.2")),
 )
 
+NEO4J: Final[Neo4jSettings] = Neo4jSettings(
+    uri=os.getenv("NEO4J_URI", "bolt://localhost:7687"),
+    user=os.getenv("NEO4J_USER", "neo4j"),
+    password=os.getenv("NEO4J_PASSWORD", "password"),
+    max_connection_pool_size=int(os.getenv("NEO4J_MAX_POOL_SIZE", "50")),
+)
+
 FEATURES: Final[FeatureToggles] = FeatureToggles(
     enable_multimodal=os.getenv("ENABLE_MULTIMODAL", "true").lower()
     in ("1", "true", "yes"),
@@ -121,6 +136,13 @@ FEATURES: Final[FeatureToggles] = FeatureToggles(
     self_improve=os.getenv("SELF_IMPROVE", "true").lower() in ("1", "true", "yes"),
 )
 
+# LLM client compatibility (used by app.llm_client)
+GENERATOR_PROVIDER: Final[str] = MODELS.generator_provider
+GENERATOR_MODEL: Final[str] = MODELS.generator_model
+GENERATOR_MAX_TOKENS: Final[int] = int(os.getenv("GENERATOR_MAX_TOKENS", "512"))
+GENERATOR_TEMPERATURE: Final[float] = float(os.getenv("GENERATOR_TEMPERATURE", "0.2"))
+GENERATOR_TOP_P: Final[float] = float(os.getenv("GENERATOR_TOP_P", "1.0"))
+
 
 __all__ = [
     "PROJECT_NAME",
@@ -128,8 +150,14 @@ __all__ = [
     "BASE_DIR",
     "ARTIFACTS_DIR",
     "QDRANT",
+    "NEO4J",
     "MODELS",
     "COLLECTIONS",
     "CONTEXT",
     "FEATURES",
+    "GENERATOR_PROVIDER",
+    "GENERATOR_MODEL",
+    "GENERATOR_MAX_TOKENS",
+    "GENERATOR_TEMPERATURE",
+    "GENERATOR_TOP_P",
 ]

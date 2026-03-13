@@ -68,6 +68,29 @@ def ensure_collection(
         logger.debug("Could not update HNSW params; continuing", exc_info=True)
 
 
+def ensure_named_vectors_collection(
+    client: QdrantClient,
+    name: str,
+    vectors_config: rest.VectorsConfig,
+) -> None:
+    """Idempotently create collection with named vectors if missing."""
+    existing = [c.name for c in client.get_collections().collections or []]
+    if name in existing:
+        logger.debug("Collection %s already exists", name)
+        return
+    client.create_collection(collection_name=name, vectors_config=vectors_config)
+    try:
+        client.update_collection(
+            name,
+            hnsw_config=rest.HnswConfig(
+                m=QDRANT.hnsw_m,
+                ef_construct=QDRANT.hnsw_ef_construct,
+            ),
+        )
+    except Exception:  # noqa: BLE001
+        logger.debug("Could not update HNSW params; continuing", exc_info=True)
+
+
 def qdrant_health_check(client: Optional[QdrantClient] = None) -> bool:
     try:
         q_client = client or get_qdrant_client()
@@ -78,5 +101,10 @@ def qdrant_health_check(client: Optional[QdrantClient] = None) -> bool:
         return False
 
 
-__all__ = ["get_qdrant_client", "ensure_collection", "qdrant_health_check"]
+__all__ = [
+    "get_qdrant_client",
+    "ensure_collection",
+    "ensure_named_vectors_collection",
+    "qdrant_health_check",
+]
 

@@ -1,10 +1,23 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Union
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct
 import logging
 
 logger = logging.getLogger(__name__)
 BATCH_SIZE = 128
+
+
+def upsert_named_vector_point(
+    client: QdrantClient,
+    collection_name: str,
+    point_id: Union[str, int],
+    vectors: Dict[str, List[float]],
+    payload: Dict[str, Any],
+) -> None:
+    """Upsert a single point with named vectors (e.g. textvector, imagevector, audiovector, videovector)."""
+    point = PointStruct(id=point_id, vector=vectors, payload=payload)
+    client.upsert(collection_name=collection_name, points=[point])
+    logger.debug("Upserted point %s to %s with %d vectors", point_id, collection_name, len(vectors))
 
 
 def upsert_points(

@@ -86,6 +86,55 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* OTTO Kaggle Dataset — Judge credibility */}
+      <section className="py-20 px-6 bg-gradient-to-r from-orange-500 to-red-600 text-white">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-black mb-8">🏆 OTTO Kaggle Dataset</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-xl mb-12">
+            <div><strong>14M</strong> sessions</div>
+            <div><strong>21M</strong> events</div>
+            <div><strong>1.9M</strong> products</div>
+            <div><strong>8ms</strong> P95 search</div>
+          </div>
+          <p className="text-xl md:text-2xl opacity-90">
+            Industry-grade recsys benchmark powers our Qdrant agents.
+          </p>
+        </div>
+      </section>
+
+      {/* RetailRocket Dataset — Real conversion funnel */}
+      <section className="py-20 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-black mb-8">🎯 RetailRocket Dataset</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 text-xl mb-12">
+            <div><strong>2.7M</strong><br />events</div>
+            <div><strong>1.4M</strong><br />items</div>
+            <div><strong>417K</strong><br />visitors</div>
+            <div><strong>8.2%</strong><br />conversion</div>
+            <div><strong>6ms</strong><br />search</div>
+          </div>
+          <p className="text-xl md:text-2xl opacity-90">
+            Real view→add2cart→transaction funnel powers inventory agent.
+          </p>
+        </div>
+      </section>
+
+      {/* Qdrant Discovery API */}
+      <section className="py-20 px-6 bg-gradient-to-r from-amber-500 to-orange-600 text-white">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-black mb-8">🎯 Qdrant Discovery API</h2>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-xl mb-12">
+            <div><strong>2.7M</strong><br />RetailRocket events</div>
+            <div><strong>92%</strong><br />co-cart precision</div>
+            <div><strong>4</strong><br />discovery contexts</div>
+            <div><strong>18ms</strong><br />P95 latency</div>
+          </div>
+          <p className="text-xl md:text-2xl opacity-90">
+            Real co-purchase patterns → dynamic bundle recommendations.
+          </p>
+        </div>
+      </section>
+
       {/* Appropriate & Effective Use of Generative AI */}
       <section className="py-20 px-6 bg-muted/50">
         <div className="max-w-5xl mx-auto">

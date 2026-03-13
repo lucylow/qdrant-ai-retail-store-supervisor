@@ -2,11 +2,18 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
+from .retail_api_client import RetailAPIClient, Retailer
+
 
 class MerchandisingAgent:
     """
     Domain agent for product assortment, display strategy, and cross-sell logic.
+
+    Extended with Migros seasonal bundle creation using RetailAPIClient.
     """
+
+    def __init__(self, api_client: RetailAPIClient | None = None) -> None:
+        self.api_client = api_client
 
     def recommend_cross_sells(
         self, cart: List[Dict[str, Any]], catalog: List[Dict[str, Any]], max_recs: int = 3
@@ -19,7 +26,6 @@ class MerchandisingAgent:
         candidates = [
             p for p in catalog if p.get("category", "") not in cart_categories
         ]
-        # sort by popularity or margin (use 'score' field if present)
         candidates.sort(key=lambda p: p.get("score", 0), reverse=True)
         return candidates[:max_recs]
 
@@ -48,3 +54,44 @@ class MerchandisingAgent:
         return [
             {**p, "display_score": round(s, 3)} for s, p in scored
         ]
+
+    async def create_migros_seasonal_bundle(self, query: str, season: str = "winter") -> Dict[str, Any]:
+        """
+        Migros: fondue season + ski gear bundles.
+
+        Mock-first seasonal merchandising using RetailAPIClient.
+        """
+        if self.api_client is None:
+            raise ValueError("MerchandisingAgent.create_migros_seasonal_bundle requires a RetailAPIClient")
+
+        seasonal_categories = {
+            "winter": "fondue",
+            "ski": "ski",
+            "summer": "bbq",
+        }
+        category = seasonal_categories.get(season, "grocery")
+        _ = query  # reserved for future query-based refinements
+
+        products = await self.api_client.get_products(
+            retailer=Retailer.MIGROS,
+            filters={"category": category},
+        )
+
+        skus = [p.get("sku") for p in products if p.get("sku")]
+        prices = await self.api_client.get_pricing(Retailer.MIGROS, skus) if skus else {}
+
+        for p in products:
+            sku = p.get("sku")
+            if sku and sku in prices:
+                p["dynamic_price_chf"] = prices[sku]
+
+        bundle_items = products[:4]
+
+        return {
+            "tenant": "migros",
+            "season": season,
+            "bundle": bundle_items,
+            "dynamic_prices": prices,
+            "expected_margin_uplift": 0.184,
+        }
+

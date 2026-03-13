@@ -1,1 +1,1 @@
-# App services (Amazon filter extraction, etc.)
+# Swiss retail services

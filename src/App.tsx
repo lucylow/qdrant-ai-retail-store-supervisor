@@ -10,6 +10,7 @@ import UnifiedDashboard from "./pages/UnifiedDashboard";
 import UnifiedSettings from "./pages/UnifiedSettings";
 import VisualSearch from "./pages/VisualSearch";
 import LiveMapPage from "./pages/LiveMap";
+import StoreMapPage from "./pages/StoreMap";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/dashboard" element={<UnifiedDashboard />} />
             <Route path="/visual-search" element={<VisualSearch />} />
             <Route path="/livemap" element={<LiveMapPage />} />
+            <Route path="/store-map" element={<StoreMapPage />} />
             <Route path="/settings" element={<UnifiedSettings />} />
           </Route>
           <Route path="*" element={<NotFound />} />

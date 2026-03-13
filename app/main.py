@@ -22,13 +22,23 @@ from app.debug_endpoints import router as debug_router
 from app.multimodal.router import router as multimodal_router
 from app.livemap_api import router as livemap_router
 from app.routers.multilingual import router as multilingual_router
+from app.routers.voice import router as voice_router
+from app.routers.swiss_retail import router as swiss_retail_router
+from app.routers.geospatial import router as geospatial_router
+from app.routers.swiss_culture import router as swiss_culture_router
+from app.routers.holidays import router as holidays_router
+from app.routers.checkout import router as checkout_router
+from app.routers.swiss_time import router as swiss_time_router
 from app.agents.fashion_visual_agent import VisualFashionAgent
+from app.middleware.swiss_culture_middleware import SwissCultureMiddleware
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
 client = None
+
+app.add_middleware(SwissCultureMiddleware)
 
 
 @app.on_event("startup")
@@ -43,6 +53,13 @@ def startup_event() -> None:
     app.include_router(multimodal_router)
     app.include_router(livemap_router)
     app.include_router(multilingual_router)
+    app.include_router(voice_router)
+    app.include_router(swiss_retail_router)
+    app.include_router(swiss_culture_router)
+    app.include_router(holidays_router)
+    app.include_router(checkout_router)
+    app.include_router(swiss_time_router)
+    app.include_router(geospatial_router)
 
 
 @app.get("/health")

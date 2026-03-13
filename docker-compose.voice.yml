@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  voice-app:
+    build: .
+    container_name: swiss-retail-voice-app
+    ports:
+      - "8000:8000"   # FastAPI (HTTP + WebSocket)
+      - "5173:5173"   # Vite frontend dev / preview
+    environment:
+      - WHISPER_MODEL=medium
+      - QDRANT_URL=http://qdrant:6333
+      - PIPER_VOICES_DIR=/app/voices
+    volumes:
+      - ./voices:/app/voices:ro
+    depends_on:
+      - qdrant
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: swiss-retail-qdrant
+    ports:
+      - "6333:6333"
+

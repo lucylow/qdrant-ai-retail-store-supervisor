@@ -1,4 +1,4 @@
-import { Home, MessageSquare, BarChart3, Settings, Database, Map } from "lucide-react";
+import { Home, MessageSquare, BarChart3, Settings, Database, Map, MapPin } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { to: "/chat", label: "Chat", icon: MessageSquare },
   { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
   { to: "/livemap", label: "LiveMap", icon: Map },
+  { to: "/store-map", label: "Store map", icon: MapPin },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
 

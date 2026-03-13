@@ -489,7 +489,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-8">📊 Production Datasets</h2>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="rounded-xl border border-border bg-gradient-to-br from-orange-500/10 to-red-500/10 p-6 text-center">
+            <div className="rounded-xl border border-border bg-primary/5 p-6 text-center">
               <h3 className="text-xl font-bold mb-4">OTTO Kaggle</h3>
               <div className="grid grid-cols-2 gap-3 text-sm mb-4">
                 <div><strong>14M</strong> sessions</div>

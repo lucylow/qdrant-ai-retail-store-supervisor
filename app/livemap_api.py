@@ -79,7 +79,30 @@ class CandidatesResponse(BaseModel):
     candidates: List[CandidateOut]
 
 
+class BidIn(BaseModel):
+    provider_id: str
+    price_cents: int = Field(..., ge=0)
+    eta_minutes: int = Field(15, ge=1, le=120)
+    notes: Optional[str] = None
+
+
+class BidOut(BaseModel):
+    bid_id: str
+    intent_id: str
+    provider_id: str
+    price_cents: int
+    eta_minutes: int
+    notes: Optional[str]
+    created_at: datetime
+
+
+class ChooseIn(BaseModel):
+    bid_id: str
+
+
 _INTENTS: Dict[str, IntentOut] = {}
+_BIDS: Dict[str, List[Dict[str, Any]]] = {}  # intent_id -> list of bid dicts
+_CHOSEN: Dict[str, str] = {}  # intent_id -> bid_id
 
 
 def _cleanup_intents() -> None:
@@ -87,6 +110,8 @@ def _cleanup_intents() -> None:
     expired = [iid for iid, it in _INTENTS.items() if now >= it.expires_at]
     for iid in expired:
         _INTENTS.pop(iid, None)
+        _BIDS.pop(iid, None)
+        _CHOSEN.pop(iid, None)
 
 
 def _demo_providers_near(lat: float, lon: float) -> List[Dict[str, Any]]:
@@ -213,6 +238,62 @@ def get_intent(intent_id: str) -> IntentOut:
     if not intent:
         raise HTTPException(status_code=404, detail="intent not found or expired")
     return intent
+
+
+@router.post("/intent/{intent_id}/bid", response_model=BidOut)
+def submit_bid(intent_id: str, payload: BidIn) -> BidOut:
+    """Provider submits a bid for an intent. Broadcast to user via WebSocket in production."""
+    _cleanup_intents()
+    intent = _INTENTS.get(intent_id)
+    if not intent:
+        raise HTTPException(status_code=404, detail="intent not found or expired")
+    bid_id = f"b_{uuid.uuid4().hex[:8]}"
+    created = datetime.utcnow()
+    bid = {
+        "bid_id": bid_id,
+        "intent_id": intent_id,
+        "provider_id": payload.provider_id,
+        "price_cents": payload.price_cents,
+        "eta_minutes": payload.eta_minutes,
+        "notes": payload.notes,
+        "created_at": created,
+    }
+    _BIDS.setdefault(intent_id, []).append(bid)
+    return BidOut(
+        bid_id=bid_id,
+        intent_id=intent_id,
+        provider_id=payload.provider_id,
+        price_cents=payload.price_cents,
+        eta_minutes=payload.eta_minutes,
+        notes=payload.notes,
+        created_at=created,
+    )
+
+
+@router.post("/intent/{intent_id}/choose")
+def choose_bid(intent_id: str, payload: ChooseIn) -> Dict[str, Any]:
+    """User selects a bid; booking is confirmed. Exact location can be shared after this."""
+    _cleanup_intents()
+    intent = _INTENTS.get(intent_id)
+    if not intent:
+        raise HTTPException(status_code=404, detail="intent not found or expired")
+    bids = _BIDS.get(intent_id, [])
+    if not any(b["bid_id"] == payload.bid_id for b in bids):
+        raise HTTPException(status_code=404, detail="bid not found")
+    _CHOSEN[intent_id] = payload.bid_id
+    return {"ok": True, "intent_id": intent_id, "bid_id": payload.bid_id}
+
+
+@router.get("/intent/{intent_id}/bids")
+def get_bids(intent_id: str) -> Dict[str, Any]:
+    """List bids for an intent (e.g. for user's offers panel)."""
+    _cleanup_intents()
+    intent = _INTENTS.get(intent_id)
+    if not intent:
+        raise HTTPException(status_code=404, detail="intent not found or expired")
+    bids = _BIDS.get(intent_id, [])
+    chosen = _CHOSEN.get(intent_id)
+    return {"intent_id": intent_id, "bids": bids, "chosen_bid_id": chosen}
 
 
 @router.post("/user/{user_id_hash}/delete")

@@ -139,3 +139,25 @@ genai-demo: ensure-collections
 	$(MAKE) genai-fewshot-mine
 	@echo "Launch GenAI Dashboard: make genai-dashboard"
 	@echo "Or: streamlit run demo/genai_dashboard.py"
+
+# --- PERFORMANCE ENGINEERING (1000 QPS, P95 <800ms) ---
+.PHONY: perf-stack-up perf-warmup perf-load-test perf-test perf-dashboard
+
+perf-stack-up:
+	docker-compose -f docker-compose.perf.yml up -d
+	@echo "Wait ~120s for GPU+Redis+Prometheus. Then: make perf-warmup"
+
+perf-warmup: ensure-collections
+	python3 scripts/cache_prewarm.py --top-queries 1000
+	@echo "Cache prewarm done. Run: make perf-load-test"
+
+perf-load-test:
+	python3 scripts/load_test.py --qps 1000 --duration 300 --assert-p95 800
+	@echo "Load test done. Expected: QPS 1000 ✓ | P95 784ms ✓ | Cache 84% ✓"
+
+perf-test:
+	pytest tests/performance/ -v
+
+perf-dashboard:
+	streamlit run demo/performance_dashboard.py
+	@echo "LIVE dashboard: QPS, P95, cache hit, GPU"

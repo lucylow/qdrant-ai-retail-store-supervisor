@@ -1,0 +1,10 @@
+# Performance stack: GPU batches, async Redis, Prometheus
+# Install with: pip install -r requirements-perf.txt
+torch>=2.0.0
+sentence-transformers>=3.0.0
+redis[asyncio]>=5.0.0
+prometheus-client>=0.21.0
+httpx>=0.25.0
+streamlit>=1.32.0
+plotly>=5.0.0
+pandas>=2.0.0

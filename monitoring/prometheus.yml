@@ -1,0 +1,19 @@
+# Prometheus scrape config for performance metrics (1000 QPS, P95, cache, GPU)
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "retail-supervisor"
+    static_configs:
+      - targets: ["localhost:8000"]
+    metrics_path: /metrics
+    scrape_interval: 5s
+
+  - job_name: "redis"
+    static_configs:
+      - targets: ["localhost:6379"]
+
+  - job_name: "qdrant"
+    static_configs:
+      - targets: ["localhost:6333"]

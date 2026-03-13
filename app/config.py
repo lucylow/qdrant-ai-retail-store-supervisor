@@ -213,6 +213,12 @@ GENERATOR_MAX_TOKENS: Final[int] = int(os.getenv("GENERATOR_MAX_TOKENS", "512"))
 GENERATOR_TEMPERATURE: Final[float] = float(os.getenv("GENERATOR_TEMPERATURE", "0.2"))
 GENERATOR_TOP_P: Final[float] = float(os.getenv("GENERATOR_TOP_P", "1.0"))
 
+# Stripe (Swiss CHF, SCA/3DS, Apple Pay / Google Pay)
+STRIPE_SECRET_KEY: Final[Optional[str]] = os.getenv("STRIPE_SECRET_KEY") or os.getenv("STRIPE_SECRET")
+STRIPE_WEBHOOK_SECRET: Final[Optional[str]] = os.getenv("STRIPE_WEBHOOK_SECRET")
+STRIPE_PUBLISHABLE_KEY: Final[Optional[str]] = os.getenv("STRIPE_PUBLISHABLE_KEY")
+STRIPE_STATEMENT_DESCRIPTOR: Final[str] = os.getenv("STRIPE_STATEMENT_DESCRIPTOR", "Coop leShop CH")
+STRIPE_COUNTRY: Final[str] = os.getenv("STRIPE_COUNTRY", "CH")
 
 __all__ = [
     "PROJECT_NAME",
@@ -235,4 +241,9 @@ __all__ = [
     "GENERATOR_MAX_TOKENS",
     "GENERATOR_TEMPERATURE",
     "GENERATOR_TOP_P",
+    "STRIPE_SECRET_KEY",
+    "STRIPE_WEBHOOK_SECRET",
+    "STRIPE_PUBLISHABLE_KEY",
+    "STRIPE_STATEMENT_DESCRIPTOR",
+    "STRIPE_COUNTRY",
 ]

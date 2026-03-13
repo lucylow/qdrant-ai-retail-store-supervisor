@@ -229,7 +229,7 @@ export default function HackathonPage() {
             <div className="rounded-xl border border-border bg-card p-6 space-y-5">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-xl bg-primary/15">
-                  <Cogs className="w-6 h-6 text-primary" />
+                  <Cog className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold">Innovative Architecture</h3>
               </div>

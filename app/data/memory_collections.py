@@ -64,11 +64,14 @@ def ensure_memory_collections(vector_size: int | None = None) -> None:
     _safe_payload_index(client, COLL_USER_PROFILES, "userId", rest.PayloadSchemaType.KEYWORD)
     _safe_payload_index(client, COLL_USER_PROFILES, "last_updated", rest.PayloadSchemaType.DATETIME)
 
-    # goal_solution_links (episodic)
-    _safe_payload_index(client, COLL_GOAL_SOLUTION_LINKS, "goal_id", rest.PayloadSchemaType.KEYWORD)
+    # goal_solution_links (episodic) — filters for case-based retrieval (payload uses goalId, userId)
+    _safe_payload_index(client, COLL_GOAL_SOLUTION_LINKS, "goalId", rest.PayloadSchemaType.KEYWORD)
+    _safe_payload_index(client, COLL_GOAL_SOLUTION_LINKS, "userId", rest.PayloadSchemaType.KEYWORD)
     _safe_payload_index(client, COLL_GOAL_SOLUTION_LINKS, "outcome", rest.PayloadSchemaType.KEYWORD)
+    _safe_payload_index(client, COLL_GOAL_SOLUTION_LINKS, "success", rest.PayloadSchemaType.KEYWORD)
     _safe_payload_index(client, COLL_GOAL_SOLUTION_LINKS, "score", rest.PayloadSchemaType.FLOAT)
-    _safe_payload_index(client, COLL_GOAL_SOLUTION_LINKS, "user_id", rest.PayloadSchemaType.KEYWORD)
+    _safe_payload_index(client, COLL_GOAL_SOLUTION_LINKS, "region", rest.PayloadSchemaType.KEYWORD)
+    _safe_payload_index(client, COLL_GOAL_SOLUTION_LINKS, "category", rest.PayloadSchemaType.KEYWORD)
     _safe_payload_index(client, COLL_GOAL_SOLUTION_LINKS, "created_at", rest.PayloadSchemaType.DATETIME)
 
     # procedural_memory

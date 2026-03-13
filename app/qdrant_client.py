@@ -20,7 +20,7 @@ def get_qdrant_client(retries: int = 3, backoff: float = 1.0) -> QdrantClient:
     Retries a few times for transient network issues.
     """
     url = QDRANT.url or f"http://{QDRANT.host}:{QDRANT.port}"
-    kwargs: dict[str, object] = {"url": url}
+    kwargs: dict[str, object] = {"url": url, "timeout": QDRANT.timeout}
     if QDRANT.api_key:
         kwargs["api_key"] = QDRANT.api_key
     last_exc: Optional[Exception] = None

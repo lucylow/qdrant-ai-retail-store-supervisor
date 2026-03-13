@@ -17,6 +17,7 @@ class QdrantSettings:
     host: str
     port: int
     api_key: Optional[str]
+    timeout: int
     hnsw_m: int
     hnsw_ef_construct: int
     hnsw_ef_search: int
@@ -68,6 +69,39 @@ class FeatureToggles:
     self_improve: bool
 
 
+@dataclass(frozen=True)
+class ExternalProviderSettings:
+    """Production external APIs: HF, Whisper, Replicate, Groq (agent), ElevenLabs (TTS)."""
+
+    hf_token: Optional[str]
+    hf_text_model: str
+    hf_image_model: str
+    openai_api_key: Optional[str]
+    replicate_api_token: Optional[str]
+    use_external_embeddings: bool
+    # LLM agent: Groq (42ms) or OpenAI GPT-4o mini for inventory/shopper reply
+    groq_api_key: Optional[str]
+    agent_provider: str  # "groq" | "openai" | "none"
+    # TTS: German voice response (e.g. ElevenLabs)
+    elevenlabs_api_key: Optional[str]
+    elevenlabs_voice_id: str
+
+
+EXTERNAL_PROVIDERS: Final[ExternalProviderSettings] = ExternalProviderSettings(
+    hf_token=os.getenv("HF_TOKEN"),
+    hf_text_model=os.getenv("HF_TEXT_MODEL", "BAAI/bge-m3"),
+    hf_image_model=os.getenv("HF_IMAGE_MODEL", "openai/clip-vit-base-patch32"),
+    openai_api_key=os.getenv("OPENAI_API_KEY"),
+    replicate_api_token=os.getenv("REPLICATE_API_TOKEN"),
+    use_external_embeddings=os.getenv("USE_EXTERNAL_EMBEDDINGS", "false").lower()
+    in ("1", "true", "yes"),
+    groq_api_key=os.getenv("GROQ_API_KEY"),
+    agent_provider=os.getenv("AGENT_PROVIDER", "groq").lower(),
+    elevenlabs_api_key=os.getenv("ELEVENLABS_API_KEY"),
+    elevenlabs_voice_id=os.getenv("ELEVENLABS_VOICE_ID", "EXAVITQu4vr4xnSDxMaL"),
+)
+
+
 BASE_DIR: Final[Path] = Path(os.getenv("BASE_DIR", "/tmp")).resolve()
 ARTIFACTS_DIR: Final[Path] = Path(
     os.getenv("ARTIFACTS_DIR", str(BASE_DIR / "artifacts"))
@@ -78,6 +112,7 @@ QDRANT: Final[QdrantSettings] = QdrantSettings(
     host=os.getenv("QDRANT_HOST", "localhost"),
     port=int(os.getenv("QDRANT_PORT", "6333")),
     api_key=os.getenv("QDRANT_API_KEY"),
+    timeout=int(os.getenv("QDRANT_TIMEOUT", "60")),
     hnsw_m=int(os.getenv("HNSW_M", "16")),
     hnsw_ef_construct=int(os.getenv("HNSW_EF_CONSTRUCT", "200")),
     hnsw_ef_search=int(os.getenv("HNSW_EF_SEARCH", "128")),
@@ -191,6 +226,8 @@ __all__ = [
     "FASHION_CLIP_COLLECTION",
     "CONTEXT",
     "FEATURES",
+    "EXTERNAL_PROVIDERS",
+    "ExternalProviderSettings",
     "GENAI",
     "GenAISettings",
     "GENERATOR_PROVIDER",

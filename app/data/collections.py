@@ -10,6 +10,7 @@ from app.multimodal.schema import (
     PRODUCTS_MULTIMODAL_COLLECTION,
     get_products_multimodal_vectors_config,
 )
+from app.multimodal.semantic_cache import ensure_semantic_cache_collection
 
 FASHION_CLIP_DIM = 512
 
@@ -37,8 +38,9 @@ def ensure_all_collections() -> None:
     Idempotently ensure all Qdrant collections exist with sane defaults.
     """
     client = get_qdrant_client()
-    ensure_collection(client, COLL_GOALS, vector_size=64, distance=rest.Distance.COSINE)
+    ensure_collection(client, COLL_GOALS, vector_size=384, distance=rest.Distance.COSINE)
     ensure_collection(client, COLL_PRODUCTS, vector_size=256, distance=rest.Distance.COSINE)
+    ensure_collection(client, COLL_SOLUTIONS, vector_size=384, distance=rest.Distance.COSINE)
     ensure_collection(
         client, COLL_REASONING_GRAPHS, vector_size=384, distance=rest.Distance.COSINE
     )
@@ -52,9 +54,15 @@ def ensure_all_collections() -> None:
     ensure_named_vectors_collection(
         client, FASHION_CLIP_COLLECTION, get_fashion_clip_vectors_config()
     )
+    ensure_semantic_cache_collection(client)
     try:
         from app.data.memory_collections import ensure_memory_collections
         ensure_memory_collections()
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        from app.data.shared_memory_indexes import ensure_shared_memory_indexes
+        ensure_shared_memory_indexes(client)
     except Exception:  # noqa: BLE001
         pass
 

@@ -1,5 +1,7 @@
 """
 API for multimodal RAG: video/audio indexing and voice+photo+text search with RRF.
+
+Production: POST /multimodal/production uses Qdrant Cloud + HF + Whisper + semantic cache.
 """
 
 from __future__ import annotations
@@ -9,6 +11,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, File, Form, UploadFile
 
 from app.multimodal.search import multimodal_search_with_payload
+from app.multimodal.production import ProductionMultiAgentStore
 from app.qdrant_client import get_qdrant_client
 
 router = APIRouter(prefix="/multimodal", tags=["multimodal"])
@@ -61,3 +64,43 @@ async def multimodal_search_endpoint(
             for r in results
         ],
     }
+
+
+@router.post("/production")
+async def production_multimodal(
+    text_query: Optional[str] = Form(None),
+    voice_audio: Optional[UploadFile] = File(None),
+    user_photo: Optional[UploadFile] = File(None),
+    limit: int = 5,
+    use_semantic_cache: bool = True,
+    use_agent: bool = True,
+    use_tts: bool = True,
+    stock_status: Optional[str] = Form("instock"),
+) -> Dict[str, Any]:
+    """
+    Production pipeline: voice + photo + text → Whisper → HF embeddings → semantic cache
+    → multi-vector search (Qdrant Cloud) → Groq/OpenAI agent → optional ElevenLabs TTS.
+    Set HF_TOKEN, OPENAI_API_KEY, GROQ_API_KEY, ELEVENLABS_API_KEY for full demo flow.
+    """
+    client = get_qdrant_client()
+    store = ProductionMultiAgentStore(client)
+    voice_bytes: Optional[bytes] = None
+    photo_bytes: Optional[bytes] = None
+    if voice_audio and voice_audio.filename:
+        voice_bytes = await voice_audio.read()
+    if user_photo and user_photo.filename:
+        photo_bytes = await user_photo.read()
+    try:
+        bundle = store.process_query(
+            voice_audio=voice_bytes,
+            user_photo=photo_bytes,
+            text_query=text_query or None,
+            use_semantic_cache=use_semantic_cache,
+            use_agent=use_agent,
+            use_tts=use_tts,
+            stock_status=stock_status,
+            limit=limit,
+        )
+    except Exception as e:
+        return {"error": str(e), "from_cache": False, "results": [], "count": 0}
+    return bundle

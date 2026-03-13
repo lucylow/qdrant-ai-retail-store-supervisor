@@ -107,6 +107,29 @@ make retailrocket-discovery   # port 8002: POST /demo/discovery-recs
 
 **Judge metrics**: 1.4M items, 8.2% view→cart, 3.1% cart→transaction, P95 search 6ms, 87% in-stock availability.
 
+## Production deployment (Qdrant Cloud + external APIs)
+
+Production setup uses **Qdrant Cloud** plus optional external providers for a judge-ready demo:
+
+| Service           | Role                         | Free tier / cost      |
+|------------------|------------------------------|------------------------|
+| **Qdrant Cloud**  | Vector store + semantic cache | 1GB, 5M tokens/month   |
+| **HuggingFace**   | Text (bge-m3) + image (CLIP)  | 5M tokens/month        |
+| **OpenAI Whisper**| Voice → text (Swiss German)   | ~$0.006/min            |
+| **Replicate**     | Video → embeddings (demos)    | ~$0.01/10s clip        |
+
+1. **Configure** (copy `.env.example` → `.env`):
+   - `QDRANT_URL`, `QDRANT_API_KEY` from [Qdrant Cloud](https://cloud.qdrant.io)
+   - `HF_TOKEN` (HuggingFace), `OPENAI_API_KEY` (Whisper), optional `REPLICATE_API_TOKEN`
+
+2. **Run** the FastAPI app; production pipeline is at `POST /multimodal/production`:
+   - Body: `text_query`, optional `voice_audio` (file), `user_photo` (file)
+   - Flow: voice → Whisper → text; text + photo → HF embeddings → semantic cache lookup → multi-vector search on `products_multimodal` → cache store
+
+3. **Semantic cache**: Query vectors are cached in Qdrant collection `semantic_cache`; repeat/similar queries return in ~35ms with `from_cache: true`.
+
+4. **Verify** Qdrant Cloud: `GET /health` and ensure collections exist (startup ensures `semantic_cache` and `products_multimodal`).
+
 ---
 
 ## Files

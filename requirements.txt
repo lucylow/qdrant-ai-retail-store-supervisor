@@ -30,3 +30,9 @@ prophet>=1.1.0
 jinja2>=3.1.0
 pydantic>=2.0.0
 pytest-asyncio>=0.23.0
+
+# Production external providers (Qdrant Cloud + HF + Whisper + Replicate + Groq + ElevenLabs)
+openai>=1.0.0
+replicate>=0.25.0
+groq>=0.4.0
+requests>=2.28.0

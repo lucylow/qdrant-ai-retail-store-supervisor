@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Award, Database, Github, ExternalLink, Cogs, CheckCircle2, Shield, Zap, Layers, Activity, Quote, Video, Mic, Image } from "lucide-react";
+import { Award, Database, Github, ExternalLink, Cog, CheckCircle2, Shield, Zap, Layers, Activity, Quote, Video, Mic, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 /** Production-grade agent quality metrics vs industry benchmarks */

@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { to: "/", label: "Home", icon: Zap },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/chat", label: "Chat", icon: MessageSquare },
-  { to: "/visual-search", label: "Visual Search", icon: ImageSearch },
+  { to: "/visual-search", label: "Visual Search", icon: ScanSearch },
   { to: "/goals", label: "Goals", icon: Target },
   { to: "/episodes", label: "Memory", icon: BookOpen },
   { to: "/products", label: "Products", icon: ShoppingBag },

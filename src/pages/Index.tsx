@@ -498,7 +498,7 @@ export default function LandingPage() {
                 <div><strong>8ms</strong> P95</div>
               </div>
             </div>
-            <div className="rounded-xl border border-border bg-gradient-to-br from-indigo-500/10 to-purple-500/10 p-6 text-center">
+            <div className="rounded-xl border border-border bg-accent/5 p-6 text-center">
               <h3 className="text-xl font-bold mb-4">RetailRocket</h3>
               <div className="grid grid-cols-2 gap-3 text-sm mb-4">
                 <div><strong>2.7M</strong> events</div>

@@ -197,7 +197,7 @@ export default function HackathonPage() {
           {/* Innovation: Novel Architecture (2 pillars) */}
           <div className="rounded-xl border border-border bg-card p-5 space-y-4">
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Cogs className="w-5 h-5 text-primary" /> Innovation (Novel Architecture)
+              <Cog className="w-5 h-5 text-primary" /> Innovation (Novel Architecture)
             </h3>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">

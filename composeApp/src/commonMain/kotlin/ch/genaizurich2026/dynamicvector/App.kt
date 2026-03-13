@@ -1,47 +1,96 @@
 package ch.genaizurich2026.dynamicvector
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.animation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.resources.painterResource
-
-import dynamicvector.composeapp.generated.resources.Res
-import dynamicvector.composeapp.generated.resources.compose_multiplatform
+import androidx.compose.ui.unit.dp
+import ch.genaizurich2026.dynamicvector.components.BottomNavBar
+import ch.genaizurich2026.dynamicvector.navigation.BottomNavTab
+import ch.genaizurich2026.dynamicvector.navigation.Screen
+import ch.genaizurich2026.dynamicvector.screens.*
+import ch.genaizurich2026.dynamicvector.theme.DynamicVectorTheme
 
 @Composable
-@Preview
 fun App() {
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
+    DynamicVectorTheme {
+        var currentScreen by remember { mutableStateOf<Screen>(Screen.Login) }
+        var selectedTab by remember { mutableStateOf(BottomNavTab.HOME) }
+
+        when (currentScreen) {
+            is Screen.Login -> {
+                LoginScreen(
+                    onLogin = { currentScreen = Screen.Home },
+                )
             }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
+
+            else -> {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            when (currentScreen) {
+                                is Screen.NewQuery -> {
+                                    NewQueryScreen(
+                                        onBack = {
+                                            currentScreen = Screen.Home
+                                            selectedTab = BottomNavTab.HOME
+                                        },
+                                    )
+                                }
+                                else -> {
+                                    AnimatedContent(
+                                        targetState = selectedTab,
+                                        transitionSpec = {
+                                            fadeIn() togetherWith fadeOut()
+                                        },
+                                    ) { tab ->
+                                        when (tab) {
+                                            BottomNavTab.HOME -> HomeScreen(
+                                                onNewQuery = { currentScreen = Screen.NewQuery },
+                                            )
+                                            BottomNavTab.REPOSITORIES -> RepositoriesScreen()
+                                            BottomNavTab.PROFILE -> ProfileScreen()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        BottomNavBar(
+                            selectedTab = selectedTab,
+                            onTabSelected = { tab ->
+                                selectedTab = tab
+                                currentScreen = when (tab) {
+                                    BottomNavTab.HOME -> Screen.Home
+                                    BottomNavTab.REPOSITORIES -> Screen.Repositories
+                                    BottomNavTab.PROFILE -> Screen.Profile
+                                }
+                            },
+                        )
+                    }
+
+                    // FAB for New Query - only on Home tab, not when already on NewQuery
+                    if (selectedTab == BottomNavTab.HOME && currentScreen !is Screen.NewQuery) {
+                        FloatingActionButton(
+                            onClick = { currentScreen = Screen.NewQuery },
+                            shape = CircleShape,
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier
+                                .padding(end = 20.dp, bottom = 92.dp)
+                                .align(Alignment.BottomEnd),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = "New Query",
+                            )
+                        }
+                    }
                 }
             }
         }

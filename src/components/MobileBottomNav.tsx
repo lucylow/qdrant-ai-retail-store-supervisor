@@ -3,12 +3,12 @@ import { Home, MessageSquare, Package, MapPin, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const MOBILE_TABS = [
-  { to: "/", label: "Home", icon: Home, end: true },
-  { to: "/chat", label: "Chat", icon: MessageSquare },
-  { to: "/dashboard", label: "Dashboard", icon: Package },
-  { to: "/livemap", label: "Map", icon: MapPin },
-  { to: "/settings", label: "Settings", icon: Settings },
-] as const;
+  { to: "/", label: "Home", icon: Home, end: true as const },
+  { to: "/chat", label: "Chat", icon: MessageSquare, end: false as const },
+  { to: "/dashboard", label: "Dashboard", icon: Package, end: false as const },
+  { to: "/livemap", label: "Map", icon: MapPin, end: false as const },
+  { to: "/settings", label: "Settings", icon: Settings, end: false as const },
+];
 
 export function MobileBottomNav() {
   const location = useLocation();

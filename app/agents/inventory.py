@@ -75,13 +75,50 @@ class InventoryAgent:
         self,
         query: str,
         episodic_skus: Sequence[str] | None = None,
+        *,
+        region: str | None = None,
+        budget_eur: float | None = None,
+        stock_gt: int | None = None,
     ) -> InventorySearchContext:
         started = time.perf_counter()
         client = get_qdrant_client()
         candidates: List[Product] = []
         prefer_skus: Set[str] = set(episodic_skus or [])
 
-        if self._use_semantic_search:
+        # Filtered product search (stock, region, price) when constraints provided
+        use_filtered = region is not None or budget_eur is not None or stock_gt is not None
+        if use_filtered:
+            try:
+                from app.data.product_search import search_products_filtered
+                from app.config import QDRANT
+
+                hits = search_products_filtered(
+                    query,
+                    limit=32,
+                    region=region,
+                    price_lte=budget_eur,
+                    stock_gt=stock_gt,
+                    hnsw_ef=getattr(QDRANT, "hnsw_ef_search", None) or 128,
+                )
+                for h in hits:
+                    p = _product_from_payload(h.get("payload") or {})
+                    if p:
+                        candidates.append(p)
+                logger.info(
+                    "Inventory filtered search",
+                    extra={
+                        "event": "inventory.filtered_search",
+                        "query": query[:80],
+                        "candidates": len(candidates),
+                        "region": region,
+                        "budget_eur": budget_eur,
+                    },
+                )
+            except Exception as e:  # noqa: BLE001
+                logger.warning("Filtered search failed, falling back to unfiltered: %s", e)
+                use_filtered = False
+
+        if not use_filtered and self._use_semantic_search:
             try:
                 from app.embeddings import embed_single
 
@@ -223,20 +260,51 @@ class InventoryAgent:
         goal_vec = embed_single(goal_text).vectors[0].tolist()
         region = goal.region
 
+        from app.config import QDRANT
+        hnsw_ef_episodic = getattr(QDRANT, "hnsw_ef_search", None) or 192  # higher recall for episodic
+
         episodic_hits = episodic_search(
             goal_text,
             top_k=4,
             outcome_filter="purchased",
             min_score=0.70,
+            hnsw_ef=hnsw_ef_episodic,
         )
         if not episodic_hits:
-            episodic_hits = episodic_search(goal_text, top_k=4, outcome_filter="success", min_score=0.70)
+            episodic_hits = episodic_search(
+                goal_text,
+                top_k=4,
+                outcome_filter="success",
+                min_score=0.70,
+                hnsw_ef=hnsw_ef_episodic,
+            )
         episodic_summaries = format_episodic_summaries(episodic_hits, max_lines=5)
 
         procedural_hits = procedural_search(goal_vec, top_k=3, min_success_rate=0.80)
         procedural_pattern = format_procedural_pattern(procedural_hits)
 
-        ctx = self.initial_search(goal_text, episodic_skus=None)
+        # Episodic SKUs for sort bias (from prior successful bundles when present in payload)
+        episodic_skus_list: List[str] | None = None
+        for h in episodic_hits[:3]:
+            opt = (h.get("payload") or {}).get("optimalBundles") or []
+            if opt and isinstance(opt, list):
+                for b in opt:
+                    if isinstance(b, str):
+                        episodic_skus_list = (episodic_skus_list or []) + [s.strip() for s in b.split(",") if s.strip()][:5]
+            # goal_solution_links payload may have solution_skus in procedural-style payload
+            skus = (h.get("payload") or {}).get("solution_skus")
+            if skus and isinstance(skus, list):
+                episodic_skus_list = (episodic_skus_list or []) + [str(s) for s in skus[:5]]
+        if episodic_skus_list:
+            episodic_skus_list = list(dict.fromkeys(episodic_skus_list))[:15]
+
+        ctx = self.initial_search(
+            goal_text,
+            episodic_skus=episodic_skus_list,
+            region=region,
+            budget_eur=goal.budget_eur,
+            stock_gt=None,  # set to 0 when products payload has "stock" for in-stock-only
+        )
         snippets: List[str] = []
         for p in ctx.candidates[:12]:
             attrs = getattr(p, "attributes", None) or {}

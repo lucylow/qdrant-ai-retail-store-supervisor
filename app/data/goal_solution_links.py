@@ -74,10 +74,12 @@ def search_similar(
     outcome_filter: str | None = None,
     user_id: str | None = None,
     min_score: float | None = None,
+    hnsw_ef: int | None = None,
+    success_only: bool = False,
 ) -> list[dict[str, Any]]:
     """
-    Semantic search for episodes similar to goal_text.
-    Optionally filter by outcome (e.g. "purchased", "success"), user_id, min_score.
+    Semantic search for episodes similar to goal_text (case-based retrieval).
+    Optionally filter by outcome, user_id, min_score; hnsw_ef increases recall.
     """
     client = get_qdrant_client()
     vec = _embed_text(goal_text)
@@ -90,13 +92,17 @@ def search_similar(
         must.append(FieldCondition(key="userId", match=MatchValue(value=user_id)))
     if min_score is not None:
         must.append(FieldCondition(key="score", range=Range(gte=min_score)))
+    if success_only:
+        must.append(FieldCondition(key="success", match=MatchValue(value=True)))
     flt = Filter(must=must) if must else None
+    params = rest.SearchParams(hnsw_ef=hnsw_ef) if hnsw_ef else None
     hits = client.search(
         collection_name=COLL_GOAL_SOLUTION_LINKS,
         query_vector=vec,
         limit=top_k,
         query_filter=flt,
         with_payload=True,
+        params=params,
     )
     return [{"id": h.id, "score": h.score, "payload": h.payload or {}} for h in hits]
 

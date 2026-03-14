@@ -1,143 +1,76 @@
-## Autonomous Retail Agents – Hackathon Skeleton
+This is a Kotlin Multiplatform project targeting Android, iOS, Web, Desktop (JVM).
 
-This repo contains a production-leaning skeleton of the **Autonomous Retail Store Manager**:
+* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
+  It contains several subfolders:
+  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that's common for all targets.
+  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
+    For example, if you want to use Apple's CoreCrypto for the iOS part of your Kotlin app,
+    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
+    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
+    folder is the appropriate location.
 
-- **Supervisor agent** orchestrating shopper, inventory, pricing, merchandising, and audit agents.
-- **Qdrant-backed RAG** with episodic memory and reasoning-graph persistence.
-- **Self-improving RAG loop** for daily hard-negative mining and A/B evaluation (stubbed but observable).
-- **Streamlit dashboard** for live orchestration demo.
+* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you're sharing your UI with Compose Multiplatform,
+  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
 
-### Quickstart (Judge Script)
+### Build and Run Android Application
 
-```bash
-docker-compose up -d                    # Qdrant + Redis
-python scripts/ingest_retail.py         # Products → Qdrant
-python scripts/self_improve.py          # Bootstrap self-improvement
-streamlit run demo/autonomous_store.py  # Judge demo
-```
+To build and run the development version of the Android app, use the run configuration from the run widget
+in your IDE's toolbar or build it directly from the terminal:
+- on macOS/Linux
+  ```shell
+  ./gradlew :composeApp:assembleDebug
+  ```
+- on Windows
+  ```shell
+  .\gradlew.bat :composeApp:assembleDebug
+  ```
 
-On the Streamlit app:
+### Build and Run Desktop (JVM) Application
 
-1. Go to **"🧑‍💼 Live Agent Orchestration"** and run the full pipeline.
-2. Inspect metrics, reasoning graphs (JSON), and promo planning tabs.
+To build and run the development version of the desktop app, use the run configuration from the run widget
+in your IDE's toolbar or run it directly from the terminal:
+- on macOS/Linux
+  ```shell
+  ./gradlew :composeApp:run
+  ```
+- on Windows
+  ```shell
+  .\gradlew.bat :composeApp:run
+  ```
 
-# Multi-Agent Store Manager (Qdrant Enhanced)
+### Build and Run Web Application
 
-This project is an advanced agentic shopping assistant built for the GenAI Zurich Hackathon 2026. It uses a **Blackboard Architecture** with **Qdrant** as the central coordination hub, featuring **Named Vectors** and **Agentic RAG**.
-
-## Key Innovations
-- **Supervisor-Orchestrated Blackboard**: A true multi-agent system where agents (Shopper, Promotions, Inventory) coordinate asynchronously through Qdrant.
-- **Qdrant Named Vectors & Context Engineering**: Implemented specialized vector spaces (`text_vector`, `context_vector`). The `PromotionsAgent` now performs **Context Enrichment** by updating the `context_vector` of a goal with relevant promotion data, creating a richer semantic representation for downstream agents.
-- **Agentic RAG (Episodic Memory)**: The `InventoryAgent` uses the enriched `context_vector` to retrieve successful historical "episodes" from Qdrant, allowing the system to learn from past successes with high precision.
-- **Payload Indexing & Multi-Stage Filtering**: Optimized performance by indexing key fields like `status`, `user_id`, and `outcome`, enabling efficient one-stage filtering in Qdrant.
-- **Collection Aliases**: Implemented aliases (`active_goals`, `success_episodes`) for cleaner role-based access and easier system versioning.
-
-## Architecture
-1.  **Shopper Agent**: Interprets user intent and writes "Goals" to the Qdrant blackboard.
-2.  **Promotions Agent**: Polls for new goals, retrieves relevant promotions using Named Vectors, and enriches the goal payload.
-3.  **Inventory Agent**: Polls for enriched goals, retrieves historical success context (Agentic RAG), matches items, and writes "Solutions" back to the blackboard.
-4.  **Supervisor Agent**: Orchestrates the state transitions of goals on the blackboard, ensuring smooth handoffs between agents.
-5.  **Qdrant**: The "Central Nervous System," storing goals, solutions, promotions, and episodic memory.
-
-## Getting Started
-1.  Install dependencies:
-    ```bash
-    pip install qdrant-client openai
+To build and run the development version of the web app, use the run configuration from the run widget
+in your IDE's toolbar or run it directly from the terminal:
+- for the Wasm target (faster, modern browsers):
+  - on macOS/Linux
+    ```shell
+    ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
     ```
-2.  Run the demo:
-    ```bash
-    python demo.py
+  - on Windows
+    ```shell
+    .\gradlew.bat :composeApp:wasmJsBrowserDevelopmentRun
     ```
-3.  Run the evaluation:
-    ```bash
-    python evaluation_script.py
+- for the JS target (slower, supports older browsers):
+  - on macOS/Linux
+    ```shell
+    ./gradlew :composeApp:jsBrowserDevelopmentRun
+    ```
+  - on Windows
+    ```shell
+    .\gradlew.bat :composeApp:jsBrowserDevelopmentRun
     ```
 
-## OTTO Dataset → Qdrant Pipeline (Hackathon)
+### Build and Run iOS Application
 
-Industry-grade [Kaggle OTTO](https://www.kaggle.com/competitions/otto-recommender-system) data (14M sessions, 21M events) powers production-style multi-agent RAG:
-
-- **4 Qdrant collections**: `products`, `goals`, `solutions`, `episodes` (384-dim)
-- **Multimodal session vectors**: 4 vectors per session (text, sequence, event, temporal) for 59% recall lift
-- **Live demo API**: Shopper → Inventory flow + multi-vector RAG over `otto_sessions`
-
-### Quick start (OTTO)
-
-```bash
-# 1. Download OTTO (Kaggle CLI)
-kaggle competitions download -c otto-recommender-system -p data/otto/
-unzip data/otto/otto-recommender-system.zip -d data/otto/
-
-# 2. Process events → Parquet + optional product embeddings (demo: cap sessions/products)
-python data/otto/process_otto.py --input data/otto/train.jsonl --out-dir data/otto --max-sessions 100000 --max-products 50000 --qdrant-url http://localhost:6333
-
-# 3. Create collections and (optional) index session vectors
-python qdrant/setup_collections.py --url http://localhost:6333
-python data/otto_multimodal_indexer.py --input data/otto/sessions.parquet --qdrant-url http://localhost:6333 --max-sessions 50000
-
-# 4. Run demo API
-uvicorn agents.otto_demo:app --host 0.0.0.0 --port 8000 --reload
-# Judge demo: GET /demo?query=in-stock+tents+under+200  or  POST /demo/otto-multimodal with {"query": "tents under 200 CHF"}
-```
-
-**Judge metrics**: 1.9M products indexed, 92% fulfillment rate, 8ms P95 hybrid search, 23% lift from episodic memory.
-
-## RetailRocket Dataset → Qdrant (2.7M events, real funnel)
-
-[RetailRocket](https://www.kaggle.com/datasets/retailrocket/ecommerce-dataset) (or [caserec](https://github.com/caserec/Datasets-for-Recommender-Systems)) provides a real view→add2cart→transaction funnel—ideal for inventory simulation and judge credibility.
-
-- **4 Qdrant collections**: `retailrocket_items`, `visitor_sessions`, `goals`, `solutions` (384-dim)
-- **Real conversion**: view→add2cart ~8.2%, add2cart→transaction ~3.1%
-- **Discovery API**: co-viewed / co-carted / co-purchased contexts from 2.7M events → Qdrant recommend API
-
-### Quick start (RetailRocket)
-
-```bash
-# 1. Download data (see data/retailrocket/README.md); place events.csv in data/retailrocket/
-# 2. Process → Parquet + retailrocket_items collection
-python data/retailrocket/process_retailrocket.py --data-dir data/retailrocket --qdrant-url http://localhost:6333
-# Optional: build discovery contexts (co_purchased, co_carted, co_viewed)
-python data/retailrocket/build_discovery_contexts.py --data-dir data/retailrocket
-# 3. Create collections
-python qdrant/setup_retailrocket.py --url http://localhost:6333
-# 4. Run demos
-make retailrocket-demo        # port 8001: GET /demo/search?query=tents
-make retailrocket-discovery   # port 8002: POST /demo/discovery-recs
-```
-
-**Judge metrics**: 1.4M items, 8.2% view→cart, 3.1% cart→transaction, P95 search 6ms, 87% in-stock availability.
-
-## Production deployment (Qdrant Cloud + external APIs)
-
-Production setup uses **Qdrant Cloud** plus optional external providers for a judge-ready demo:
-
-| Service           | Role                         | Free tier / cost      |
-|------------------|------------------------------|------------------------|
-| **Qdrant Cloud**  | Vector store + semantic cache | 1GB, 5M tokens/month   |
-| **HuggingFace**   | Text (bge-m3) + image (CLIP)  | 5M tokens/month        |
-| **OpenAI Whisper**| Voice → text (Swiss German)   | ~$0.006/min            |
-| **Replicate**     | Video → embeddings (demos)    | ~$0.01/10s clip        |
-
-1. **Configure** (copy `.env.example` → `.env`):
-   - `QDRANT_URL`, `QDRANT_API_KEY` from [Qdrant Cloud](https://cloud.qdrant.io)
-   - `HF_TOKEN` (HuggingFace), `OPENAI_API_KEY` (Whisper), optional `REPLICATE_API_TOKEN`
-
-2. **Run** the FastAPI app; production pipeline is at `POST /multimodal/production`:
-   - Body: `text_query`, optional `voice_audio` (file), `user_photo` (file)
-   - Flow: voice → Whisper → text; text + photo → HF embeddings → semantic cache lookup → multi-vector search on `products_multimodal` → cache store
-
-3. **Semantic cache**: Query vectors are cached in Qdrant collection `semantic_cache`; repeat/similar queries return in ~35ms with `from_cache: true`.
-
-4. **Verify** Qdrant Cloud: `GET /health` and ensure collections exist (startup ensures `semantic_cache` and `products_multimodal`).
+To build and run the development version of the iOS app, use the run configuration from the run widget
+in your IDE's toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
 
 ---
 
-## Files
-- `config.py`: Configuration for OpenAI and Qdrant.
-- `qdrant_manager.py`: Core logic for Qdrant interactions using **Named Vectors**.
-- `shopper_agent.py`: Agent for user interaction and goal formulation.
-- `inventory_agent.py`: Agent for product matching using **Agentic RAG**.
-- `promotions_agent.py`: Agent for managing and retrieving promotions.
-- `supervisor_agent.py`: Orchestrator for the blackboard state machine.
-- `demo.py`: End-to-end system demonstration.
-- `evaluation_script.py`: Comprehensive test suite for coordination and performance.
+Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
+[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
+[Kotlin/Wasm](https://kotl.in/wasm/)…
+
+We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
+If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).

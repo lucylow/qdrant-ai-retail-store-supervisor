@@ -1,4 +1,3 @@
-```markdown
 # Dynamic Vector – Qdrant AI Retail Store Supervisor 🇨🇭
 
 > Multi‑agent, Qdrant‑powered AI supervisor for Swiss retail (Coop/Migros class) with holiday‑aware inventory, TWINT/Stripe checkout, punctual pickup scheduling, and production‑grade governance.
@@ -717,4 +716,4 @@ The orchestrator can be LLM‑agnostic:
   - New region packs (DE/FR/IT beyond Switzerland).
 
 > If you’re running Qdrant in production retail or want to adapt Dynamic Vector to another market, open an issue or PR – this repo is designed as a **reference architecture** for agentic retail AI with Qdrant.
-```
+

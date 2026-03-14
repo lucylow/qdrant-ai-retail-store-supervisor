@@ -12,6 +12,15 @@ val Purple400 = Color(0xFFA78BFA)
 val Purple200 = Color(0xFFDDD6FE)
 val Purple50 = Color(0xFFF5F3FF)
 
+// Rating / score accents
+val Amber500 = Color(0xFFF59E0B)
+val Amber400 = Color(0xFFFBBF24)
+
+// Match score indicators
+val MatchHigh = Color(0xFF16A34A)
+val MatchMedium = Color(0xFFD97706)
+val MatchLow = Color(0xFF6B7280)
+
 // Tag colors
 val TagGreen = Color(0xFF16A34A)
 val TagGreenBg = Color(0xFFDCFCE7)
@@ -60,7 +69,7 @@ private val DarkColorScheme = darkColorScheme(
     onBackground = Color(0xFFF1F5F9),
     surface = Color(0xFF1E293B),
     onSurface = Color(0xFFF1F5F9),
-    surfaceVariant = Color(0xFF1E293B),
+    surfaceVariant = Color(0xFF283548),
     onSurfaceVariant = Color(0xFF94A3B8),
     outline = Color(0xFF334155),
     outlineVariant = Color(0xFF1E293B),

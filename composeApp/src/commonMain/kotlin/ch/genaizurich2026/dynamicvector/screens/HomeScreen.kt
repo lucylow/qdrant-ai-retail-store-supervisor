@@ -26,15 +26,19 @@ import androidx.compose.ui.unit.sp
 import ch.genaizurich2026.dynamicvector.components.QueryFilterChip
 import ch.genaizurich2026.dynamicvector.data.intervalLabels
 import ch.genaizurich2026.dynamicvector.data.mockHistory
+import ch.genaizurich2026.dynamicvector.data.mockProfile
 import ch.genaizurich2026.dynamicvector.data.mockSavedQueries
+import ch.genaizurich2026.dynamicvector.model.ShoppingQuery
 
 @Composable
 fun HomeScreen(
     onNewQuery: () -> Unit,
+    showSnackbar: (String) -> Unit = {},
 ) {
     val queries = mockSavedQueries
     val history = mockHistory
     var activeTab by remember { mutableStateOf("queries") }
+    var queryToDelete by remember { mutableStateOf<ShoppingQuery?>(null) }
 
     Column(
         modifier = Modifier
@@ -42,8 +46,24 @@ fun HomeScreen(
             .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding(),
     ) {
+        // Greeting header
+        Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 4.dp)) {
+            Text(
+                text = "Hi ${mockProfile.name.split(" ").first()}",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Text(
+                text = "${queries.size} saved queries",
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+        }
+
         // Tab switcher
-        Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
+        Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 16.dp)) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant,
@@ -149,16 +169,15 @@ fun HomeScreen(
                                                     SmallIconButton(
                                                         icon = Icons.Outlined.PlayArrow,
                                                         contentDescription = "Run query",
-                                                    ) { }
+                                                    ) { showSnackbar("Running \"${query.name}\"\u2026") }
                                                     SmallIconButton(
                                                         icon = Icons.Outlined.CalendarMonth,
                                                         contentDescription = "Schedule",
-                                                    ) { }
-                                                    // Delete button
+                                                    ) { showSnackbar("Schedule updated for \"${query.name}\"") }
                                                     SmallIconButton(
                                                         icon = Icons.Outlined.Delete,
                                                         contentDescription = "Delete",
-                                                    ) { }
+                                                    ) { queryToDelete = query }
                                                 }
                                             }
 
@@ -256,6 +275,7 @@ fun HomeScreen(
                                         Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()
+                                                .clickable { showSnackbar("Opening \"${entry.queryName}\" results\u2026") }
                                                 .padding(16.dp),
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically,
@@ -292,6 +312,34 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    queryToDelete?.let { query ->
+        AlertDialog(
+            onDismissRequest = { queryToDelete = null },
+            title = { Text("Delete Query") },
+            text = {
+                Text("Are you sure you want to delete \"${query.name}\"? This action cannot be undone.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        queryToDelete = null
+                        showSnackbar("\"${query.name}\" deleted")
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                    ),
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { queryToDelete = null }) {
+                    Text("Cancel")
+                }
+            },
+        )
     }
 }
 

@@ -1,6 +1,7 @@
 package ch.genaizurich2026.dynamicvector.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -19,10 +20,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import ch.genaizurich2026.dynamicvector.data.mockHistory
 import ch.genaizurich2026.dynamicvector.data.mockProfile
+import ch.genaizurich2026.dynamicvector.data.mockRepositories
+import ch.genaizurich2026.dynamicvector.data.mockSavedQueries
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(
+    onSignOut: () -> Unit = {},
+) {
     val p = mockProfile
     val scrollState = rememberScrollState()
 
@@ -67,6 +73,20 @@ fun ProfileScreen() {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 2.dp),
         )
+
+        Spacer(Modifier.height(20.dp))
+
+        // Stats section
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            StatCard("Queries", "${mockSavedQueries.size}", Modifier.weight(1f), isFirst = true)
+            StatCard("Results", "${mockHistory.sumOf { it.resultCount }}", Modifier.weight(1f))
+            StatCard("Repos", "${mockRepositories.size}", Modifier.weight(1f), isLast = true)
+        }
 
         Spacer(Modifier.height(24.dp))
 
@@ -144,8 +164,18 @@ fun ProfileScreen() {
                 isFirst = true,
                 isLast = true,
                 isDestructive = true,
+                onClick = onSignOut,
             )
         }
+
+        Spacer(Modifier.height(24.dp))
+
+        // Version footer
+        Text(
+            text = "Dynamic Vector v0.1.0",
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+        )
 
         // Bottom spacer for nav bar
         Spacer(Modifier.height(80.dp))
@@ -204,12 +234,52 @@ private fun ProfileRow(
 }
 
 @Composable
+private fun StatCard(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    isFirst: Boolean = false,
+    isLast: Boolean = false,
+) {
+    val shape = when {
+        isFirst -> RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp, topEnd = 4.dp, bottomEnd = 4.dp)
+        isLast -> RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp, topEnd = 16.dp, bottomEnd = 16.dp)
+        else -> RoundedCornerShape(4.dp)
+    }
+    Surface(
+        modifier = modifier,
+        shape = shape,
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 1.dp,
+    ) {
+        Column(
+            modifier = Modifier.padding(vertical = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = value,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                text = label,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+        }
+    }
+}
+
+@Composable
 private fun ActionRow(
     icon: ImageVector,
     label: String,
     isFirst: Boolean = false,
     isLast: Boolean = false,
     isDestructive: Boolean = false,
+    onClick: () -> Unit = {},
 ) {
     val shape = when {
         isFirst && isLast -> RoundedCornerShape(16.dp)
@@ -230,6 +300,7 @@ private fun ActionRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable(onClick = onClick)
                 .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {

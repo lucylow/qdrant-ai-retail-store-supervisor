@@ -15,12 +15,19 @@ import ch.genaizurich2026.dynamicvector.navigation.BottomNavTab
 import ch.genaizurich2026.dynamicvector.navigation.Screen
 import ch.genaizurich2026.dynamicvector.screens.*
 import ch.genaizurich2026.dynamicvector.theme.DynamicVectorTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun App() {
     DynamicVectorTheme {
         var currentScreen by remember { mutableStateOf<Screen>(Screen.Login) }
         var selectedTab by remember { mutableStateOf(BottomNavTab.HOME) }
+        val snackbarHostState = remember { SnackbarHostState() }
+        val scope = rememberCoroutineScope()
+
+        val showSnackbar: (String) -> Unit = { message ->
+            scope.launch { snackbarHostState.showSnackbar(message) }
+        }
 
         when (currentScreen) {
             is Screen.Login -> {
@@ -40,6 +47,7 @@ fun App() {
                                             currentScreen = Screen.Home
                                             selectedTab = BottomNavTab.HOME
                                         },
+                                        showSnackbar = showSnackbar,
                                     )
                                 }
                                 else -> {
@@ -52,9 +60,17 @@ fun App() {
                                         when (tab) {
                                             BottomNavTab.HOME -> HomeScreen(
                                                 onNewQuery = { currentScreen = Screen.NewQuery },
+                                                showSnackbar = showSnackbar,
                                             )
-                                            BottomNavTab.REPOSITORIES -> RepositoriesScreen()
-                                            BottomNavTab.PROFILE -> ProfileScreen()
+                                            BottomNavTab.REPOSITORIES -> RepositoriesScreen(
+                                                showSnackbar = showSnackbar,
+                                            )
+                                            BottomNavTab.PROFILE -> ProfileScreen(
+                                                onSignOut = {
+                                                    currentScreen = Screen.Login
+                                                    selectedTab = BottomNavTab.HOME
+                                                },
+                                            )
                                         }
                                     }
                                 }
@@ -91,6 +107,14 @@ fun App() {
                             )
                         }
                     }
+
+                    // Snackbar host
+                    SnackbarHost(
+                        hostState = snackbarHostState,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 80.dp),
+                    )
                 }
             }
         }

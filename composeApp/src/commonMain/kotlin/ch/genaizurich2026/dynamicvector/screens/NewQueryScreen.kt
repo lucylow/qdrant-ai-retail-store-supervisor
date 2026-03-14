@@ -27,11 +27,15 @@ import kotlinx.coroutines.delay
 @Composable
 fun NewQueryScreen(
     onBack: () -> Unit,
+    showSnackbar: (String) -> Unit = {},
 ) {
     var results by remember { mutableStateOf(emptyList<ShoppingResult>()) }
     var hasSearched by remember { mutableStateOf(false) }
     var isSearching by remember { mutableStateOf(false) }
     var exclusions by remember { mutableStateOf(emptyList<String>()) }
+    var showSaveDialog by remember { mutableStateOf(false) }
+    var queryName by remember { mutableStateOf("") }
+    var sortBy by remember { mutableStateOf("match") }
 
     LaunchedEffect(isSearching) {
         if (isSearching) {
@@ -118,7 +122,7 @@ fun NewQueryScreen(
                             Row(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(4.dp))
-                                    .clickable { }
+                                    .clickable { showSaveDialog = true }
                                     .padding(4.dp),
                                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                                 verticalAlignment = Alignment.CenterVertically,
@@ -135,6 +139,34 @@ fun NewQueryScreen(
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.primary,
                                 )
+                            }
+                        }
+                    }
+
+                    // Sort controls
+                    if (!isSearching && results.isNotEmpty()) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            listOf("match" to "Match", "price" to "Price", "rating" to "Rating").forEach { (key, label) ->
+                                val selected = sortBy == key
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = if (selected) MaterialTheme.colorScheme.primary
+                                    else MaterialTheme.colorScheme.surfaceVariant,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .clickable { sortBy = key },
+                                ) {
+                                    Text(
+                                        text = label,
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = if (selected) MaterialTheme.colorScheme.onPrimary
+                                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                    )
+                                }
                             }
                         }
                     }
@@ -185,7 +217,12 @@ fun NewQueryScreen(
                             }
                         }
                     } else {
-                        results.forEach { result ->
+                        val sortedResults = when (sortBy) {
+                            "price" -> results.sortedBy { it.price }
+                            "rating" -> results.sortedByDescending { it.rating }
+                            else -> results.sortedByDescending { it.matchScore }
+                        }
+                        sortedResults.forEach { result ->
                             ResultCard(
                                 result = result,
                                 onExclude = { r ->
@@ -202,5 +239,50 @@ fun NewQueryScreen(
                 }
             }
         }
+    }
+
+    if (showSaveDialog) {
+        AlertDialog(
+            onDismissRequest = { showSaveDialog = false },
+            title = { Text("Save Query") },
+            text = {
+                Column {
+                    Text(
+                        "Give your query a name so you can find it later.",
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = queryName,
+                        onValueChange = { queryName = it },
+                        placeholder = { Text("e.g. Weekly Groceries") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showSaveDialog = false
+                        showSnackbar("Query \"${queryName.ifBlank { "Untitled" }}\" saved")
+                        queryName = ""
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showSaveDialog = false; queryName = "" },
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Text("Cancel")
+                }
+            },
+        )
     }
 }

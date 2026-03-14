@@ -338,6 +338,12 @@ fun QueryBuilder(
 
                         // Progress bar
                         Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = "Step ${activeStep + 1} of $totalSteps \u2014 ${typeLabels[currentQuestion.type] ?: ""}",
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 4.dp),
+                        )
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(4.dp),

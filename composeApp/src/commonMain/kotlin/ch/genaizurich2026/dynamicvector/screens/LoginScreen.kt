@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
@@ -33,6 +34,19 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
     var isSignUp by remember { mutableStateOf(false) }
+    var hasAttempted by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+
+    val emailError = hasAttempted && (email.isBlank() || !email.contains("@"))
+    val passwordError = hasAttempted && password.isBlank()
+
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            delay(1000)
+            isLoading = false
+            onLogin()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -90,16 +104,25 @@ fun LoginScreen(
             )
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = { email = it; if (hasAttempted) hasAttempted = false },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("you@example.com") },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
+                isError = emailError,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next,
                 ),
             )
+            if (emailError) {
+                Text(
+                    text = "Enter a valid email address",
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(start = 4.dp, top = 4.dp),
+                )
+            }
         }
 
         Spacer(Modifier.height(16.dp))
@@ -116,17 +139,23 @@ fun LoginScreen(
             )
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = { password = it; if (hasAttempted) hasAttempted = false },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022") },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
+                isError = passwordError,
                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done,
                 ),
-                keyboardActions = KeyboardActions(onDone = { onLogin() }),
+                keyboardActions = KeyboardActions(onDone = {
+                    hasAttempted = true
+                    if (email.contains("@") && email.isNotBlank() && password.isNotBlank()) {
+                        isLoading = true
+                    }
+                }),
                 trailingIcon = {
                     IconButton(onClick = { showPassword = !showPassword }) {
                         Icon(
@@ -137,6 +166,14 @@ fun LoginScreen(
                     }
                 },
             )
+            if (passwordError) {
+                Text(
+                    text = "Password is required",
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(start = 4.dp, top = 4.dp),
+                )
+            }
         }
 
         if (!isSignUp) {
@@ -158,15 +195,29 @@ fun LoginScreen(
 
         // Sign in button
         Button(
-            onClick = onLogin,
+            onClick = {
+                hasAttempted = true
+                if (email.contains("@") && email.isNotBlank() && password.isNotBlank()) {
+                    isLoading = true
+                }
+            },
+            enabled = !isLoading,
             modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = RoundedCornerShape(12.dp),
         ) {
-            Text(
-                text = if (isSignUp) "Create Account" else "Sign In",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-            )
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                )
+            } else {
+                Text(
+                    text = if (isSignUp) "Create Account" else "Sign In",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                )
+            }
         }
 
         // Toggle sign up / sign in

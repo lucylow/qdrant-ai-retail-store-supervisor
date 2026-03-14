@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -26,7 +27,9 @@ import ch.genaizurich2026.dynamicvector.model.Repository
 import ch.genaizurich2026.dynamicvector.model.RepositoryPreferences
 
 @Composable
-fun RepositoriesScreen() {
+fun RepositoriesScreen(
+    showSnackbar: (String) -> Unit = {},
+) {
     val repos = mockRepositories
     var showAdd by remember { mutableStateOf(false) }
     var newName by remember { mutableStateOf("") }
@@ -34,22 +37,36 @@ fun RepositoriesScreen() {
     var newDesc by remember { mutableStateOf("") }
     var editingRepo by remember { mutableStateOf<Repository?>(null) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .statusBarsPadding()
+            .verticalScroll(rememberScrollState()),
+    ) {
+        // Header
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .statusBarsPadding()
-                .verticalScroll(rememberScrollState()),
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 12.dp, top = 16.dp, bottom = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            // Header
             Text(
                 text = "Repositories",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(start = 20.dp, top = 16.dp, bottom = 16.dp),
             )
+            FilledTonalIconButton(
+                onClick = { showAdd = !showAdd },
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add Repository",
+                )
+            }
+        }
 
             // Add form
             AnimatedVisibility(visible = showAdd) {
@@ -174,7 +191,7 @@ fun RepositoriesScreen() {
                                         )
                                     }
                                     IconButton(
-                                        onClick = { },
+                                        onClick = { showSnackbar("\"${repo.name}\" removed") },
                                         modifier = Modifier.size(32.dp),
                                     ) {
                                         Icon(
@@ -187,12 +204,20 @@ fun RepositoriesScreen() {
                                 }
                             }
 
-                            // Endpoint
+                            // Endpoint + connection status
                             Row(
                                 modifier = Modifier.padding(top = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                             ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .background(
+                                            if (repo.preferences != null) Color(0xFF16A34A) else Color(0xFF9CA3AF),
+                                            CircleShape,
+                                        ),
+                                )
                                 Icon(
                                     imageVector = Icons.Outlined.Link,
                                     contentDescription = null,
@@ -283,23 +308,6 @@ fun RepositoriesScreen() {
                 Spacer(Modifier.height(96.dp))
             }
         }
-
-        // FAB
-        FloatingActionButton(
-            onClick = { showAdd = !showAdd },
-            shape = CircleShape,
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier
-                .padding(end = 20.dp, bottom = 20.dp)
-                .align(Alignment.BottomEnd),
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = "Add Repository",
-            )
-        }
-    }
 
     // Edit preferences dialog
     editingRepo?.let { repo ->

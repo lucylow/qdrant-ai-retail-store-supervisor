@@ -59,6 +59,50 @@ Web frontend:      cd web && npm install && npm run dev
 Docker (infra):    docker-compose up
 ```
 
+## Backend Architecture
+
+The backend is a multi-agent orchestration system:
+
+- **ShopperAgent** (`backend/app/agents/shopper.py`) — Extracts intent, budget, region, urgency from free-text queries via NLP
+- **InventoryAgent** (`backend/app/agents/inventory.py`) — Hybrid vector search on Qdrant `products` collection, bundle optimization
+- **PricingAgent** (`backend/app/agents/pricing.py`) — Competitive pricing heuristics
+- **MerchandisingAgent** (`backend/app/agents/merchandising.py`) — Promo text and layout generation
+- **AuditAgent** (`backend/app/agents/audit_agent.py`) — Hallucination detection + safety guardrails
+- **Supervisor** (`backend/app/agents/supervisor.py`) — Orchestrates all agents in parallel phases
+
+### Key Endpoints
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/health` | GET | Qdrant health check |
+| `/query?q=...` | GET | Single-shot RAG answer with provenance |
+| `/stream_query?q=...` | GET (SSE) | Streaming RAG answer |
+| `/chat/swiss` | POST | Multilingual chat (DE/FR/IT/EN) |
+| `/ws/voice/{tenant}` | WS | Bidirectional voice chat |
+| `/products` | GET | Product catalog search |
+| `/api/visual-search` | POST | CLIP image search |
+| `/goals` | GET/POST | User intent CRUD |
+| `/solutions/{goalId}` | GET | Solutions for a goal |
+| `/api/stores/nearby` | GET | Geospatial store locator |
+| `/checkout/twint` | POST | TWINT payment |
+
+### Qdrant Collections
+
+- `products` — Main product catalog (256d text embeddings)
+- `products_multimodal` — Named vectors: text + image
+- `goals`, `solutions`, `episodes` — Agent memory (384d)
+- `reasoning_graphs` — Orchestration traces
+- Session memory in Redis (1hr TTL, max 10 turns)
+
+## Web Frontend (React)
+
+Key pages at `web/src/pages/`:
+- **Chat** — Free-text conversational interface, SSE streaming, Swiss German normalization
+- **Products** — Catalog with NL filter extraction + hybrid search
+- **Visual Search** — Image upload → CLIP embedding search
+- **Dashboard** — 19-tab analytics hub
+- API client at `web/src/lib/api.ts` connects to backend on localhost:8000
+
 ## KMP Code Structure
 
 ```
@@ -71,7 +115,7 @@ composeApp/src/commonMain/kotlin/ch/genaizurich2026/dynamicvector/
 ├── components/             — Shared UI components
 │   ├── BottomNav.kt
 │   ├── FilterChip.kt
-│   ├── QueryBuilder.kt     — Multi-step agent query flow
+│   ├── QueryBuilder.kt     — Multi-step agent query flow (7 steps)
 │   ├── ResultCard.kt
 │   └── SelectionSummary.kt
 └── screens/                — Full-screen composables
@@ -81,6 +125,22 @@ composeApp/src/commonMain/kotlin/ch/genaizurich2026/dynamicvector/
     ├── ProfileScreen.kt     — User account info
     └── RepositoriesScreen.kt — Data sources with per-repo preferences
 ```
+
+## Integration Status
+
+The KMP UI and backend are **not yet connected**:
+- KMP has no HTTP client — all data is mock (`data/MockData.kt`)
+- KMP's 7-step query builder (Category → Budget → Brand → Location → Sustainability → Rating → Extras) collects structured `QueryFilter` objects, but the backend expects **free-text queries** — there is no backend endpoint that accepts structured filters
+- KMP data models (`ShoppingResult`, `QueryFilter`, `Repository`) don't match backend models (`Product`, `ShopperGoal`, `InventoryPlan`)
+- The "Repository" concept (configurable data sources with endpoints + preferences) has no backend equivalent
+- No auth system exists in the backend; KMP login screen is cosmetic
+- KMP's scheduled queries feature has no backend support
+
+## Security Notes
+
+- `.env` contains real Qdrant API keys committed to git history — needs key rotation
+- `backend/app/agents/tool_builder.py` executes arbitrary Python code without sandboxing (hackathon shortcut)
+- No malware detected in security scan of backend, web, or infrastructure code
 
 ## Conventions
 

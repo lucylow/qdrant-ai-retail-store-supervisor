@@ -220,6 +220,30 @@ STRIPE_PUBLISHABLE_KEY: Final[Optional[str]] = os.getenv("STRIPE_PUBLISHABLE_KEY
 STRIPE_STATEMENT_DESCRIPTOR: Final[str] = os.getenv("STRIPE_STATEMENT_DESCRIPTOR", "Coop leShop CH")
 STRIPE_COUNTRY: Final[str] = os.getenv("STRIPE_COUNTRY", "CH")
 
+# ---------------------------------------------------------------------------
+# Apertus-70B-2509 LLM configuration
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class ApertusSettings:
+    """swiss-ai/Apertus-70B-2509 — primary multilingual LLM backbone."""
+    model: str
+    backend: str  # local | remote | hf
+    endpoint: str
+    max_tokens: int
+    temperature: float
+    top_p: float
+
+
+APERTUS: Final[ApertusSettings] = ApertusSettings(
+    model=os.getenv("APERTUS_MODEL", "swiss-ai/Apertus-70B-2509"),
+    backend=os.getenv("APERTUS_BACKEND", "remote").lower(),
+    endpoint=os.getenv("APERTUS_ENDPOINT", "http://localhost:8000/v1"),
+    max_tokens=int(os.getenv("APERTUS_MAX_TOKENS", "1024")),
+    temperature=float(os.getenv("APERTUS_TEMPERATURE", "0.3")),
+    top_p=float(os.getenv("APERTUS_TOP_P", "0.95")),
+)
+
 __all__ = [
     "PROJECT_NAME",
     "LOG_LEVEL",
@@ -246,4 +270,6 @@ __all__ = [
     "STRIPE_PUBLISHABLE_KEY",
     "STRIPE_STATEMENT_DESCRIPTOR",
     "STRIPE_COUNTRY",
+    "APERTUS",
+    "ApertusSettings",
 ]

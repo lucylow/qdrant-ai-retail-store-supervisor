@@ -161,3 +161,20 @@ perf-test:
 perf-dashboard:
 	streamlit run demo/performance_dashboard.py
 	@echo "LIVE dashboard: QPS, P95, cache hit, GPU"
+
+# ---------------------------------------------------------------------------
+# Apertus + HF Dataset Benchmarks
+# ---------------------------------------------------------------------------
+.PHONY: bench-hf bench-hf-ingest apertus-demo
+
+bench-hf:
+	python3 -m scripts.bench_hf --dataset bm42_bench --max-rows 500 --k 1,5,10
+	@echo "Benchmark complete."
+
+bench-hf-ingest:
+	python3 -m scripts.bench_hf --dataset bm42_bench --max-rows 1000 --ingest-only
+	@echo "HF dataset ingested."
+
+apertus-demo:
+	python3 -m scripts.run_apertus_demo
+	@echo "Apertus demo complete."

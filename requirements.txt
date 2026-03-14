@@ -55,3 +55,8 @@ websockets>=12.0
 # Swiss cultural backend (TWINT, PostFinance, QR)
 httpx>=0.25.0
 qrcode[pil]>=7.0
+
+# Apertus-70B + HF datasets
+datasets>=2.18.0
+huggingface-hub>=0.22.0
+transformers>=4.40.0

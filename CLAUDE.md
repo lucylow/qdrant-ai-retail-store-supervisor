@@ -18,21 +18,48 @@ Repositories store their connection endpoint and per-repo query preferences. Whe
 
 ## Tech Stack
 
-- **Kotlin Multiplatform** with Compose Multiplatform (targets: Android, iOS, JVM Desktop, JS, WasmJS)
+- **Kotlin Multiplatform** with Compose Multiplatform (targets: Android, iOS, JVM Desktop)
 - **Package**: `ch.genaizurich2026.dynamicvector`
 - **Module**: `:composeApp` (single shared module with platform-specific entry points)
+- **Python/FastAPI** backend with multi-agent system, Qdrant vector DB, hybrid RAG (`backend/`)
+- **React/TypeScript** frontend with Vite, shadcn/ui, TailwindCSS (`web/`)
+
+## Monorepo Structure
+
+```
+├── composeApp/              # KMP (Android, iOS, Desktop only)
+├── iosApp/                  # iOS Xcode project
+├── gradle/, gradlew, etc.   # KMP build system
+├── backend/                 # Python/FastAPI + agents + data pipelines
+│   ├── app/                 #   FastAPI application + agents
+│   ├── agents/              #   Agent demos/scripts
+│   ├── scripts/             #   Data ingestion, seeding
+│   ├── tests/               #   Python tests
+│   ├── data/                #   Datasets (otto, retailrocket, amazon)
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   └── README.md
+├── web/                     # React/TypeScript frontend
+│   ├── src/                 #   Pages, components, hooks, lib
+│   ├── package.json
+│   └── vite.config.ts
+├── docker-compose.yml
+└── .env.example
+```
 
 ## Build Commands
 
 ```
-Android Debug:    ./gradlew :composeApp:assembleDebug
-Desktop (JVM):    ./gradlew :composeApp:run
-Web (Wasm):       ./gradlew :composeApp:wasmJsBrowserDevelopmentRun
-iOS:              Open iosApp/ in Xcode
-All compile check: ./gradlew :composeApp:compileKotlinJvm :composeApp:compileDebugKotlinAndroid :composeApp:compileKotlinIosSimulatorArm64
+Android Debug:     ./gradlew :composeApp:assembleDebug
+Desktop (JVM):     ./gradlew :composeApp:run
+iOS:               Open iosApp/ in Xcode
+KMP compile check: ./gradlew :composeApp:compileKotlinJvm :composeApp:compileDebugKotlinAndroid :composeApp:compileKotlinIosSimulatorArm64
+Backend:           cd backend && uvicorn app.main:app --port 8000
+Web frontend:      cd web && npm install && npm run dev
+Docker (infra):    docker-compose up
 ```
 
-## Code Structure
+## KMP Code Structure
 
 ```
 composeApp/src/commonMain/kotlin/ch/genaizurich2026/dynamicvector/
@@ -61,3 +88,5 @@ composeApp/src/commonMain/kotlin/ch/genaizurich2026/dynamicvector/
 - Material3 with `compose.materialIconsExtended` for icons
 - State-based navigation (no nav library) via `Screen` sealed class
 - No network calls yet — all data is mock/dummy
+- Backend code in `backend/` — do not modify logic, only infrastructure/config
+- Web frontend in `web/` — React/TypeScript, do not modify logic

@@ -11,7 +11,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -65,23 +69,67 @@ fun LoginScreen(
         ) {
             Spacer(Modifier.weight(1f))
 
-            // Title
-            Text(
-                text = "Dynamic",
-                fontSize = 64.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = (-1).sp,
-                color = Color(0xFFE0E0F0),
-                textAlign = TextAlign.Center,
-            )
-            Text(
-                text = "Vector",
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 2.sp,
-                color = Color(0xFF4ECDC4),
-                textAlign = TextAlign.Center,
-            )
+            // Title — vector/matrix bracket notation
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min),
+            ) {
+                // Left bracket [
+                Box(
+                    modifier = Modifier
+                        .width(24.dp)
+                        .fillMaxHeight()
+                        .drawBehind {
+                            val sw = 3.dp.toPx()
+                            val c = Color(0xFFE0E0F0).copy(alpha = 0.5f)
+                            drawLine(c, Offset(sw / 2, 0f), Offset(sw / 2, size.height), sw)
+                            drawLine(c, Offset(0f, sw / 2), Offset(size.width, sw / 2), sw)
+                            drawLine(c, Offset(0f, size.height - sw / 2), Offset(size.width, size.height - sw / 2), sw)
+                        },
+                )
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(vertical = 8.dp, horizontal = 8.dp),
+                ) {
+                    Text(
+                        text = "Dynamic",
+                        fontSize = 64.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontFamily = FontFamily.Monospace,
+                        letterSpacing = (-1).sp,
+                        color = Color(0xFFE0E0F0),
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Text(
+                        text = "Vector",
+                        fontSize = 40.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace,
+                        letterSpacing = 2.sp,
+                        color = Color(0xFF4ECDC4),
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+
+                // Right bracket ]
+                Box(
+                    modifier = Modifier
+                        .width(24.dp)
+                        .fillMaxHeight()
+                        .drawBehind {
+                            val sw = 3.dp.toPx()
+                            val c = Color(0xFFE0E0F0).copy(alpha = 0.5f)
+                            drawLine(c, Offset(size.width - sw / 2, 0f), Offset(size.width - sw / 2, size.height), sw)
+                            drawLine(c, Offset(0f, sw / 2), Offset(size.width, sw / 2), sw)
+                            drawLine(c, Offset(0f, size.height - sw / 2), Offset(size.width, size.height - sw / 2), sw)
+                        },
+                )
+            }
 
             Spacer(Modifier.height(48.dp))
 
@@ -89,8 +137,9 @@ fun LoginScreen(
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it; error = null },
-                label = { Text("Username") },
+                label = { Text("Username", fontFamily = FontFamily.Monospace) },
                 singleLine = true,
+                textStyle = TextStyle(fontFamily = FontFamily.Monospace, color = Color.White),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -111,8 +160,9 @@ fun LoginScreen(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it; error = null },
-                label = { Text("Password") },
+                label = { Text("Password", fontFamily = FontFamily.Monospace) },
                 singleLine = true,
+                textStyle = TextStyle(fontFamily = FontFamily.Monospace, color = Color.White),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { doLogin() }),
@@ -145,6 +195,7 @@ fun LoginScreen(
                     text = it,
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 13.sp,
+                    fontFamily = FontFamily.Monospace,
                 )
             }
 
@@ -175,6 +226,7 @@ fun LoginScreen(
                         text = "Sign In",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
+                        fontFamily = FontFamily.Monospace,
                     )
                 }
             }

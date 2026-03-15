@@ -104,14 +104,6 @@ fun LoginScreen(
             }
         }
 
-        Spacer(Modifier.height(12.dp))
-
-        Text(
-            text = "SSO is the only supported sign-in method",
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
         Spacer(Modifier.weight(1f))
 
         // Version

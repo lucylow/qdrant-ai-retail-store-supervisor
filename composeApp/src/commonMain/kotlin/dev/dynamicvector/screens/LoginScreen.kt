@@ -1,17 +1,17 @@
 package dev.dynamicvector.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.dynamicvector.components.DynamicVectorBackground
 import kotlinx.coroutines.delay
 
 @Composable
@@ -28,91 +28,83 @@ fun LoginScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .statusBarsPadding()
-            .padding(horizontal = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Spacer(Modifier.weight(1f))
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Layer 1: Animated background
+        DynamicVectorBackground()
 
-        // Logo
-        Box(
+        // Layer 2: Login overlay
+        Column(
             modifier = Modifier
-                .size(64.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.primary),
-            contentAlignment = Alignment.Center,
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(horizontal = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Spacer(Modifier.weight(1f))
+
+            // Title
             Text(
-                text = "DV",
-                fontSize = 22.sp,
+                text = "Dynamic",
+                fontSize = 64.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = (-1).sp,
+                color = Color(0xFFE0E0F0),
+                textAlign = TextAlign.Center,
+            )
+            Text(
+                text = "Vector",
+                fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimary,
+                letterSpacing = 2.sp,
+                color = Color(0xFF4ECDC4),
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(Modifier.height(64.dp))
+
+            // GitHub SSO button
+            Button(
+                onClick = { isLoading = true },
+                enabled = !isLoading,
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF24292F),
+                    contentColor = Color.White,
+                ),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = Color.White,
+                    )
+                } else {
+                    Icon(
+                        imageVector = GithubIcon,
+                        contentDescription = "GitHub",
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = "Sign in with GitHub",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+            }
+
+            Spacer(Modifier.weight(1f))
+
+            // Version
+            Text(
+                text = "v${dev.dynamicvector.BuildConfig.VERSION}",
+                fontSize = 12.sp,
+                color = Color.White.copy(alpha = 0.4f),
+                modifier = Modifier.padding(bottom = 24.dp),
             )
         }
-
-        Spacer(Modifier.height(16.dp))
-
-        Text(
-            text = "Dynamic Vector",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
-        )
-        Text(
-            text = "Multi-agent store manager",
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 4.dp),
-        )
-
-        Spacer(Modifier.height(48.dp))
-
-        // GitHub SSO button
-        Button(
-            onClick = { isLoading = true },
-            enabled = !isLoading,
-            modifier = Modifier.fillMaxWidth().height(52.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF24292F),
-                contentColor = Color.White,
-            ),
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp,
-                    color = Color.White,
-                )
-            } else {
-                Icon(
-                    imageVector = GithubIcon,
-                    contentDescription = "GitHub",
-                    modifier = Modifier.size(20.dp),
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = "Sign in with GitHub",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium,
-                )
-            }
-        }
-
-        Spacer(Modifier.weight(1f))
-
-        // Version
-        Text(
-            text = "v${dev.dynamicvector.BuildConfig.VERSION}",
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-            modifier = Modifier.padding(bottom = 24.dp),
-        )
     }
 }
 

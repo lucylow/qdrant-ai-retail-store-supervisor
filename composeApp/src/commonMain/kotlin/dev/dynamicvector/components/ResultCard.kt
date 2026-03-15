@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
 import dev.dynamicvector.model.ContextResultItem
 import dev.dynamicvector.model.TagColor
-import ch.genaizurich2026.dynamicvector.theme.*
+import dev.dynamicvector.theme.*
 import dev.dynamicvector.components.formatPrice
 import dev.dynamicvector.components.formatRating
 

@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import dev.dynamicvector.components.BottomNavBar
 import dev.dynamicvector.navigation.BottomNavTab
 import dev.dynamicvector.navigation.Screen
-import ch.genaizurich2026.dynamicvector.screens.*
+import dev.dynamicvector.screens.*
 import dev.dynamicvector.theme.DynamicVectorTheme
 import kotlinx.coroutines.launch
 

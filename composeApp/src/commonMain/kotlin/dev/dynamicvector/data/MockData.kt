@@ -1,6 +1,6 @@
 package dev.dynamicvector.data
 
-import ch.genaizurich2026.dynamicvector.model.*
+import dev.dynamicvector.model.*
 
 // ── Mock results ─────────────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 package dev.dynamicvector.viewmodel
 
 import androidx.lifecycle.ViewModel
-import ch.genaizurich2026.dynamicvector.model.*
+import dev.dynamicvector.model.*
 import dev.dynamicvector.navigation.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

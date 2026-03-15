@@ -26,7 +26,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.dynamicvector.data.fieldLabels
-import ch.genaizurich2026.dynamicvector.model.*
+import dev.dynamicvector.model.*
 import kotlin.collections.orEmpty
 import kotlin.collections.plus
 

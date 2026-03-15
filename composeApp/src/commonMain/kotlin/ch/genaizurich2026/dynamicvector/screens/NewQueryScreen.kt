@@ -21,7 +21,8 @@ import androidx.compose.ui.unit.sp
 import ch.genaizurich2026.dynamicvector.components.QueryBuilder
 import ch.genaizurich2026.dynamicvector.components.ResultCard
 import ch.genaizurich2026.dynamicvector.data.mockResults
-import ch.genaizurich2026.dynamicvector.model.ShoppingResult
+import ch.genaizurich2026.dynamicvector.data.shoppingQuestions
+import ch.genaizurich2026.dynamicvector.model.ContextResultItem
 import kotlinx.coroutines.delay
 
 @Composable
@@ -29,7 +30,7 @@ fun NewQueryScreen(
     onBack: () -> Unit,
     showSnackbar: (String) -> Unit = {},
 ) {
-    var results by remember { mutableStateOf(emptyList<ShoppingResult>()) }
+    var results by remember { mutableStateOf(emptyList<ContextResultItem>()) }
     var hasSearched by remember { mutableStateOf(false) }
     var isSearching by remember { mutableStateOf(false) }
     var exclusions by remember { mutableStateOf(emptyList<String>()) }
@@ -41,7 +42,7 @@ fun NewQueryScreen(
         if (isSearching) {
             delay(800)
             val filtered = mockResults.filter { r ->
-                exclusions.none { ex -> r.name == ex || r.brand == ex }
+                exclusions.none { ex -> r.title == ex || r.subtitle == ex }
             }
             results = filtered
             isSearching = false
@@ -86,6 +87,7 @@ fun NewQueryScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             QueryBuilder(
+                questions = shoppingQuestions,
                 onSearch = { _, _, _ ->
                     isSearching = true
                     hasSearched = true
@@ -218,16 +220,16 @@ fun NewQueryScreen(
                         }
                     } else {
                         val sortedResults = when (sortBy) {
-                            "price" -> results.sortedBy { it.price }
-                            "rating" -> results.sortedByDescending { it.rating }
+                            "price" -> results.sortedBy { it.price ?: Double.MAX_VALUE }
+                            "rating" -> results.sortedByDescending { it.rating ?: 0.0 }
                             else -> results.sortedByDescending { it.matchScore }
                         }
                         sortedResults.forEach { result ->
                             ResultCard(
                                 result = result,
                                 onExclude = { r ->
-                                    if (r.name !in exclusions) {
-                                        exclusions = exclusions + r.name
+                                    if (r.title !in exclusions) {
+                                        exclusions = exclusions + r.title
                                         results = results.filter { it.id != r.id }
                                     }
                                 },

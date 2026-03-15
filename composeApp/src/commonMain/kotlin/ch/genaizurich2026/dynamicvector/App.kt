@@ -62,7 +62,7 @@ fun App() {
                                                 onNewQuery = { currentScreen = Screen.NewQuery },
                                                 showSnackbar = showSnackbar,
                                             )
-                                            BottomNavTab.REPOSITORIES -> RepositoriesScreen(
+                                            BottomNavTab.CONTEXTS -> ContextsScreen(
                                                 showSnackbar = showSnackbar,
                                             )
                                             BottomNavTab.PROFILE -> ProfileScreen(
@@ -83,7 +83,7 @@ fun App() {
                                 selectedTab = tab
                                 currentScreen = when (tab) {
                                     BottomNavTab.HOME -> Screen.Home
-                                    BottomNavTab.REPOSITORIES -> Screen.Repositories
+                                    BottomNavTab.CONTEXTS -> Screen.Contexts
                                     BottomNavTab.PROFILE -> Screen.Profile
                                 }
                             },

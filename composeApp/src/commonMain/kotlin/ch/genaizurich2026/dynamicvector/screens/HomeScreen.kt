@@ -28,7 +28,7 @@ import ch.genaizurich2026.dynamicvector.data.intervalLabels
 import ch.genaizurich2026.dynamicvector.data.mockHistory
 import ch.genaizurich2026.dynamicvector.data.mockProfile
 import ch.genaizurich2026.dynamicvector.data.mockSavedQueries
-import ch.genaizurich2026.dynamicvector.model.ShoppingQuery
+import ch.genaizurich2026.dynamicvector.model.ContextQuery
 
 @Composable
 fun HomeScreen(
@@ -38,7 +38,7 @@ fun HomeScreen(
     val queries = mockSavedQueries
     val history = mockHistory
     var activeTab by remember { mutableStateOf("queries") }
-    var queryToDelete by remember { mutableStateOf<ShoppingQuery?>(null) }
+    var queryToDelete by remember { mutableStateOf<ContextQuery?>(null) }
 
     Column(
         modifier = Modifier
@@ -116,7 +116,6 @@ fun HomeScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     when (tab) {
                         "queries" -> {
-                            // Queries list
                             if (queries.isEmpty()) {
                                 Box(
                                     modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
@@ -181,15 +180,15 @@ fun HomeScreen(
                                                 }
                                             }
 
-                                            // Filter chips
+                                            // Answer chips
                                             FlowRow(
                                                 modifier = Modifier.padding(top = 12.dp),
                                                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                                                 verticalArrangement = Arrangement.spacedBy(6.dp),
                                             ) {
-                                                query.filters.forEach { filter ->
+                                                query.answers.forEach { answer ->
                                                     QueryFilterChip(
-                                                        label = filter.label,
+                                                        label = answer.label,
                                                         active = true,
                                                         onToggle = { },
                                                     )

@@ -2,81 +2,91 @@ package ch.genaizurich2026.dynamicvector.data
 
 import ch.genaizurich2026.dynamicvector.model.*
 
+// ── Mock results ─────────────────────────────────────────────────────────────
+
 val mockResults = listOf(
-    ShoppingResult(
+    ContextResultItem(
         id = "1",
-        name = "Allbirds Tree Runners",
-        brand = "Allbirds",
+        contextId = "ctx-retail",
+        matchScore = 95,
+        title = "Allbirds Tree Runners",
+        subtitle = "Allbirds",
         price = 98.00,
         rating = 4.6,
-        matchScore = 95,
+        source = "allbirds.com",
         tags = listOf(
             ResultTag("Eco-Friendly", TagColor.GREEN),
             ResultTag("Your Style", TagColor.BLUE),
         ),
-        source = "allbirds.com",
     ),
-    ShoppingResult(
+    ContextResultItem(
         id = "2",
-        name = "Organic Cotton Tee",
-        brand = "Patagonia",
+        contextId = "ctx-retail",
+        matchScore = 92,
+        title = "Organic Cotton Tee",
+        subtitle = "Patagonia",
         price = 45.00,
         rating = 4.8,
-        matchScore = 92,
+        source = "patagonia.com",
         tags = listOf(
             ResultTag("Sustainable", TagColor.GREEN),
             ResultTag("Fair Trade", TagColor.PURPLE),
         ),
-        source = "patagonia.com",
     ),
-    ShoppingResult(
+    ContextResultItem(
         id = "3",
-        name = "Bamboo Wireless Charger",
-        brand = "Nimble",
+        contextId = "ctx-retail",
+        matchScore = 88,
+        title = "Bamboo Wireless Charger",
+        subtitle = "Nimble",
         price = 35.99,
         rating = 4.3,
-        matchScore = 88,
+        source = "gonimble.com",
         tags = listOf(
             ResultTag("Eco-Friendly", TagColor.GREEN),
             ResultTag("Budget Pick", TagColor.BLUE),
         ),
-        source = "gonimble.com",
     ),
-    ShoppingResult(
+    ContextResultItem(
         id = "4",
-        name = "Recycled Canvas Backpack",
-        brand = "Cotopaxi",
+        contextId = "ctx-retail",
+        matchScore = 85,
+        title = "Recycled Canvas Backpack",
+        subtitle = "Cotopaxi",
         price = 75.00,
         rating = 4.7,
-        matchScore = 85,
+        source = "cotopaxi.com",
         tags = listOf(
             ResultTag("B Corp", TagColor.PURPLE),
             ResultTag("Local Pickup", TagColor.BLUE),
         ),
-        source = "cotopaxi.com",
     ),
-    ShoppingResult(
+    ContextResultItem(
         id = "5",
-        name = "Fair Trade Coffee Beans",
-        brand = "Counter Culture",
+        contextId = "ctx-retail",
+        matchScore = 82,
+        title = "Fair Trade Coffee Beans",
+        subtitle = "Counter Culture",
         price = 16.50,
         rating = 4.9,
-        matchScore = 82,
+        source = "counterculturecoffee.com",
         tags = listOf(
             ResultTag("Fair Trade", TagColor.PURPLE),
             ResultTag("Top Rated", TagColor.GREEN),
         ),
-        source = "counterculturecoffee.com",
     ),
 )
 
+// ── Mock saved queries ───────────────────────────────────────────────────────
+
 val mockSavedQueries = listOf(
-    ShoppingQuery(
+    ContextQuery(
         id = "q1",
         name = "Weekly Groceries",
-        filters = listOf(
-            QueryFilter("1", FilterType.CATEGORY, "Groceries", "groceries", true),
-            QueryFilter("2", FilterType.LOCATION, "Local", "local", true),
+        contextIds = listOf("ctx-retail"),
+        answers = listOf(
+            ContextAnswer("q-category", "category", listOf("groceries"), "Groceries"),
+            ContextAnswer("q-location", "location", listOf("local-5"), "Local"),
         ),
         naturalLanguage = "Best organic produce deals within 5 miles",
         createdAt = "2026-03-08",
@@ -84,23 +94,24 @@ val mockSavedQueries = listOf(
         scheduleInterval = "weekly",
         lastRun = "2026-03-10",
     ),
-    ShoppingQuery(
+    ContextQuery(
         id = "q2",
         name = "Gift Ideas",
-        filters = listOf(
-            QueryFilter("1", FilterType.PRICE, "Under \$50", "0-50", true),
-            QueryFilter("2", FilterType.SUSTAINABILITY, "Eco-Friendly", "eco", true),
+        contextIds = listOf("ctx-retail"),
+        answers = listOf(
+            ContextAnswer("q-price", "price", listOf("0-50"), "Under \$50"),
+            ContextAnswer("q-sustainability", "sustainability", listOf("eco"), "Eco-Friendly"),
         ),
         naturalLanguage = "Unique eco-friendly gifts under \$50",
         createdAt = "2026-03-05",
-        scheduled = false,
     ),
-    ShoppingQuery(
+    ContextQuery(
         id = "q3",
         name = "Running Gear",
-        filters = listOf(
-            QueryFilter("1", FilterType.CATEGORY, "Clothing", "clothing", true),
-            QueryFilter("2", FilterType.RATING, "4\u2605+", "4+", true),
+        contextIds = listOf("ctx-retail"),
+        answers = listOf(
+            ContextAnswer("q-category", "category", listOf("clothing"), "Clothing"),
+            ContextAnswer("q-rating", "rating", listOf("4+"), "4\u2605+"),
         ),
         naturalLanguage = "Best rated running shoes for flat feet",
         createdAt = "2026-03-01",
@@ -110,6 +121,8 @@ val mockSavedQueries = listOf(
     ),
 )
 
+// ── Mock profile ─────────────────────────────────────────────────────────────
+
 val mockProfile = UserProfile(
     name = "Alex Johnson",
     username = "alexj",
@@ -117,144 +130,242 @@ val mockProfile = UserProfile(
     phone = "+1 (503) 555-0142",
     location = "Portland, OR",
     memberSince = "January 2026",
+    contextId = "ctx-profile",
 )
+
+// ── Mock history ─────────────────────────────────────────────────────────────
 
 val mockHistory = listOf(
-    HistoryEntry("h1", "Weekly Groceries", "2026-03-10 14:30", 12),
-    HistoryEntry("h2", "Running Gear", "2026-03-11 09:15", 8),
-    HistoryEntry("h3", "Gift Ideas", "2026-03-09 16:00", 5),
+    HistoryEntry("h1", "Weekly Groceries", "2026-03-10 14:30", 12, listOf("Retail Products")),
+    HistoryEntry("h2", "Running Gear", "2026-03-11 09:15", 8, listOf("Retail Products")),
+    HistoryEntry("h3", "Gift Ideas", "2026-03-09 16:00", 5, listOf("Retail Products")),
 )
 
-val mockRepositories = listOf(
-    Repository(
-        id = "repo-1",
-        name = "Retail Products",
-        endpoint = "https://api.example.com/retail",
-        description = "Product catalog with pricing, ratings, and availability",
-        createdAt = "2026-02-15",
-        preferences = RepositoryPreferences(
-            goals = listOf("Find sustainable products", "Compare prices across brands"),
-            preferredBrands = listOf("Patagonia", "Allbirds", "Cotopaxi"),
-            sustainabilityPriority = "high",
-            priceRange = Pair(0, 200),
-            values = listOf("Eco-Friendly", "Fair Trade"),
-            customNotes = "Prefer items with free shipping",
-        ),
-    ),
-    Repository(
-        id = "repo-2",
-        name = "Local Services",
-        endpoint = "https://api.example.com/services",
-        description = "Local service providers with reviews and scheduling",
-        createdAt = "2026-03-01",
-        preferences = RepositoryPreferences(
-            goals = listOf("Find reliable local providers"),
-            preferredBrands = emptyList(),
-            sustainabilityPriority = "medium",
-            priceRange = Pair(0, 500),
-            values = listOf("Local", "Verified"),
-            customNotes = "",
-        ),
-    ),
-    Repository(
-        id = "repo-3",
-        name = "Research Papers",
-        endpoint = "https://api.example.com/research",
-        description = "Academic papers, citations, and abstracts",
-        createdAt = "2026-03-10",
-    ),
-)
+// ── Shopping context questions ───────────────────────────────────────────────
 
-val agentQuestions = listOf(
-    AgentQuestion(
+val shoppingQuestions = listOf(
+    ContextQuestion(
         id = "q-category",
-        type = FilterType.CATEGORY,
+        fieldKey = "category",
         question = "What are you shopping for?",
         options = listOf(
-            AgentOption("cat-electronics", "Electronics", "electronics"),
-            AgentOption("cat-groceries", "Groceries", "groceries"),
-            AgentOption("cat-clothing", "Clothing", "clothing"),
-            AgentOption("cat-home", "Home & Garden", "home"),
-            AgentOption("cat-beauty", "Beauty", "beauty"),
-            AgentOption("cat-sports", "Sports", "sports"),
+            ContextOption("cat-electronics", "Electronics", "electronics"),
+            ContextOption("cat-groceries", "Groceries", "groceries"),
+            ContextOption("cat-clothing", "Clothing", "clothing"),
+            ContextOption("cat-home", "Home & Garden", "home"),
+            ContextOption("cat-beauty", "Beauty", "beauty"),
+            ContextOption("cat-sports", "Sports", "sports"),
         ),
     ),
-    AgentQuestion(
+    ContextQuestion(
         id = "q-price",
-        type = FilterType.PRICE,
+        fieldKey = "price",
         question = "What's your budget?",
         options = listOf(
-            AgentOption("price-under25", "Under \$25", "0-25"),
-            AgentOption("price-25-50", "\$25 \u2013 \$50", "25-50"),
-            AgentOption("price-50-100", "\$50 \u2013 \$100", "50-100"),
-            AgentOption("price-100-200", "\$100 \u2013 \$200", "100-200"),
-            AgentOption("price-200plus", "\$200+", "200+"),
+            ContextOption("price-under25", "Under \$25", "0-25"),
+            ContextOption("price-25-50", "\$25 \u2013 \$50", "25-50"),
+            ContextOption("price-50-100", "\$50 \u2013 \$100", "50-100"),
+            ContextOption("price-100-200", "\$100 \u2013 \$200", "100-200"),
+            ContextOption("price-200plus", "\$200+", "200+"),
         ),
     ),
-    AgentQuestion(
+    ContextQuestion(
         id = "q-brand",
-        type = FilterType.BRAND,
+        fieldKey = "brand",
         question = "Any brand preferences?",
         options = listOf(
-            AgentOption("brand-ethical", "Ethical Brands", "ethical"),
-            AgentOption("brand-local", "Local Makers", "local-makers"),
-            AgentOption("brand-premium", "Premium", "premium"),
-            AgentOption("brand-budget", "Budget Brands", "budget"),
+            ContextOption("brand-ethical", "Ethical Brands", "ethical"),
+            ContextOption("brand-local", "Local Makers", "local-makers"),
+            ContextOption("brand-premium", "Premium", "premium"),
+            ContextOption("brand-budget", "Budget Brands", "budget"),
         ),
     ),
-    AgentQuestion(
+    ContextQuestion(
         id = "q-location",
-        type = FilterType.LOCATION,
+        fieldKey = "location",
         question = "Where do you want to shop?",
         options = listOf(
-            AgentOption("loc-local", "Local (5 mi)", "local-5"),
-            AgentOption("loc-nearby", "Nearby (25 mi)", "nearby-25"),
-            AgentOption("loc-online", "Online Only", "online"),
-            AgentOption("loc-instore", "In-Store Pickup", "instore"),
+            ContextOption("loc-local", "Local (5 mi)", "local-5"),
+            ContextOption("loc-nearby", "Nearby (25 mi)", "nearby-25"),
+            ContextOption("loc-online", "Online Only", "online"),
+            ContextOption("loc-instore", "In-Store Pickup", "instore"),
         ),
     ),
-    AgentQuestion(
+    ContextQuestion(
         id = "q-sustainability",
-        type = FilterType.SUSTAINABILITY,
+        fieldKey = "sustainability",
         question = "Do sustainability features matter?",
         options = listOf(
-            AgentOption("sus-eco", "Eco-Friendly", "eco"),
-            AgentOption("sus-fairtrade", "Fair Trade", "fairtrade"),
-            AgentOption("sus-recycled", "Recycled Materials", "recycled"),
-            AgentOption("sus-bcorp", "B Corp", "bcorp"),
+            ContextOption("sus-eco", "Eco-Friendly", "eco"),
+            ContextOption("sus-fairtrade", "Fair Trade", "fairtrade"),
+            ContextOption("sus-recycled", "Recycled Materials", "recycled"),
+            ContextOption("sus-bcorp", "B Corp", "bcorp"),
         ),
     ),
-    AgentQuestion(
+    ContextQuestion(
         id = "q-rating",
-        type = FilterType.RATING,
+        fieldKey = "rating",
         question = "Minimum rating?",
         options = listOf(
-            AgentOption("rate-4plus", "4\u2605 and up", "4+"),
-            AgentOption("rate-45plus", "4.5\u2605 and up", "4.5+"),
+            ContextOption("rate-4plus", "4\u2605 and up", "4+"),
+            ContextOption("rate-45plus", "4.5\u2605 and up", "4.5+"),
         ),
     ),
-    AgentQuestion(
+    ContextQuestion(
         id = "q-custom",
-        type = FilterType.CUSTOM,
+        fieldKey = "custom",
         question = "Anything else to narrow it down?",
         options = listOf(
-            AgentOption("cust-coupons", "Has Coupons", "coupons"),
-            AgentOption("cust-new", "New Releases", "new-releases"),
-            AgentOption("cust-sale", "On Sale", "on-sale"),
-            AgentOption("cust-trending", "Trending", "trending"),
+            ContextOption("cust-coupons", "Has Coupons", "coupons"),
+            ContextOption("cust-new", "New Releases", "new-releases"),
+            ContextOption("cust-sale", "On Sale", "on-sale"),
+            ContextOption("cust-trending", "Trending", "trending"),
         ),
         multiSelect = true,
     ),
 )
 
-val typeLabels = mapOf(
-    FilterType.CATEGORY to "Category",
-    FilterType.BRAND to "Brand",
-    FilterType.PRICE to "Budget",
-    FilterType.LOCATION to "Location",
-    FilterType.SUSTAINABILITY to "Sustainability",
-    FilterType.RATING to "Rating",
-    FilterType.CUSTOM to "Extras",
+// ── Mock contexts ────────────────────────────────────────────────────────────
+
+val mockContexts = listOf(
+    Context(
+        id = "ctx-retail",
+        name = "Retail Products",
+        description = "Product catalog with pricing, ratings, and availability",
+        sourceType = ContextSourceType.VECTOR_COLLECTION,
+        sourceConfig = ContextSourceConfig(
+            collectionName = "products",
+            embeddingModel = "sentence-transformers/all-mpnet-base-v2",
+        ),
+        questions = shoppingQuestions,
+        resultSchema = listOf(
+            ResultFieldSchema("title", "Name", FieldType.STRING),
+            ResultFieldSchema("price", "Price", FieldType.PRICE, sortable = true, filterable = true),
+            ResultFieldSchema("rating", "Rating", FieldType.RATING, sortable = true, filterable = true),
+            ResultFieldSchema("brand", "Brand", FieldType.STRING, filterable = true),
+            ResultFieldSchema("source", "Source", FieldType.URL),
+        ),
+        createdAt = "2026-02-15",
+    ),
+    Context(
+        id = "ctx-services",
+        name = "Local Services",
+        description = "Local service providers with reviews and scheduling",
+        sourceType = ContextSourceType.SCRAPING_AGENT,
+        sourceConfig = ContextSourceConfig(
+            endpoint = "https://api.example.com/services",
+        ),
+        questions = listOf(
+            ContextQuestion(
+                id = "svc-type",
+                fieldKey = "service_type",
+                question = "What type of service?",
+                options = listOf(
+                    ContextOption("svc-plumbing", "Plumbing", "plumbing"),
+                    ContextOption("svc-electrical", "Electrical", "electrical"),
+                    ContextOption("svc-cleaning", "Cleaning", "cleaning"),
+                    ContextOption("svc-landscaping", "Landscaping", "landscaping"),
+                ),
+            ),
+            ContextQuestion(
+                id = "svc-location",
+                fieldKey = "location",
+                question = "Where do you need service?",
+                options = listOf(
+                    ContextOption("loc-local", "Local (5 mi)", "local-5"),
+                    ContextOption("loc-nearby", "Nearby (25 mi)", "nearby-25"),
+                ),
+            ),
+        ),
+        resultSchema = listOf(
+            ResultFieldSchema("title", "Provider", FieldType.STRING),
+            ResultFieldSchema("rating", "Rating", FieldType.RATING, sortable = true),
+            ResultFieldSchema("price", "Price", FieldType.PRICE, sortable = true),
+        ),
+        createdAt = "2026-03-01",
+    ),
+    Context(
+        id = "ctx-research",
+        name = "Research Papers",
+        description = "Academic papers, citations, and abstracts",
+        sourceType = ContextSourceType.DOCUMENT_STORE,
+        sourceConfig = ContextSourceConfig(
+            collectionName = "papers",
+        ),
+        questions = listOf(
+            ContextQuestion(
+                id = "res-topic",
+                fieldKey = "topic",
+                question = "What topic area?",
+                options = listOf(
+                    ContextOption("topic-ai", "AI / ML", "ai-ml"),
+                    ContextOption("topic-sustainability", "Sustainability", "sustainability"),
+                    ContextOption("topic-economics", "Economics", "economics"),
+                ),
+            ),
+        ),
+        resultSchema = listOf(
+            ResultFieldSchema("title", "Title", FieldType.STRING),
+            ResultFieldSchema("authors", "Authors", FieldType.STRING),
+            ResultFieldSchema("year", "Year", FieldType.NUMBER, sortable = true),
+        ),
+        createdAt = "2026-03-10",
+    ),
+    Context(
+        id = "ctx-profile",
+        name = "My Profile",
+        description = "Your preferences — automatically enriches other Contexts",
+        sourceType = ContextSourceType.USER_PROFILE,
+        sourceConfig = ContextSourceConfig(),
+        questions = listOf(
+            ContextQuestion(
+                id = "prof-location",
+                fieldKey = "location",
+                question = "Your default location",
+                options = listOf(
+                    ContextOption("loc-portland", "Portland, OR", "portland"),
+                    ContextOption("loc-zurich", "Zurich", "zurich"),
+                    ContextOption("loc-berlin", "Berlin", "berlin"),
+                ),
+            ),
+            ContextQuestion(
+                id = "prof-budget",
+                fieldKey = "price",
+                question = "Your typical budget",
+                options = listOf(
+                    ContextOption("budget-low", "Under \$50", "0-50"),
+                    ContextOption("budget-mid", "Under \$200", "0-200"),
+                    ContextOption("budget-high", "No limit", "0+"),
+                ),
+            ),
+            ContextQuestion(
+                id = "prof-sustainability",
+                fieldKey = "sustainability",
+                question = "Sustainability preference",
+                options = listOf(
+                    ContextOption("sus-eco", "Eco-Friendly", "eco"),
+                    ContextOption("sus-fairtrade", "Fair Trade", "fairtrade"),
+                ),
+                multiSelect = true,
+            ),
+        ),
+        resultSchema = emptyList(),
+        createdAt = "2026-01-15",
+    ),
+)
+
+// ── Labels ───────────────────────────────────────────────────────────────────
+
+val fieldLabels = mapOf(
+    "category" to "Category",
+    "brand" to "Brand",
+    "price" to "Budget",
+    "location" to "Location",
+    "sustainability" to "Sustainability",
+    "rating" to "Rating",
+    "custom" to "Extras",
+    "service_type" to "Service Type",
+    "topic" to "Topic",
 )
 
 val intervalLabels = mapOf(

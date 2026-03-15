@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ch.genaizurich2026.dynamicvector.data.mockHistory
 import ch.genaizurich2026.dynamicvector.data.mockProfile
-import ch.genaizurich2026.dynamicvector.data.mockRepositories
+import ch.genaizurich2026.dynamicvector.data.mockContexts
 import ch.genaizurich2026.dynamicvector.data.mockSavedQueries
 
 @Composable
@@ -85,7 +85,7 @@ fun ProfileScreen(
         ) {
             StatCard("Queries", "${mockSavedQueries.size}", Modifier.weight(1f), isFirst = true)
             StatCard("Results", "${mockHistory.sumOf { it.resultCount }}", Modifier.weight(1f))
-            StatCard("Repos", "${mockRepositories.size}", Modifier.weight(1f), isLast = true)
+            StatCard("Repos", "${mockContexts.size}", Modifier.weight(1f), isLast = true)
         }
 
         Spacer(Modifier.height(24.dp))

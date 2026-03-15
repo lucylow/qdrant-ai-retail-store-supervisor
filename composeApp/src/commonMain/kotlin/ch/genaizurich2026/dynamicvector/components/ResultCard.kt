@@ -15,14 +15,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
-import ch.genaizurich2026.dynamicvector.model.ShoppingResult
+import ch.genaizurich2026.dynamicvector.model.ContextResultItem
 import ch.genaizurich2026.dynamicvector.model.TagColor
 import ch.genaizurich2026.dynamicvector.theme.*
 
 @Composable
 fun ResultCard(
-    result: ShoppingResult,
-    onExclude: ((ShoppingResult) -> Unit)? = null,
+    result: ContextResultItem,
+    onExclude: ((ContextResultItem) -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     Surface(
@@ -48,14 +48,14 @@ fun ResultCard(
             }
 
             Column(modifier = Modifier.weight(1f)) {
-                // Name + match score
+                // Title + match score
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Top,
                 ) {
                     Text(
-                        text = result.name,
+                        text = result.title,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -99,9 +99,9 @@ fun ResultCard(
                     }
                 }
 
-                // Brand + source
+                // Subtitle + source
                 Text(
-                    text = "${result.brand} \u00b7 ${result.source}",
+                    text = "${result.subtitle} \u00b7 ${result.source}",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 2.dp),
@@ -113,26 +113,30 @@ fun ResultCard(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
-                        text = "$${result.price.formatPrice()}",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
+                    result.price?.let { price ->
                         Text(
-                            text = "\u2605",
-                            fontSize = 12.sp,
-                            color = Amber500,
+                            text = "$${price.formatPrice()}",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
-                        Text(
-                            text = result.rating.formatRating(),
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+                    }
+                    result.rating?.let { rating ->
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = "\u2605",
+                                fontSize = 12.sp,
+                                color = Amber500,
+                            )
+                            Text(
+                                text = rating.formatRating(),
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
 

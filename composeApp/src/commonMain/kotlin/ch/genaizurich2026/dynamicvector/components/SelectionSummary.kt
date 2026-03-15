@@ -12,21 +12,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ch.genaizurich2026.dynamicvector.model.FilterType
-import ch.genaizurich2026.dynamicvector.model.QueryFilter
+import ch.genaizurich2026.dynamicvector.model.ContextAnswer
 
 @Composable
 fun SelectionSummary(
-    selections: Map<FilterType, List<QueryFilter>>,
-    typeLabels: Map<FilterType, String>,
-    onRemove: (FilterType, String) -> Unit,
-    onEditType: (FilterType) -> Unit,
+    selections: Map<String, List<ContextAnswer>>,
+    fieldLabels: Map<String, String>,
+    onRemove: (String, String) -> Unit,
+    onEditField: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val filledTypes = selections.filter { it.value.isNotEmpty() }
-    if (filledTypes.isEmpty()) return
+    val filledFields = selections.filter { it.value.isNotEmpty() }
+    if (filledFields.isEmpty()) return
 
-    val totalFilters = filledTypes.values.sumOf { it.size }
+    val totalFilters = filledFields.values.sumOf { it.size }
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -46,13 +45,13 @@ fun SelectionSummary(
 
             Spacer(Modifier.height(12.dp))
 
-            filledTypes.forEach { (type, filters) ->
+            filledFields.forEach { (fieldKey, answers) ->
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                     verticalAlignment = Alignment.Top,
                 ) {
                     Text(
-                        text = (typeLabels[type] ?: type.name).uppercase(),
+                        text = (fieldLabels[fieldKey] ?: fieldKey).uppercase(),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -65,7 +64,7 @@ fun SelectionSummary(
                         horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalArrangement = Arrangement.spacedBy(6.dp),
                     ) {
-                        filters.forEach { filter ->
+                        answers.forEach { answer ->
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
                                 color = MaterialTheme.colorScheme.secondary,
@@ -76,7 +75,7 @@ fun SelectionSummary(
                                     horizontalArrangement = Arrangement.spacedBy(4.dp),
                                 ) {
                                     Text(
-                                        text = filter.label,
+                                        text = answer.label,
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Medium,
                                         color = MaterialTheme.colorScheme.onSecondary,
@@ -87,7 +86,7 @@ fun SelectionSummary(
                                         color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.5f),
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(4.dp))
-                                            .clickable { onRemove(type, filter.id) },
+                                            .clickable { onRemove(fieldKey, answer.questionId) },
                                     )
                                 }
                             }
@@ -101,7 +100,7 @@ fun SelectionSummary(
                         modifier = Modifier
                             .padding(start = 8.dp, top = 4.dp)
                             .clip(RoundedCornerShape(4.dp))
-                            .clickable { onEditType(type) },
+                            .clickable { onEditField(fieldKey) },
                     )
                 }
             }

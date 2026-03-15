@@ -25,34 +25,34 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ch.genaizurich2026.dynamicvector.data.agentQuestions
-import ch.genaizurich2026.dynamicvector.data.typeLabels
+import ch.genaizurich2026.dynamicvector.data.fieldLabels
 import ch.genaizurich2026.dynamicvector.model.*
 
 @Composable
 fun QueryBuilder(
-    onSearch: (List<QueryFilter>, String, List<String>) -> Unit,
+    questions: List<ContextQuestion>,
+    onSearch: (List<ContextAnswer>, String, List<String>) -> Unit,
     exclusions: List<String> = emptyList(),
     onRemoveExclusion: ((String) -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     var currentStep by remember { mutableStateOf(0) }
-    var selections by remember { mutableStateOf(mapOf<FilterType, List<QueryFilter>>()) }
+    var selections by remember { mutableStateOf(mapOf<String, List<ContextAnswer>>()) }
     var inputValue by remember { mutableStateOf("") }
-    var refinements by remember { mutableStateOf(listOf<RefinementNote>()) }
+    var refinements by remember { mutableStateOf(listOf<String>()) }
     var isComplete by remember { mutableStateOf(false) }
     var editingStep by remember { mutableStateOf<Int?>(null) }
-    var editingNoteId by remember { mutableStateOf<String?>(null) }
+    var editingNoteIndex by remember { mutableStateOf<Int?>(null) }
     var editingNoteText by remember { mutableStateOf("") }
 
-    val totalSteps = agentQuestions.size
+    val totalSteps = questions.size
     val activeStep = editingStep ?: currentStep
-    val currentQuestion = agentQuestions.getOrNull(activeStep)
-    val allActiveFilters = selections.values.flatten()
-    val canSearch = allActiveFilters.isNotEmpty() || refinements.isNotEmpty()
+    val currentQuestion = questions.getOrNull(activeStep)
+    val allActiveAnswers = selections.values.flatten()
+    val canSearch = allActiveAnswers.isNotEmpty() || refinements.isNotEmpty()
 
     fun isOptionSelected(optionId: String): Boolean =
-        allActiveFilters.any { it.id == optionId }
+        allActiveAnswers.any { it.questionId == optionId || optionId in it.selectedValues }
 
     fun advanceStep() {
         if (editingStep != null) {
@@ -66,23 +66,22 @@ fun QueryBuilder(
         }
     }
 
-    fun handleSelect(option: AgentOption) {
-        val question = agentQuestions[activeStep]
-        val type = question.type
-        val filter = QueryFilter(
-            id = option.id,
-            type = type,
+    fun handleSelect(option: ContextOption) {
+        val question = questions[activeStep]
+        val fieldKey = question.fieldKey
+        val answer = ContextAnswer(
+            questionId = question.id,
+            fieldKey = fieldKey,
+            selectedValues = listOf(option.value),
             label = option.label,
-            value = option.value,
-            active = true,
         )
-        val current = selections[type].orEmpty()
-        val exists = current.any { it.id == option.id }
+        val current = selections[fieldKey].orEmpty()
+        val exists = current.any { option.value in it.selectedValues }
 
         selections = if (question.multiSelect) {
-            selections + (type to if (exists) current.filter { it.id != option.id } else current + filter)
+            selections + (fieldKey to if (exists) current.filter { option.value !in it.selectedValues } else current + answer)
         } else {
-            selections + (type to if (exists) emptyList() else listOf(filter))
+            selections + (fieldKey to if (exists) emptyList() else listOf(answer))
         }
 
         if (!question.multiSelect && !exists) {
@@ -91,13 +90,13 @@ fun QueryBuilder(
     }
 
     fun handleSkip() {
-        val type = agentQuestions[activeStep].type
-        selections = selections + (type to emptyList())
+        val fieldKey = questions[activeStep].fieldKey
+        selections = selections + (fieldKey to emptyList())
         advanceStep()
     }
 
-    fun handleRemoveFilter(type: FilterType, id: String) {
-        selections = selections + (type to (selections[type].orEmpty().filter { it.id != id }))
+    fun handleRemoveAnswer(fieldKey: String, questionId: String) {
+        selections = selections + (fieldKey to (selections[fieldKey].orEmpty().filter { it.questionId != questionId }))
     }
 
     fun handleEditStep(stepIndex: Int) {
@@ -108,35 +107,30 @@ fun QueryBuilder(
     fun handleSendRefinement() {
         val text = inputValue.trim()
         if (text.isEmpty()) return
-        refinements = refinements + RefinementNote(
-            id = "ref-${refinements.size}",
-            text = text,
-        )
+        refinements = refinements + text
         inputValue = ""
     }
 
-    fun handleDeleteRefinement(id: String) {
-        refinements = refinements.filter { it.id != id }
+    fun handleDeleteRefinement(index: Int) {
+        refinements = refinements.filterIndexed { i, _ -> i != index }
     }
 
     fun handleSaveEditNote() {
-        val noteId = editingNoteId ?: return
+        val idx = editingNoteIndex ?: return
         val text = editingNoteText.trim()
         if (text.isEmpty()) {
-            handleDeleteRefinement(noteId)
+            handleDeleteRefinement(idx)
         } else {
-            refinements = refinements.map {
-                if (it.id == noteId) it.copy(text = text) else it
-            }
+            refinements = refinements.toMutableList().also { it[idx] = text }
         }
-        editingNoteId = null
+        editingNoteIndex = null
         editingNoteText = ""
     }
 
     fun handleSearch() {
-        val allFilters = selections.values.flatten()
-        val naturalQuery = refinements.joinToString(". ") { it.text }
-        onSearch(allFilters, naturalQuery, exclusions)
+        val allAnswers = selections.values.flatten()
+        val naturalQuery = refinements.joinToString(". ")
+        onSearch(allAnswers, naturalQuery, exclusions)
     }
 
     fun handleReset() {
@@ -146,7 +140,7 @@ fun QueryBuilder(
         refinements = emptyList()
         isComplete = false
         editingStep = null
-        editingNoteId = null
+        editingNoteIndex = null
     }
 
     Column(
@@ -154,13 +148,13 @@ fun QueryBuilder(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         // Selection Summary
-        if (allActiveFilters.isNotEmpty()) {
+        if (allActiveAnswers.isNotEmpty()) {
             SelectionSummary(
                 selections = selections,
-                typeLabels = typeLabels,
-                onRemove = ::handleRemoveFilter,
-                onEditType = { type ->
-                    val idx = agentQuestions.indexOfFirst { it.type == type }
+                fieldLabels = fieldLabels,
+                onRemove = ::handleRemoveAnswer,
+                onEditField = { fieldKey ->
+                    val idx = questions.indexOfFirst { it.fieldKey == fieldKey }
                     if (idx != -1) handleEditStep(idx)
                 },
             )
@@ -279,9 +273,12 @@ fun QueryBuilder(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             currentQuestion.options.forEach { option ->
+                                val selected = selections[currentQuestion.fieldKey]
+                                    .orEmpty()
+                                    .any { option.value in it.selectedValues }
                                 QueryFilterChip(
                                     label = option.label,
-                                    active = isOptionSelected(option.id),
+                                    active = selected,
                                     onToggle = { handleSelect(option) },
                                 )
                             }
@@ -339,7 +336,7 @@ fun QueryBuilder(
                         // Progress bar
                         Spacer(Modifier.height(12.dp))
                         Text(
-                            text = "Step ${activeStep + 1} of $totalSteps \u2014 ${typeLabels[currentQuestion.type] ?: ""}",
+                            text = "Step ${activeStep + 1} of $totalSteps \u2014 ${fieldLabels[currentQuestion.fieldKey] ?: ""}",
                             fontSize = 11.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 4.dp),
@@ -348,7 +345,7 @@ fun QueryBuilder(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
-                            agentQuestions.forEachIndexed { i, _ ->
+                            questions.forEachIndexed { i, _ ->
                                 val color = when {
                                     i < currentStep -> MaterialTheme.colorScheme.primary
                                     i == activeStep -> MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
@@ -370,7 +367,7 @@ fun QueryBuilder(
 
         // Refinement notes
         if (currentStep > 0 || isComplete) {
-            refinements.forEach { note ->
+            refinements.forEachIndexed { index, noteText ->
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.05f),
@@ -382,7 +379,7 @@ fun QueryBuilder(
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        if (editingNoteId == note.id) {
+                        if (editingNoteIndex == index) {
                             OutlinedTextField(
                                 value = editingNoteText,
                                 onValueChange = { editingNoteText = it },
@@ -394,18 +391,18 @@ fun QueryBuilder(
                             )
                         } else {
                             Text(
-                                text = note.text,
+                                text = noteText,
                                 fontSize = 14.sp,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.weight(1f),
                             )
                         }
 
-                        if (editingNoteId != note.id) {
+                        if (editingNoteIndex != index) {
                             IconButton(
                                 onClick = {
-                                    editingNoteId = note.id
-                                    editingNoteText = note.text
+                                    editingNoteIndex = index
+                                    editingNoteText = noteText
                                 },
                                 modifier = Modifier.size(32.dp),
                             ) {
@@ -418,7 +415,7 @@ fun QueryBuilder(
                             }
                         }
                         IconButton(
-                            onClick = { handleDeleteRefinement(note.id) },
+                            onClick = { handleDeleteRefinement(index) },
                             modifier = Modifier.size(32.dp),
                         ) {
                             Icon(

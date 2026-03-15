@@ -64,7 +64,7 @@ fun BottomNavBar(
                 ) {
                     val icon = when (tab) {
                         BottomNavTab.HOME -> if (isActive) Icons.Filled.Home else Icons.Outlined.Home
-                        BottomNavTab.REPOSITORIES -> if (isActive) Icons.Filled.Folder else Icons.Outlined.FolderOpen
+                        BottomNavTab.CONTEXTS -> if (isActive) Icons.Filled.Folder else Icons.Outlined.FolderOpen
                         BottomNavTab.PROFILE -> if (isActive) Icons.Filled.Person else Icons.Outlined.Person
                     }
                     Icon(

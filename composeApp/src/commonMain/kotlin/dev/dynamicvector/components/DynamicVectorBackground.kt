@@ -20,10 +20,10 @@ private const val TOTAL = GRID * GRID
 private const val CAM_Z = 12f
 private const val CAM_LOOK_Y = 0.5f
 private const val FOV = 500f
-private const val STAR_COUNT = 50
+private const val STAR_COUNT = 180
 private val BG = Color(0xFF040410)
 
-private data class Star(val x: Float, val y: Float, val phase: Float, val speed: Float)
+private data class Star(val x: Float, val y: Float, val radius: Float, val alpha: Float, val phase: Float, val speed: Float)
 
 /**
  * Pre-allocated per-frame buffers — avoids GC pressure from allocating
@@ -58,7 +58,14 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
     val stars = remember {
         val rng = Random(42)
         Array(STAR_COUNT) {
-            Star(rng.nextFloat(), rng.nextFloat(), rng.nextFloat() * 6.28f, 0.5f + rng.nextFloat() * 1.5f)
+            Star(
+                x = rng.nextFloat(),
+                y = rng.nextFloat(),
+                radius = 0.4f + rng.nextFloat() * 1.0f,
+                alpha = 0.15f + rng.nextFloat() * 0.45f,
+                phase = rng.nextFloat() * 6.28f,
+                speed = 0.3f + rng.nextFloat() * 1.2f,
+            )
         }
     }
     val buf = remember { Buffers() }
@@ -87,8 +94,9 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
 
         // ── Stars ──
         for (s in stars) {
-            val a = 0.3f + 0.4f * ((sin(time * s.speed + s.phase) + 1f) * 0.5f)
-            drawCircle(Color.White.copy(alpha = a * 0.5f), 1f, Offset(s.x * w, s.y * h))
+            val twinkle = (sin(time * s.speed + s.phase) + 1f) * 0.5f
+            val a = s.alpha * (0.6f + 0.4f * twinkle)
+            drawCircle(Color.White.copy(alpha = a), s.radius, Offset(s.x * w, s.y * h))
         }
 
         // Camera orbit (matches Three.js)

@@ -116,7 +116,7 @@ fun LoginScreen(
 
         // Version
         Text(
-            text = "v0.1.0",
+            text = "v${dev.dynamicvector.BuildConfig.VERSION}",
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
             modifier = Modifier.padding(bottom = 24.dp),

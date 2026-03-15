@@ -1,6 +1,8 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
+val appVersion = "1.0.0"
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
@@ -63,7 +65,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = appVersion
     }
     packaging {
         resources {
@@ -85,6 +87,30 @@ dependencies {
     debugImplementation(libs.compose.uiTooling)
 }
 
+val generateBuildConfig by tasks.registering {
+    val outputDir = layout.buildDirectory.dir("generated/buildconfig")
+    val version = appVersion
+    outputs.dir(outputDir)
+    inputs.property("version", version)
+    doLast {
+        val dir = outputDir.get().asFile.resolve("dev/dynamicvector")
+        dir.mkdirs()
+        dir.resolve("BuildConfig.kt").writeText(
+            """
+            |package dev.dynamicvector
+            |
+            |object BuildConfig {
+            |    const val VERSION = "$version"
+            |}
+            """.trimMargin()
+        )
+    }
+}
+
+kotlin.sourceSets.commonMain {
+    kotlin.srcDir(generateBuildConfig.map { it.outputs.files.singleFile })
+}
+
 compose.desktop {
     application {
         mainClass = "ch.genaizurich2026.dynamicvector.MainKt"
@@ -92,7 +118,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ch.genaizurich2026.dynamicvector"
-            packageVersion = "1.0.0"
+            packageVersion = appVersion
         }
     }
 }

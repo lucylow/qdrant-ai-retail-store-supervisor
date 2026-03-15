@@ -16,14 +16,18 @@ Dynamic Vector uses a conversational flow to understand customer needs, then sea
          └──────────┬──────────────────┘
                     ▼
          ┌─────────────────────┐
-         │  FastAPI Backend    │
-         │  Multi-Agent System │
+         │  server/             │  ← Lightweight auth server (no API keys needed)
+         │  FastAPI + JWT       │
+         └─────────────────────┘
+                    │
+                    ▼ (future)
+         ┌─────────────────────┐
+         │  backend/            │  ← Full multi-agent system (requires API keys)
+         │  Qdrant + RAG       │
          └──┬──────────┬──────┘
             ▼          ▼
       ┌─────────┐ ┌─────────┐
       │ Qdrant  │ │  Redis  │
-      │ Vector  │ │ Session │
-      │   DB    │ │  Cache  │
       └─────────┘ └─────────┘
 ```
 
@@ -32,57 +36,65 @@ Dynamic Vector uses a conversational flow to understand customer needs, then sea
 ```
 ├── composeApp/              # KMP app (Android, iOS, Desktop)
 ├── iosApp/                  # iOS Xcode project
-├── backend/                 # Python/FastAPI + multi-agent system
+├── server/                  # Lightweight FastAPI server (auth, health)
+│   └── app/
+│       ├── main.py          #   FastAPI entrypoint
+│       └── auth.py          #   JWT auth (hardcoded demo accounts)
+├── backend/                 # Full multi-agent system (requires API keys)
 │   ├── app/                 #   FastAPI application + agents
-│   │   ├── auth.py          #   JWT auth (hardcoded demo accounts)
 │   │   ├── agents/          #   Shopper, Inventory, Pricing, Merchandising, Audit
 │   │   └── routers/         #   Multilingual, voice, geospatial, checkout
 │   ├── scripts/             #   Data ingestion, seeding
 │   └── data/                #   Datasets
 ├── web/                     # React/TypeScript frontend
 │   └── src/                 #   Pages, components, hooks
-├── docker-compose.yml       # Run everything with one command
-└── .env.example             # Environment variables template
+├── docker-compose.yml       # Run server + web with one command
+└── .env.example             # Environment variables template (for backend/)
 ```
 
 ## Quick Start
 
-### Option 1: Docker (recommended for demo)
+### Option 1: Docker (recommended)
 
 ```shell
-cp .env.example .env
-# Edit .env with your API keys (Qdrant, OpenAI, etc.)
 docker compose up --build
 ```
 
 This starts:
-- **Qdrant** on http://localhost:6333
-- **Redis** on localhost:6379
-- **FastAPI backend** on http://localhost:8000
+- **Server** (auth + health) on http://localhost:8000
 - **React web frontend** on http://localhost:8080
+
+No API keys needed — the server module is self-contained.
 
 ### Option 2: Run services individually
 
-**1. Start infrastructure:**
+**1. Start the server:**
 ```shell
-docker compose up qdrant redis
-```
-
-**2. Start the backend:**
-```shell
-cd backend
+cd server
 pip install -r requirements.txt
 uvicorn app.main:app --port 8000 --reload
 ```
 
-**3. Start the web frontend:**
+**2. Start the web frontend:**
 ```shell
 cd web
 npm install
 npm run dev
 ```
 
-**4. Run the KMP mobile app** (see below).
+**3. Run the KMP mobile app** (see below).
+
+### Running the full backend (optional)
+
+The `backend/` module contains the full multi-agent system with Qdrant, RAG, and voice. It requires API keys configured in `.env` (see `.env.example`). It is not needed for frontend development.
+
+```shell
+cp .env.example .env
+# Edit .env with your API keys
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --port 8000 --reload
+```
 
 ## KMP Mobile App
 
@@ -113,7 +125,7 @@ Open [/iosApp](./iosApp) in Xcode and run from there.
 
 ## Authentication
 
-Auth uses hardcoded demo accounts with JWT tokens. All clients (KMP and React) authenticate against the same `POST /token` endpoint. There is no registration route — this is intentional to block random visitors.
+Auth uses hardcoded demo accounts with JWT tokens. All clients (KMP and React) authenticate against the same `POST /token` endpoint on the server. There is no registration route — this is intentional to block random visitors.
 
 | Username | Password   | Intended Use               |
 |----------|------------|----------------------------|
@@ -122,15 +134,20 @@ Auth uses hardcoded demo accounts with JWT tokens. All clients (KMP and React) a
 | `bob`    | `bob123`   | Third persona              |
 | `judge`  | `judge123` | Hackathon judges           |
 
-Accounts can be added/removed in `backend/app/auth.py`.
+Accounts can be added/removed in `server/app/auth.py`.
 
-## Key API Endpoints
+## Server Endpoints
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
 | `/token` | POST | Login (OAuth2 password flow) |
 | `/users/me` | GET | Current user info (requires JWT) |
-| `/health` | GET | Qdrant health check |
+| `/health` | GET | Health check |
+
+## Backend Endpoints (full system)
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
 | `/query?q=...` | GET | Single-shot RAG answer |
 | `/stream_query?q=...` | GET (SSE) | Streaming RAG answer |
 | `/chat/swiss` | POST | Multilingual chat (DE/FR/IT/EN) |
@@ -151,7 +168,9 @@ Accounts can be added/removed in `backend/app/auth.py`.
 
 ## Environment Variables
 
-Copy `.env.example` to `.env` and fill in your keys:
+The `server/` module requires no environment variables.
+
+The `backend/` module requires API keys. Copy `.env.example` to `.env` and fill in:
 
 - `QDRANT_URL` / `QDRANT_API_KEY` — Qdrant Cloud connection
 - `HF_TOKEN` — HuggingFace embeddings
@@ -164,6 +183,7 @@ Copy `.env.example` to `.env` and fill in your keys:
 
 - **Mobile:** Kotlin Multiplatform + Compose Multiplatform (Android, iOS, JVM Desktop)
 - **Web:** React, TypeScript, Vite, shadcn/ui, TailwindCSS
+- **Server:** Python, FastAPI, JWT auth
 - **Backend:** Python, FastAPI, multi-agent orchestration
 - **Vector DB:** Qdrant (hybrid text + image search)
 - **Session Cache:** Redis (1hr TTL, max 10 turns)

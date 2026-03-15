@@ -14,8 +14,6 @@ types-requests>=2.32.0
 fastapi>=0.100.0
 uvicorn>=0.22.0
 python-dotenv>=1.0.0
-python-jose[cryptography]
-python-multipart
 
 # Multilingual NLP for Swiss retail chatbot
 langdetect>=1.0.9

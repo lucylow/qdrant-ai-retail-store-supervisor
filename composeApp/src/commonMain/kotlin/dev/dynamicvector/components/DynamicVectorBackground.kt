@@ -228,9 +228,9 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
         // them for every point in that row (50× savings = 2,500 → 50 LUT reads).
         //
         // We also pre-compute the base color per row. The color gradient goes:
-        //   Left edge  (cB < 0.4) → teal/blue   (R:0.12–0.32, G:0.50–0.78, B:0.90–0.82)
-        //   Center     (cB 0.4–0.6) → purple     (R:0.45, G:0.35, B:0.70)
-        //   Right edge (cB > 0.6) → warm/orange  (R:0.50–1.0, G:0.30–0.50, B:0.40–0.0)
+        //   Left edge  (cB < 0.4) → deep emerald   (R:0.05–0.15, G:0.30–0.55, B:0.20–0.40)
+        //   Center     (cB 0.4–0.6) → brand teal    (R:0.31, G:0.80, B:0.77)
+        //   Right edge (cB > 0.6) → bright mint     (R:0.20–0.35, G:0.85–0.95, B:0.65–0.80)
         // ═════════════════════════════════════════════════════════════════════
         for (xi in 0 until GRID) {
             val px = xi * SEP - HALF     // world X position (centered at 0)
@@ -245,22 +245,23 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
             val cB = (nx + 1f) / 2f
             when {
                 cB < 0.4f -> {
-                    // Left side: teal/blue tones
-                    buf.baseR[xi] = 0.12f + cB * 0.5f
-                    buf.baseG[xi] = 0.5f + cB * 0.7f
-                    buf.baseB[xi] = 0.9f - cB * 0.2f
+                    // Left side: deep emerald green
+                    buf.baseR[xi] = 0.05f + cB * 0.25f
+                    buf.baseG[xi] = 0.30f + cB * 0.625f
+                    buf.baseB[xi] = 0.20f + cB * 0.50f
                 }
                 cB < 0.6f -> {
-                    // Center: purple
-                    buf.baseR[xi] = 0.45f
-                    buf.baseG[xi] = 0.35f
-                    buf.baseB[xi] = 0.7f
+                    // Center: brand teal (#4ECDC4)
+                    buf.baseR[xi] = 0.31f
+                    buf.baseG[xi] = 0.80f
+                    buf.baseB[xi] = 0.77f
                 }
                 else -> {
-                    // Right side: warm orange/red
-                    buf.baseR[xi] = (0.5f + (cB - 0.6f) * 1.5f).coerceAtMost(1f)
-                    buf.baseG[xi] = 0.3f + cB * 0.2f
-                    buf.baseB[xi] = (0.4f - cB * 0.2f).coerceAtLeast(0f)
+                    // Right side: bright mint/cyan
+                    val t = (cB - 0.6f) / 0.4f
+                    buf.baseR[xi] = 0.20f + t * 0.15f
+                    buf.baseG[xi] = 0.85f + t * 0.10f
+                    buf.baseB[xi] = 0.65f + t * 0.15f
                 }
             }
         }

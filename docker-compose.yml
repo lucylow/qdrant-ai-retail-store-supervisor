@@ -15,16 +15,27 @@ services:
     ports:
       - "6379:6379"
 
-  app:
+  backend:
     build: ./backend
-    command: bash -c "python scripts/run_supervisor.py"
+    ports:
+      - "8000:8000"
+    env_file: .env
     environment:
-      - LOG_LEVEL=DEBUG
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - REDIS_HOST=redis
     volumes:
       - ./backend:/usr/src/app
     depends_on:
       - qdrant
       - redis
+
+  web:
+    build: ./web
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
 
 volumes:
   qdrant-data: {}

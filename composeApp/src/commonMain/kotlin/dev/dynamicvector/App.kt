@@ -36,7 +36,7 @@ fun App() {
         when (currentScreen) {
             is dev.dynamicvector.navigation.Screen.Login -> {
                 _root_ide_package_.dev.dynamicvector.screens.LoginScreen(
-                    onLogin = {
+                    onLoginSuccess = {
                         currentScreen = _root_ide_package_.dev.dynamicvector.navigation.Screen.Home
                     },
                 )

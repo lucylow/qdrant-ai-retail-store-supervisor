@@ -31,6 +31,7 @@ from app.routers.checkout import router as checkout_router
 from app.routers.swiss_time import router as swiss_time_router
 from app.agents.fashion_visual_agent import VisualFashionAgent
 from app.middleware.swiss_culture_middleware import SwissCultureMiddleware
+from app.auth import router as auth_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -39,6 +40,7 @@ app = FastAPI()
 client = None
 
 app.add_middleware(SwissCultureMiddleware)
+app.include_router(auth_router)
 
 
 @app.on_event("startup")

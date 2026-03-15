@@ -1,6 +1,7 @@
 package dev.dynamicvector
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -33,16 +34,25 @@ fun App() {
             scope.launch { snackbarHostState.showSnackbar(message) }
         }
 
-        when (currentScreen) {
-            is dev.dynamicvector.navigation.Screen.Login -> {
+        val isLoggedIn = currentScreen !is dev.dynamicvector.navigation.Screen.Login
+
+        AnimatedContent(
+            targetState = isLoggedIn,
+            transitionSpec = {
+                fadeIn(
+                    animationSpec = tween(durationMillis = 600, delayMillis = 100),
+                ) togetherWith fadeOut(
+                    animationSpec = tween(durationMillis = 500),
+                )
+            },
+        ) { loggedIn ->
+            if (!loggedIn) {
                 _root_ide_package_.dev.dynamicvector.screens.LoginScreen(
                     onLoginSuccess = {
                         currentScreen = _root_ide_package_.dev.dynamicvector.navigation.Screen.Home
                     },
                 )
-            }
-
-            else -> {
+            } else {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         Box(modifier = Modifier.weight(1f)) {

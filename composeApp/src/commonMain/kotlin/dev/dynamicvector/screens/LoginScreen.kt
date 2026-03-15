@@ -11,7 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.dynamicvector.components.DynamicVectorBackground
+import dev.dynamicvector.components.QuantumWaveFabric
 import kotlinx.coroutines.delay
 
 @Composable
@@ -30,7 +30,7 @@ fun LoginScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Layer 1: Animated background
-        DynamicVectorBackground()
+        QuantumWaveFabric()
 
         // Layer 2: Login overlay
         Column(

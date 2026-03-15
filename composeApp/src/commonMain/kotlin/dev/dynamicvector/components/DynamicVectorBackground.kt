@@ -21,7 +21,6 @@ private const val CAM_LOOK_Y = 0.5f
 private const val FOV_SCALE = 500f
 
 private const val STAR_COUNT = 60
-private const val STREAM_COUNT = 500
 
 private val BG = Color(0xFF040410)
 
@@ -67,27 +66,6 @@ private fun getBlend(t: Float): Float {
 
 private data class Star(val x: Float, val y: Float, val phase: Float, val speed: Float)
 
-private class StreamParticle {
-    var x = 0f; var y = 0f; var z = 0f
-    var vx = 0f; var vy = 0f; var vz = 0f
-    var life = 0f
-    var cr = 0f; var cg = 0f; var cb = 0f
-
-    fun reset(rng: Random) {
-        val a = rng.nextFloat() * 6.2832f
-        val r = 6f + rng.nextFloat() * 6f
-        x = cos(a) * r
-        y = (rng.nextFloat() - 0.3f) * 4f
-        z = sin(a) * r
-        val spd = 0.02f + rng.nextFloat() * 0.03f
-        vx = -cos(a) * spd
-        vy = (0f - y) * 0.005f
-        vz = -sin(a) * spd
-        life = rng.nextFloat()
-        if (rng.nextBoolean()) { cr = 0.3f; cg = 0.8f; cb = 0.77f }
-        else { cr = 0.48f; cg = 0.37f; cb = 0.65f }
-    }
-}
 
 @Composable
 fun DynamicVectorBackground(modifier: Modifier = Modifier) {
@@ -96,11 +74,6 @@ fun DynamicVectorBackground(modifier: Modifier = Modifier) {
         Array(STAR_COUNT) {
             Star(rng.nextFloat(), rng.nextFloat(), rng.nextFloat() * 6.28f, 0.5f + rng.nextFloat() * 1.5f)
         }
-    }
-
-    val streams = remember {
-        val rng = Random(99)
-        Array(STREAM_COUNT) { StreamParticle().also { it.reset(rng) } }
     }
 
     var time by remember { mutableFloatStateOf(0f) }
@@ -258,48 +231,5 @@ fun DynamicVectorBackground(modifier: Modifier = Modifier) {
             }
         }
 
-        // Stream particles — converge inward toward mesh center
-        val sI = if (mb > 0.1f) 1f else 0.3f
-        val streamRng = Random(((time * 10).toInt()).toLong() + 7)
-        for (sp in streams) {
-            // During convergence, add extra pull toward center
-            if (mb > 0.1f) {
-                val d = sqrt(sp.x * sp.x + sp.z * sp.z).coerceAtLeast(0.1f)
-                val pull = mb * 0.01f
-                sp.vx -= sp.x / d * pull
-                sp.vz -= sp.z / d * pull
-                sp.vy += (0f - sp.y) * 0.01f * mb
-            }
-
-            sp.x += sp.vx * sI
-            sp.y += sp.vy
-            sp.z += sp.vz * sI
-            sp.life -= 0.004f * sI
-
-            val d = sqrt(sp.x * sp.x + sp.z * sp.z)
-            if (sp.life < 0f || d < 0.3f || d > 15f) {
-                sp.reset(streamRng)
-            }
-
-            // Project stream particle
-            val sx = sp.x - camX
-            val sy = sp.y - camY + CAM_LOOK_Y
-            val sz = sp.z
-            val szd = CAM_Z - sz
-            if (szd <= 0.5f) continue
-            val sScale = FOV_SCALE / szd
-            val spx = sx * sScale + screenCx
-            val spy = sy * sScale + screenCy
-
-            if (spx < -50f || spx > w + 50f || spy < -50f || spy > h + 50f) continue
-
-            val stAlpha = (0.4f + mb * 0.5f) * 0.8f
-            val stRadius = (0.12f * 200f / szd).coerceIn(0.4f, 3f)
-            drawCircle(
-                Color(sp.cr, sp.cg, sp.cb, stAlpha),
-                stRadius,
-                Offset(spx, spy),
-            )
-        }
     }
 }

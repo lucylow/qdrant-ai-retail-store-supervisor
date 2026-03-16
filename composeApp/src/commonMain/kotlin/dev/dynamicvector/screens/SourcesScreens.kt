@@ -100,7 +100,7 @@ fun SourcesHostScreen(onNavigateToDetail: (ExploreSource) -> Unit, onNavigateToF
         items(sources, key = { it.id }) { src ->
             val bk = src.id in bookmarks
             Box(Modifier.padding(horizontal = 16.dp, vertical = 5.dp).fillMaxWidth().dvCard(16.dp)) {
-                Box(Modifier.fillMaxWidth().height(1.dp).background(DVColors.CardTopEdge))
+
                 Column(Modifier.padding(14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(bottom = 6.dp)) {
                     Text(src.name, style = DVTypography.CardTitle.copy(fontSize = 14.sp), modifier = Modifier.weight(1f, false), maxLines = 1, overflow = TextOverflow.Ellipsis); SourceBadge(src.repoType)

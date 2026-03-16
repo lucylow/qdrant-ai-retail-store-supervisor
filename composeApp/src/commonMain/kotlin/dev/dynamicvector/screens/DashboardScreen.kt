@@ -69,7 +69,7 @@ private fun SavedQueryCard(query: SavedQuery, onTap: () -> Unit) {
         .dvCard(16.dp)
         .clickable(onClick = onTap)
     ) {
-        Box(Modifier.fillMaxWidth().height(1.dp).background(DVColors.CardTopEdge))
+
         Column(Modifier.padding(14.dp)) {
         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
             Text(query.name, style = DVTypography.CardTitle.copy(fontSize = 14.sp), modifier = Modifier.weight(1f, false))

@@ -67,7 +67,7 @@ private const val CAM_LOOK_Y = 0.5f   // vertical offset of the look-at target
 private const val FOV = 500f          // projection scale factor (pseudo field-of-view)
 
 private const val STAR_COUNT = 180    // number of static background stars
-private val BG = Color(0xFF8B1A1A)    // deep crimson — Swiss flag red field
+private val BG = Color(0xFFFFFAF8)    // warm white — light Swiss
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // STAR — a single static background dot, positioned in normalized coords (0–1)
@@ -161,9 +161,10 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
             )
         }
     }
-    // Pre-compute Color objects — white dots on red bg
+    // Pre-compute Color objects — red dots on white bg
     val starColors = remember {
-        Array(STAR_COUNT) { Color.White.copy(alpha = stars[it].alpha) }
+        val red = Color(0xFFDC2626)
+        Array(STAR_COUNT) { red.copy(alpha = stars[it].alpha) }
     }
 
     val buf = remember { Buffers() }
@@ -228,9 +229,9 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
         // them for every point in that row (50× savings = 2,500 → 50 LUT reads).
         //
         // We also pre-compute the base color per row. The color gradient goes:
-        //   Left edge  (cB < 0.4) → warm cream     (R:0.90–0.95, G:0.82–0.88, B:0.78–0.84)
-        //   Center     (cB 0.4–0.6) → pure white   (R:1.0, G:1.0, B:1.0)
-        //   Right edge (cB > 0.6) → cool pink-white (R:1.0, G:0.88–0.95, B:0.88–0.92)
+        //   Left edge  (cB < 0.4) → dark maroon    (R:0.50–0.65, G:0.08–0.12, B:0.08–0.12)
+        //   Center     (cB 0.4–0.6) → Swiss Red     (R:0.86, G:0.15, B:0.15)
+        //   Right edge (cB > 0.6) → warm coral/rose  (R:0.90–0.96, G:0.30–0.50, B:0.30–0.45)
         // ═════════════════════════════════════════════════════════════════════
         for (xi in 0 until GRID) {
             val px = xi * SEP - HALF     // world X position (centered at 0)
@@ -245,23 +246,23 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
             val cB = (nx + 1f) / 2f
             when {
                 cB < 0.4f -> {
-                    // Left side: warm cream/ivory
-                    buf.baseR[xi] = 0.90f + cB * 0.12f
-                    buf.baseG[xi] = 0.82f + cB * 0.15f
-                    buf.baseB[xi] = 0.78f + cB * 0.15f
+                    // Left side: dark maroon
+                    buf.baseR[xi] = 0.50f + cB * 0.38f
+                    buf.baseG[xi] = 0.08f + cB * 0.10f
+                    buf.baseB[xi] = 0.08f + cB * 0.10f
                 }
                 cB < 0.6f -> {
-                    // Center: pure white
-                    buf.baseR[xi] = 1.0f
-                    buf.baseG[xi] = 1.0f
-                    buf.baseB[xi] = 1.0f
+                    // Center: Swiss Red (#DC2626)
+                    buf.baseR[xi] = 0.86f
+                    buf.baseG[xi] = 0.15f
+                    buf.baseB[xi] = 0.15f
                 }
                 else -> {
-                    // Right side: cool pink-white
+                    // Right side: warm coral/rose
                     val t = (cB - 0.6f) / 0.4f
-                    buf.baseR[xi] = 1.0f
-                    buf.baseG[xi] = 0.95f - t * 0.07f
-                    buf.baseB[xi] = 0.92f - t * 0.04f
+                    buf.baseR[xi] = 0.90f + t * 0.06f
+                    buf.baseG[xi] = 0.30f + t * 0.20f
+                    buf.baseB[xi] = 0.30f + t * 0.15f
                 }
             }
         }
@@ -359,11 +360,11 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
                 buf.sy[idx] = projY
                 buf.ok[idx] = true
 
-                // Fog blends base color toward red bg for distant points
+                // Fog blends base color toward white bg for distant points
                 val fog = buf.fog[zi]
-                buf.cr[idx] = buf.baseR[xi] * fog + (1f - fog) * 0.545f
-                buf.cg[idx] = buf.baseG[xi] * fog + (1f - fog) * 0.102f
-                buf.cb[idx] = buf.baseB[xi] * fog + (1f - fog) * 0.102f
+                buf.cr[idx] = buf.baseR[xi] * fog + (1f - fog) * 1f
+                buf.cg[idx] = buf.baseG[xi] * fog + (1f - fog) * 1f
+                buf.cb[idx] = buf.baseB[xi] * fog + (1f - fog) * 1f
             }
         }
 
@@ -406,8 +407,8 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
                 }
             }
         }
-        // Single draw call for the entire wireframe — white on red, subtle
-        drawPath(wirePath, Color(1f, 1f, 1f, 0.05f), style = Stroke(0.5f))
+        // Single draw call for the entire wireframe — red on white, subtle
+        drawPath(wirePath, Color(0.86f, 0.15f, 0.15f, 0.06f), style = Stroke(0.5f))
 
         // ═════════════════════════════════════════════════════════════════════
         // PHASE 5: POINT PARTICLES (BACK-TO-FRONT)

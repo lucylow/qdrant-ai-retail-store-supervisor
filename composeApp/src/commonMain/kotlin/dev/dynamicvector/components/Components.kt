@@ -34,8 +34,7 @@ import dev.dynamicvector.theme.DVTypography
 fun Modifier.dvCard(radius: androidx.compose.ui.unit.Dp = DVShapes.CardRadius) = this
     .drawBehind {
         val r = CornerRadius(radius.toPx())
-        drawRoundRect(Color.Black.copy(0.05f), cornerRadius = r, topLeft = Offset(0f, 6.dp.toPx()), size = size.copy(height = size.height + 6.dp.toPx()))
-        drawRoundRect(Color.Black.copy(0.08f), cornerRadius = r, topLeft = Offset(0f, 3.dp.toPx()), size = size.copy(height = size.height + 3.dp.toPx()))
+        drawRoundRect(Color.Black.copy(0.015f), cornerRadius = r, topLeft = Offset(0f, 2.dp.toPx()), size = size.copy(height = size.height + 2.dp.toPx()))
     }
     .clip(RoundedCornerShape(radius))
     .background(Brush.linearGradient(listOf(DVColors.CardGradientStart, DVColors.CardGradientEnd)))
@@ -155,7 +154,7 @@ fun EventCard(event: QueryEvent, onClick: () -> Unit, onToggleStar: () -> Unit, 
             .dvCard()
             .clickable(onClick = onClick)
     ) {
-        Box(Modifier.fillMaxWidth().height(1.dp).background(DVColors.CardTopEdge))
+
         Column(Modifier.padding(16.dp)) {
             Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.Top) {
                 Text(event.queryName, style = DVTypography.CardTitle, modifier = Modifier.weight(1f, false))

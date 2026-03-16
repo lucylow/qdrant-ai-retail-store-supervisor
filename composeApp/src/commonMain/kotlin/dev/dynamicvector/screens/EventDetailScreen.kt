@@ -43,7 +43,7 @@ fun EventDetailScreen(event: QueryEvent, onBack: () -> Unit) {
         item { SectionHeader("Top results") }
         itemsIndexed(event.results) { _, result ->
             Box(Modifier.padding(horizontal = 16.dp, vertical = 5.dp).fillMaxWidth().dvCard(16.dp)) {
-                Box(Modifier.fillMaxWidth().height(1.dp).background(DVColors.CardTopEdge))
+
                 Column(Modifier.padding(14.dp)) {
                 Text("#${result.rank} · ${result.category}", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = DVColors.Accent)
                 Spacer(Modifier.height(6.dp))

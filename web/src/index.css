@@ -1,0 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 68% 32%;
+    --foreground: 0 0% 96%;
+
+    --card: 0 70% 28%;
+    --card-foreground: 0 0% 96%;
+
+    --popover: 0 70% 28%;
+    --popover-foreground: 0 0% 96%;
+
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 68% 32%;
+
+    --secondary: 0 60% 25%;
+    --secondary-foreground: 0 0% 90%;
+
+    --muted: 0 55% 26%;
+    --muted-foreground: 0 20% 70%;
+
+    --accent: 0 0% 95%;
+    --accent-foreground: 0 68% 32%;
+
+    --destructive: 0 30% 75%;
+    --destructive-foreground: 0 68% 20%;
+
+    --border: 0 0% 100% / 0.1;
+    --input: 0 0% 100% / 0.1;
+    --ring: 0 0% 100%;
+
+    --radius: 0.75rem;
+
+    /* Custom tokens */
+    --gradient-primary: linear-gradient(135deg, hsl(0 0% 100%), hsl(0 20% 90%));
+    --gradient-card: linear-gradient(145deg, hsl(0 65% 30%), hsl(0 70% 27%));
+    --glow-primary: 0 0 30px hsl(0 0% 100% / 0.2);
+    --glow-accent: 0 0 20px hsl(0 0% 100% / 0.15);
+
+    --sidebar-background: 0 70% 28%;
+    --sidebar-foreground: 0 15% 75%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 0 68% 32%;
+    --sidebar-accent: 0 60% 25%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 100% / 0.1;
+    --sidebar-ring: 0 0% 100%;
+
+    /* Status colors — white/pink on red */
+    --status-online: 0 0% 100%;
+    --status-warning: 0 40% 85%;
+    --status-error: 0 70% 15%;
+    --status-info: 0 25% 80%;
+  }
+
+  /* Light mode override — same Swiss flag palette */
+  .light {
+    --background: 0 68% 32%;
+    --foreground: 0 0% 96%;
+    --card: 0 70% 28%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 70% 28%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 68% 32%;
+    --secondary: 0 60% 25%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 0 55% 26%;
+    --muted-foreground: 0 20% 70%;
+    --accent: 0 0% 95%;
+    --accent-foreground: 0 68% 32%;
+    --destructive: 0 30% 75%;
+    --destructive-foreground: 0 68% 20%;
+    --border: 0 0% 100% / 0.1;
+    --input: 0 0% 100% / 0.1;
+    --ring: 0 0% 100%;
+    --sidebar-background: 0 70% 28%;
+    --sidebar-foreground: 0 15% 75%;
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 0 68% 32%;
+    --sidebar-accent: 0 60% 25%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 100% / 0.1;
+    --sidebar-ring: 0 0% 100%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+
+  .glow-primary {
+    box-shadow: var(--glow-primary);
+  }
+
+  .glow-accent {
+    box-shadow: var(--glow-accent);
+  }
+
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 2px;
+  }
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px hsl(var(--status-online) / 0.6); }
+  50% { opacity: 0.7; box-shadow: 0 0 16px hsl(var(--status-online) / 0.9); }
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.4s ease-out forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--border)) 50%, hsl(var(--muted)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}

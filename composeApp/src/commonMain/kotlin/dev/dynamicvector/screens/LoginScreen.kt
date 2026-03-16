@@ -82,7 +82,7 @@ fun LoginScreen(
                         .fillMaxHeight()
                         .drawBehind {
                             val sw = 3.dp.toPx()
-                            val c = Color(0xFFE0E0F0).copy(alpha = 0.5f)
+                            val c = Color(0xFFF0E8E0).copy(alpha = 0.5f)
                             drawLine(c, Offset(sw / 2, 0f), Offset(sw / 2, size.height), sw)
                             drawLine(c, Offset(0f, sw / 2), Offset(size.width, sw / 2), sw)
                             drawLine(c, Offset(0f, size.height - sw / 2), Offset(size.width, size.height - sw / 2), sw)
@@ -100,7 +100,7 @@ fun LoginScreen(
                         fontWeight = FontWeight.ExtraBold,
                         fontFamily = FontFamily.Monospace,
                         letterSpacing = (-1).sp,
-                        color = Color(0xFFE0E0F0),
+                        color = Color(0xFFF0E8E0),
                         textAlign = TextAlign.Start,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -110,7 +110,7 @@ fun LoginScreen(
                         fontWeight = FontWeight.Bold,
                         fontFamily = FontFamily.Monospace,
                         letterSpacing = 2.sp,
-                        color = Color(0xFF4ECDC4),
+                        color = Color(0xFFDC2626),
                         textAlign = TextAlign.Start,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -123,7 +123,7 @@ fun LoginScreen(
                         .fillMaxHeight()
                         .drawBehind {
                             val sw = 3.dp.toPx()
-                            val c = Color(0xFFE0E0F0).copy(alpha = 0.5f)
+                            val c = Color(0xFFF0E8E0).copy(alpha = 0.5f)
                             drawLine(c, Offset(size.width - sw / 2, 0f), Offset(size.width - sw / 2, size.height), sw)
                             drawLine(c, Offset(0f, sw / 2), Offset(size.width, sw / 2), sw)
                             drawLine(c, Offset(0f, size.height - sw / 2), Offset(size.width, size.height - sw / 2), sw)
@@ -145,10 +145,10 @@ fun LoginScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
-                    focusedBorderColor = Color(0xFF4ECDC4),
+                    focusedBorderColor = Color(0xFFDC2626),
                     unfocusedLabelColor = Color.White.copy(alpha = 0.5f),
-                    focusedLabelColor = Color(0xFF4ECDC4),
-                    cursorColor = Color(0xFF4ECDC4),
+                    focusedLabelColor = Color(0xFFDC2626),
+                    cursorColor = Color(0xFFDC2626),
                     unfocusedTextColor = Color.White,
                     focusedTextColor = Color.White,
                 ),
@@ -179,10 +179,10 @@ fun LoginScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
-                    focusedBorderColor = Color(0xFF4ECDC4),
+                    focusedBorderColor = Color(0xFFDC2626),
                     unfocusedLabelColor = Color.White.copy(alpha = 0.5f),
-                    focusedLabelColor = Color(0xFF4ECDC4),
-                    cursorColor = Color(0xFF4ECDC4),
+                    focusedLabelColor = Color(0xFFDC2626),
+                    cursorColor = Color(0xFFDC2626),
                     unfocusedTextColor = Color.White,
                     focusedTextColor = Color.White,
                 ),
@@ -208,10 +208,10 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4ECDC4),
-                    contentColor = Color(0xFF040410),
-                    disabledContainerColor = Color(0xFF4ECDC4).copy(alpha = 0.3f),
-                    disabledContentColor = Color(0xFF040410).copy(alpha = 0.4f),
+                    containerColor = Color(0xFFDC2626),
+                    contentColor = Color(0xFF080406),
+                    disabledContainerColor = Color(0xFFDC2626).copy(alpha = 0.3f),
+                    disabledContentColor = Color(0xFF080406).copy(alpha = 0.4f),
                 ),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
             ) {
@@ -219,7 +219,7 @@ fun LoginScreen(
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
                         strokeWidth = 2.dp,
-                        color = Color(0xFF040410),
+                        color = Color(0xFF080406),
                     )
                 } else {
                     Text(

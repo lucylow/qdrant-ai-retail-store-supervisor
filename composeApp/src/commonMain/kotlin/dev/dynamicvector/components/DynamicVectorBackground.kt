@@ -67,7 +67,7 @@ private const val CAM_LOOK_Y = 0.5f   // vertical offset of the look-at target
 private const val FOV = 500f          // projection scale factor (pseudo field-of-view)
 
 private const val STAR_COUNT = 180    // number of static background stars
-private val BG = Color(0xFF040410)    // near-black background with a subtle blue tint
+private val BG = Color(0xFF080406)    // near-black background with a warm Swiss undertone
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // STAR — a single static background dot, positioned in normalized coords (0–1)
@@ -113,7 +113,7 @@ private class Buffers {
     val sinPx08 = FloatArray(GRID)  // sin(px * 0.8 - t*1.1) * 0.5 — wave term 2
     val sinPx15 = FloatArray(GRID)  // sin(px * 1.5 + t*1.8) — used in wave term 5
 
-    // Per-row base colors (indexed by xi) — teal on left, purple in center, warm on right
+    // Per-row base colors (indexed by xi) — burgundy on left, Swiss red in center, coral on right
     val baseR = FloatArray(GRID)
     val baseG = FloatArray(GRID)
     val baseB = FloatArray(GRID)
@@ -245,23 +245,23 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
             val cB = (nx + 1f) / 2f
             when {
                 cB < 0.4f -> {
-                    // Left side: deep emerald green
-                    buf.baseR[xi] = 0.05f + cB * 0.25f
-                    buf.baseG[xi] = 0.30f + cB * 0.625f
-                    buf.baseB[xi] = 0.20f + cB * 0.50f
+                    // Left side: deep burgundy/wine
+                    buf.baseR[xi] = 0.25f + cB * 0.50f
+                    buf.baseG[xi] = 0.03f + cB * 0.08f
+                    buf.baseB[xi] = 0.05f + cB * 0.08f
                 }
                 cB < 0.6f -> {
-                    // Center: brand teal (#4ECDC4)
-                    buf.baseR[xi] = 0.31f
-                    buf.baseG[xi] = 0.80f
-                    buf.baseB[xi] = 0.77f
+                    // Center: Swiss Red (#DC2626)
+                    buf.baseR[xi] = 0.86f
+                    buf.baseG[xi] = 0.15f
+                    buf.baseB[xi] = 0.15f
                 }
                 else -> {
-                    // Right side: bright mint/cyan
+                    // Right side: warm coral/rose
                     val t = (cB - 0.6f) / 0.4f
-                    buf.baseR[xi] = 0.20f + t * 0.15f
-                    buf.baseG[xi] = 0.85f + t * 0.10f
-                    buf.baseB[xi] = 0.65f + t * 0.15f
+                    buf.baseR[xi] = 0.85f + t * 0.10f
+                    buf.baseG[xi] = 0.20f + t * 0.25f
+                    buf.baseB[xi] = 0.15f + t * 0.15f
                 }
             }
         }
@@ -406,8 +406,8 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
                 }
             }
         }
-        // Single draw call for the entire wireframe — teal, very low opacity
-        drawPath(wirePath, Color(0.21f, 0.56f, 0.54f, 0.04f), style = Stroke(0.5f))
+        // Single draw call for the entire wireframe — Swiss red, very low opacity
+        drawPath(wirePath, Color(0.86f, 0.15f, 0.15f, 0.04f), style = Stroke(0.5f))
 
         // ═════════════════════════════════════════════════════════════════════
         // PHASE 5: POINT PARTICLES (BACK-TO-FRONT)

@@ -1,4 +1,4 @@
-package dev.dynamicvector.screens
+package ch.genaizurich2026.dynamicvector.ui.screens
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,12 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.dynamicvector.components.*
-import dev.dynamicvector.data.MockData
-import dev.dynamicvector.model.*
-import dev.dynamicvector.navigation.QueryCreationMode
-import dev.dynamicvector.theme.DVColors
-import dev.dynamicvector.theme.DVTypography
+import ch.genaizurich2026.dynamicvector.*
+import ch.genaizurich2026.dynamicvector.ui.components.*
 
 @Composable
 fun NewQueryScreen(onBack: () -> Unit) {
@@ -34,7 +29,7 @@ fun NewQueryScreen(onBack: () -> Unit) {
         Spacer(Modifier.height(44.dp))
         Row(Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             Box(Modifier.size(32.dp).background(DVColors.Accent.copy(0.08f), RoundedCornerShape(10.dp)).clickable(onClick = onBack), contentAlignment = Alignment.Center) {
-                Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Back", tint = DVColors.Accent, modifier = Modifier.size(16.dp))
+                Icon(Icons.Outlined.ArrowBack, "Back", tint = DVColors.Accent, modifier = Modifier.size(16.dp))
             }
             Text("New query", style = DVTypography.H1.copy(fontSize = 18.sp))
         }

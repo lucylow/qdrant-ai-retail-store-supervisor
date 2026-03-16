@@ -1,7 +1,4 @@
-package dev.dynamicvector.data
-
-import dev.dynamicvector.model.*
-import dev.dynamicvector.theme.DVColors
+package ch.genaizurich2026.dynamicvector
 
 object MockData {
 

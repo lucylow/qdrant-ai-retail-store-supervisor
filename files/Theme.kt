@@ -1,30 +1,26 @@
-package dev.dynamicvector.theme
+package ch.genaizurich2026.dynamicvector
 
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// ── Design system: Space-black Swiss Red ──
-
 object DVColors {
-    // Core backgrounds — warm dark (Swiss-themed undertone)
-    val Background        = Color(0xFF080406)
-    val Surface           = Color(0xFF0A0606)
+    // Core backgrounds — warm dark
+    val Background        = Color(0xFF0A0810)
+    val Surface           = Color(0xFF120E18)
     val SurfaceVariant    = Color(0x0AFFFFFF)
     val CardGradientStart = Color(0x0DFFFFFF)
     val CardGradientEnd   = Color(0x05FFFFFF)
     val CardBorder        = Color(0x0FFFFFFF)
-    val CardTopEdge       = Color(0x40DC2626) // Swiss red at 25%
+    val CardTopEdge       = Color(0x40E63946) // Swiss red at 25%
 
-    // Primary accent — Swiss Red
-    val Accent       = Color(0xFFDC2626)
-    val AccentDim    = Color(0x1ADC2626) // 10%
-    val AccentBorder = Color(0x40DC2626) // 25%
-    val AccentDark   = Color(0xFFB91C1C) // darker red for gradients
+    // Primary accent — Swiss red
+    val Accent       = Color(0xFFE63946)
+    val AccentDim    = Color(0x1AE63946) // 10%
+    val AccentBorder = Color(0x40E63946) // 25%
+    val AccentDark   = Color(0xFFC12E3A) // darker red for gradients
 
     // Text
     val TextPrimary   = Color(0xFFF0F0F5)
@@ -37,7 +33,7 @@ object DVColors {
     val IconMutedLight = Color(0xFF8A8A9E)
 
     // Status
-    val StatusLive   = Color(0xFFDC2626) // Swiss red for Live
+    val StatusLive   = Color(0xFFE63946) // Swiss red for Live
     val StatusDone   = Color(0xFF7AB87A)
     val StatusStale  = Color(0xFFF0B43C)
     val StatusFailed = Color(0xFFDC5050)
@@ -89,36 +85,4 @@ object DVShapes {
 object DVElevation {
     val CardTonalElevation = 0.dp
     val CardShadowElevation = 8.dp
-}
-
-// Keep MaterialTheme wrapper for LoginScreen and any M3 components that need it
-private val DarkColorScheme = darkColorScheme(
-    primary = DVColors.Accent,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFF1A0808),
-    onPrimaryContainer = DVColors.Accent,
-    secondary = Color(0xFF0C0A0A),
-    onSecondary = Color(0xFFBEB0B0),
-    background = DVColors.Background,
-    onBackground = Color(0xFFF0E8E8),
-    surface = DVColors.Surface,
-    onSurface = Color(0xFFECE0E0),
-    surfaceVariant = Color(0xFF140C0C),
-    onSurfaceVariant = Color(0xFF988A8A),
-    outline = Color(0xFF3A2828),
-    outlineVariant = Color(0xFF181010),
-    surfaceTint = Color.Transparent,
-    error = Color(0xFFFF6B6B),
-    onError = Color.White,
-)
-
-@Composable
-fun DynamicVectorTheme(
-    content: @Composable () -> Unit,
-) {
-    MaterialTheme(
-        colorScheme = DarkColorScheme,
-        typography = Typography(),
-        content = content,
-    )
 }

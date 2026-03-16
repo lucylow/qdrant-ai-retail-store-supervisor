@@ -1,85 +1,41 @@
 package dev.dynamicvector.components
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import dev.dynamicvector.navigation.BottomNavTab
+import dev.dynamicvector.navigation.DVTab
+import dev.dynamicvector.theme.DVColors
 
 @Composable
-fun BottomNavBar(
-    selectedTab: dev.dynamicvector.navigation.BottomNavTab,
-    onTabSelected: (dev.dynamicvector.navigation.BottomNavTab) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 3.dp,
-        shadowElevation = 8.dp,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(72.dp)
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            _root_ide_package_.dev.dynamicvector.navigation.BottomNavTab.entries.forEach { tab ->
-                val isActive = tab == selectedTab
-                val iconColor by animateColorAsState(
-                    if (isActive) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+fun DVBottomNav(currentTab: DVTab, onTabSelected: (DVTab) -> Unit) {
+    Box(Modifier.fillMaxWidth().height(80.dp).background(Brush.verticalGradient(listOf(Color.Transparent, DVColors.Background.copy(0.95f), DVColors.Background)))) {
+        NavigationBar(containerColor = Color.Transparent, modifier = Modifier.align(Alignment.BottomCenter)) {
+            listOf(
+                Triple(DVTab.DASHBOARD, Icons.Outlined.Home, "Dashboard"),
+                Triple(DVTab.SOURCES, Icons.Outlined.Storage, "Sources"),
+                Triple(DVTab.SETTINGS, Icons.Outlined.Settings, "Settings"),
+            ).forEach { (tab, icon, label) ->
+                NavigationBarItem(
+                    selected = currentTab == tab, onClick = { onTabSelected(tab) },
+                    icon = { Icon(icon, label, modifier = Modifier.size(22.dp)) },
+                    label = { Text(label, fontSize = 10.sp) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = DVColors.Accent, selectedTextColor = DVColors.Accent,
+                        unselectedIconColor = DVColors.IconMuted, unselectedTextColor = DVColors.IconMuted,
+                        indicatorColor = Color.Transparent,
+                    )
                 )
-
-                Column(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null,
-                        ) { onTabSelected(tab) }
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    val icon = when (tab) {
-                        _root_ide_package_.dev.dynamicvector.navigation.BottomNavTab.HOME -> if (isActive) Icons.Filled.Home else Icons.Outlined.Home
-                        _root_ide_package_.dev.dynamicvector.navigation.BottomNavTab.CONTEXTS -> if (isActive) Icons.Filled.Folder else Icons.Outlined.FolderOpen
-                        _root_ide_package_.dev.dynamicvector.navigation.BottomNavTab.PROFILE -> if (isActive) Icons.Filled.Person else Icons.Outlined.Person
-                    }
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = tab.label,
-                        tint = iconColor,
-                        modifier = Modifier.size(24.dp),
-                    )
-                    Text(
-                        text = tab.label,
-                        fontSize = 10.sp,
-                        fontWeight = if (isActive) FontWeight.Medium else FontWeight.Normal,
-                        color = iconColor,
-                    )
-                }
             }
         }
     }

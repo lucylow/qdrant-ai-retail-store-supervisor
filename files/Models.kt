@@ -1,11 +1,14 @@
-package dev.dynamicvector.model
+package ch.genaizurich2026.dynamicvector
 
 import androidx.compose.ui.graphics.Color
-import dev.dynamicvector.theme.DVColors
 
 enum class QueryStatus { LIVE, DONE, STALE, FAILED }
 enum class SourceType { QDRANT, APIFY, LIVEMAP, LOCAL, GIT, HUGGINGFACE }
 enum class CompositionType { PIPELINE, UNION, INTERSECTION }
+enum class DVTab { DASHBOARD, SOURCES, SETTINGS }
+enum class DashboardTab { RESULTS, QUERIES }
+enum class SourcesTab { MY_SOURCES, EXPLORE }
+enum class QueryCreationMode { DESCRIBE, BUILD, TEMPLATES }
 enum class BlockType { SEARCH_QDRANT, SCRAPE_APIFY, FILTER_LOCATION, SET_BUDGET, SUGGEST, IF_OTHERWISE }
 
 data class QueryEvent(

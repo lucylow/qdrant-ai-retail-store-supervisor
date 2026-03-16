@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.dynamicvector.components.SectionHeader
+import dev.dynamicvector.components.dvCard
 import dev.dynamicvector.data.MockData
 import dev.dynamicvector.theme.DVColors
 import dev.dynamicvector.theme.DVTypography
@@ -31,8 +32,7 @@ fun SettingsScreen() {
         item { SectionHeader("User goals") }
         items(goals) { goal ->
             Row(Modifier.padding(horizontal = 16.dp, vertical = 4.dp).fillMaxWidth()
-                .background(DVColors.Accent.copy(0.06f), RoundedCornerShape(12.dp))
-                .border(1.dp, DVColors.Accent.copy(0.12f), RoundedCornerShape(12.dp))
+                .dvCard(12.dp)
                 .padding(horizontal = 14.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.Top) {
                 Text("◆", color = DVColors.Accent, fontSize = 14.sp)
@@ -72,8 +72,8 @@ fun SettingsScreen() {
 }
 
 @Composable private fun SRow(title: String, subtitle: String? = null, trailing: @Composable () -> Unit = {}) {
-    Row(Modifier.padding(horizontal = 16.dp, vertical = 3.dp).fillMaxWidth().background(DVColors.SurfaceVariant, RoundedCornerShape(12.dp))
-        .border(1.dp, DVColors.CardBorder, RoundedCornerShape(12.dp)).padding(horizontal = 16.dp, vertical = 14.dp),
+    Row(Modifier.padding(horizontal = 16.dp, vertical = 3.dp).fillMaxWidth().dvCard(12.dp)
+        .padding(horizontal = 16.dp, vertical = 14.dp),
         Arrangement.SpaceBetween, Alignment.CenterVertically) {
         Column(Modifier.weight(1f, false), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(title, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = DVColors.TextPrimary)

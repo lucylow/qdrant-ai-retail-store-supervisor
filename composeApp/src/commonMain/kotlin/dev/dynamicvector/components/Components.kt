@@ -28,6 +28,20 @@ import dev.dynamicvector.theme.DVShapes
 import dev.dynamicvector.theme.DVTypography
 
 // ═══════════════════════════════════════════════════════════════════
+// Shared card modifier — subtle levitating card with gradient + border
+// ═══════════════════════════════════════════════════════════════════
+
+fun Modifier.dvCard(radius: androidx.compose.ui.unit.Dp = DVShapes.CardRadius) = this
+    .drawBehind {
+        val r = CornerRadius(radius.toPx())
+        drawRoundRect(Color.Black.copy(0.05f), cornerRadius = r, topLeft = Offset(0f, 6.dp.toPx()), size = size.copy(height = size.height + 6.dp.toPx()))
+        drawRoundRect(Color.Black.copy(0.08f), cornerRadius = r, topLeft = Offset(0f, 3.dp.toPx()), size = size.copy(height = size.height + 3.dp.toPx()))
+    }
+    .clip(RoundedCornerShape(radius))
+    .background(Brush.linearGradient(listOf(DVColors.CardGradientStart, DVColors.CardGradientEnd)))
+    .border(1.dp, DVColors.CardBorder, RoundedCornerShape(radius))
+
+// ═══════════════════════════════════════════════════════════════════
 // DVSearchBar
 // ═══════════════════════════════════════════════════════════════════
 
@@ -138,13 +152,7 @@ fun StaleNudge(onRerun: () -> Unit) {
 fun EventCard(event: QueryEvent, onClick: () -> Unit, onToggleStar: () -> Unit, onRerun: () -> Unit = {}) {
     Box(
         Modifier.padding(horizontal = 16.dp, vertical = 6.dp).fillMaxWidth()
-            .drawBehind {
-                drawRoundRect(Color.Black.copy(0.10f), cornerRadius = CornerRadius(20.dp.toPx()), topLeft = Offset(0f, 16.dp.toPx()), size = size.copy(height = size.height + 16.dp.toPx()))
-                drawRoundRect(Color.Black.copy(0.15f), cornerRadius = CornerRadius(20.dp.toPx()), topLeft = Offset(0f, 8.dp.toPx()), size = size.copy(height = size.height + 8.dp.toPx()))
-            }
-            .clip(RoundedCornerShape(DVShapes.CardRadius))
-            .background(Brush.linearGradient(listOf(DVColors.CardGradientStart, DVColors.CardGradientEnd)))
-            .border(1.dp, DVColors.CardBorder, RoundedCornerShape(DVShapes.CardRadius))
+            .dvCard()
             .clickable(onClick = onClick)
     ) {
         Box(Modifier.fillMaxWidth().height(1.dp).background(DVColors.CardTopEdge))

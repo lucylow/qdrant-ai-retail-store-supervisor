@@ -54,7 +54,7 @@ fun SourcesHostScreen(onNavigateToDetail: (ExploreSource) -> Unit, onNavigateToF
                 }
             }
             items(repo.sources) { src ->
-                Row(Modifier.padding(horizontal = 16.dp, vertical = 3.dp).fillMaxWidth().background(DVColors.SurfaceVariant, RoundedCornerShape(12.dp)).border(1.dp, DVColors.CardBorder, RoundedCornerShape(12.dp)).padding(horizontal = 14.dp, vertical = 12.dp), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+                Row(Modifier.padding(horizontal = 16.dp, vertical = 3.dp).fillMaxWidth().dvCard(12.dp).padding(horizontal = 14.dp, vertical = 12.dp), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                     Column(Modifier.weight(1f, false), verticalArrangement = Arrangement.spacedBy(3.dp)) { Text(src.name, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DVColors.TextPrimary); Text(src.meta, style = DVTypography.Caption) }
                     Box(Modifier.size(8.dp).background(if (src.isOnline) DVColors.Accent else DVColors.TextHint, CircleShape))
                 }
@@ -63,7 +63,7 @@ fun SourcesHostScreen(onNavigateToDetail: (ExploreSource) -> Unit, onNavigateToF
         }
         item { SectionHeader("Local sources") }
         items(MockData.localSources) { src ->
-            Row(Modifier.padding(horizontal = 16.dp, vertical = 3.dp).fillMaxWidth().background(DVColors.SurfaceVariant, RoundedCornerShape(12.dp)).border(1.dp, DVColors.CardBorder, RoundedCornerShape(12.dp)).padding(horizontal = 14.dp, vertical = 12.dp), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+            Row(Modifier.padding(horizontal = 16.dp, vertical = 3.dp).fillMaxWidth().dvCard(12.dp).padding(horizontal = 14.dp, vertical = 12.dp), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f, false)) {
                     Text(if (src.isFolder) "📁" else "📄", fontSize = 16.sp)
                     Column(verticalArrangement = Arrangement.spacedBy(3.dp)) { Text(src.displayName, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = DVColors.TextPrimary); Text(src.meta, style = DVTypography.Caption) }
@@ -99,7 +99,9 @@ fun SourcesHostScreen(onNavigateToDetail: (ExploreSource) -> Unit, onNavigateToF
         val sources = if (filter == "All") MockData.exploreSources else MockData.exploreSources.filter { it.repoType.label() == filter }
         items(sources, key = { it.id }) { src ->
             val bk = src.id in bookmarks
-            Column(Modifier.padding(horizontal = 16.dp, vertical = 5.dp).fillMaxWidth().background(Brush.linearGradient(listOf(DVColors.CardGradientStart, DVColors.CardGradientEnd)), RoundedCornerShape(16.dp)).border(1.dp, DVColors.CardBorder, RoundedCornerShape(16.dp)).padding(14.dp)) {
+            Box(Modifier.padding(horizontal = 16.dp, vertical = 5.dp).fillMaxWidth().dvCard(16.dp)) {
+                Box(Modifier.fillMaxWidth().height(1.dp).background(DVColors.CardTopEdge))
+                Column(Modifier.padding(14.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(bottom = 6.dp)) {
                     Text(src.name, style = DVTypography.CardTitle.copy(fontSize = 14.sp), modifier = Modifier.weight(1f, false), maxLines = 1, overflow = TextOverflow.Ellipsis); SourceBadge(src.repoType)
                 }
@@ -116,7 +118,7 @@ fun SourcesHostScreen(onNavigateToDetail: (ExploreSource) -> Unit, onNavigateToF
                     }
                     if (!src.isAlreadySaved) { Spacer(Modifier.width(8.dp)); Row(Modifier.background(DVColors.Accent, RoundedCornerShape(10.dp)).padding(horizontal = 18.dp, vertical = 7.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) { Icon(Icons.Outlined.FileDownload, null, tint = Color.White, modifier = Modifier.size(14.dp)); Text("Pull", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color.White) } }
                 }
-            }
+            }}
         }
     }
 }

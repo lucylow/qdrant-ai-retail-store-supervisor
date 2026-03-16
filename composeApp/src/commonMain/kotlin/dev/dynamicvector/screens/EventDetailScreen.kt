@@ -42,10 +42,9 @@ fun EventDetailScreen(event: QueryEvent, onBack: () -> Unit) {
         item { Row(Modifier.padding(horizontal = 16.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) { event.sources.forEach { SourceBadge(it) } } }
         item { SectionHeader("Top results") }
         itemsIndexed(event.results) { _, result ->
-            Column(Modifier.padding(horizontal = 16.dp, vertical = 5.dp).fillMaxWidth()
-                .background(Brush.linearGradient(listOf(DVColors.CardGradientStart, DVColors.CardGradientEnd)), RoundedCornerShape(16.dp))
-                .border(1.dp, DVColors.CardBorder, RoundedCornerShape(16.dp)).padding(14.dp)
-            ) {
+            Box(Modifier.padding(horizontal = 16.dp, vertical = 5.dp).fillMaxWidth().dvCard(16.dp)) {
+                Box(Modifier.fillMaxWidth().height(1.dp).background(DVColors.CardTopEdge))
+                Column(Modifier.padding(14.dp)) {
                 Text("#${result.rank} · ${result.category}", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = DVColors.Accent)
                 Spacer(Modifier.height(6.dp))
                 Text(result.name, style = DVTypography.CardTitle)
@@ -66,7 +65,7 @@ fun EventDetailScreen(event: QueryEvent, onBack: () -> Unit) {
                     HorizontalDivider(Modifier.padding(vertical = 10.dp), thickness = 1.dp, color = DVColors.Accent.copy(0.08f))
                     Text(result.explanation, style = DVTypography.Caption.copy(color = DVColors.TextTertiary, lineHeight = 16.sp, fontStyle = FontStyle.Italic))
                 }
-            }
+            }}
         }
     }
 }

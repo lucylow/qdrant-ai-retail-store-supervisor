@@ -65,10 +65,12 @@ private fun SavedQueriesList(queries: List<SavedQuery>, onQueryTap: (SavedQuery)
 
 @Composable
 private fun SavedQueryCard(query: SavedQuery, onTap: () -> Unit) {
-    Column(Modifier.padding(horizontal = 16.dp, vertical = 5.dp).fillMaxWidth()
-        .background(DVColors.SurfaceVariant, RoundedCornerShape(16.dp)).border(1.dp, DVColors.CardBorder, RoundedCornerShape(16.dp))
-        .clickable(onClick = onTap).padding(14.dp)
+    Box(Modifier.padding(horizontal = 16.dp, vertical = 5.dp).fillMaxWidth()
+        .dvCard(16.dp)
+        .clickable(onClick = onTap)
     ) {
+        Box(Modifier.fillMaxWidth().height(1.dp).background(DVColors.CardTopEdge))
+        Column(Modifier.padding(14.dp)) {
         Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
             Text(query.name, style = DVTypography.CardTitle.copy(fontSize = 14.sp), modifier = Modifier.weight(1f, false))
             Box(Modifier.background(DVColors.AccentDim, RoundedCornerShape(8.dp)).padding(horizontal = 8.dp, vertical = 3.dp)) {
@@ -96,5 +98,5 @@ private fun SavedQueryCard(query: SavedQuery, onTap: () -> Unit) {
                 Text(query.schedule, fontSize = 10.sp, color = DVColors.Accent.copy(0.6f))
             }
         }
-    }
+    }}
 }

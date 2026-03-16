@@ -34,7 +34,7 @@ import dev.dynamicvector.theme.DVTypography
 fun Modifier.dvCard(radius: androidx.compose.ui.unit.Dp = DVShapes.CardRadius) = this
     .drawBehind {
         val r = CornerRadius(radius.toPx())
-        drawRoundRect(Color.Black.copy(0.015f), cornerRadius = r, topLeft = Offset(0f, 2.dp.toPx()), size = size.copy(height = size.height + 2.dp.toPx()))
+        drawRoundRect(Color.Black.copy(0.06f), cornerRadius = r, topLeft = Offset(0f, 2.dp.toPx()), size = size.copy(height = size.height + 2.dp.toPx()))
     }
     .clip(RoundedCornerShape(radius))
     .background(Brush.linearGradient(listOf(DVColors.CardGradientStart, DVColors.CardGradientEnd)))

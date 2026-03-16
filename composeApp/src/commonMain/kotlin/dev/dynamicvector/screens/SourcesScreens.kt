@@ -107,7 +107,7 @@ fun SourcesHostScreen(onNavigateToDetail: (ExploreSource) -> Unit, onNavigateToF
                 Row(horizontalArrangement = Arrangement.spacedBy(14.dp), modifier = Modifier.padding(bottom = 10.dp)) {
                     src.stats.forEach { (l, v) -> Column(verticalArrangement = Arrangement.spacedBy(2.dp)) { Text(l.uppercase(), fontSize = 9.sp, color = DVColors.TextHint, letterSpacing = 0.5.sp); Text(v, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = DVColors.TextPrimary) } }
                 }
-                HorizontalDivider(thickness = 1.dp, color = Color.White.copy(0.04f)); Spacer(Modifier.height(10.dp))
+                HorizontalDivider(thickness = 1.dp, color = DVColors.Accent.copy(0.08f)); Spacer(Modifier.height(10.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
                     if (src.isAlreadySaved) { Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp), modifier = Modifier.weight(1f)) { Icon(Icons.Outlined.Check, null, tint = DVColors.Accent, modifier = Modifier.size(14.dp)); Text("Already saved", fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = DVColors.Accent) } } else Spacer(Modifier.weight(1f))
                     if (!src.isAlreadySaved) { Box(Modifier.background(DVColors.SurfaceVariant, RoundedCornerShape(10.dp)).border(1.dp, DVColors.CardBorder, RoundedCornerShape(10.dp)).clickable { onPreview(src) }.padding(horizontal = 14.dp, vertical = 7.dp)) { Text("Preview", fontSize = 12.sp, color = DVColors.TextTertiary) }; Spacer(Modifier.width(8.dp)) }
@@ -131,7 +131,7 @@ fun SourceDetailScreen(source: ExploreSource, onBack: () -> Unit) {
                 SourceBadge(source.repoType); Spacer(Modifier.height(8.dp)); Text(source.name, style = DVTypography.H1.copy(fontSize = 18.sp)); Spacer(Modifier.height(4.dp))
                 if (source.providerInfo.isNotBlank()) Text(source.providerInfo, style = DVTypography.Caption, modifier = Modifier.padding(bottom = 12.dp))
                 Text(source.description, style = DVTypography.Body.copy(lineHeight = 20.sp), modifier = Modifier.padding(bottom = 14.dp))
-                source.stats.chunked(2).forEach { row -> Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { row.forEach { (l, v) -> Column(Modifier.weight(1f).background(Color.Black.copy(0.2f), RoundedCornerShape(10.dp)).padding(horizontal = 12.dp, vertical = 10.dp)) { Text(l.uppercase(), fontSize = 10.sp, color = DVColors.TextHint, letterSpacing = 0.5.sp); Spacer(Modifier.height(4.dp)); Text(v, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = DVColors.TextPrimary) } }; if (row.size == 1) Spacer(Modifier.weight(1f)) } }
+                source.stats.chunked(2).forEach { row -> Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) { row.forEach { (l, v) -> Column(Modifier.weight(1f).background(DVColors.Accent.copy(0.05f), RoundedCornerShape(10.dp)).padding(horizontal = 12.dp, vertical = 10.dp)) { Text(l.uppercase(), fontSize = 10.sp, color = DVColors.TextHint, letterSpacing = 0.5.sp); Spacer(Modifier.height(4.dp)); Text(v, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = DVColors.TextPrimary) } }; if (row.size == 1) Spacer(Modifier.weight(1f)) } }
             }
         }
         item {
@@ -148,7 +148,7 @@ fun SourceDetailScreen(source: ExploreSource, onBack: () -> Unit) {
             item {
                 Spacer(Modifier.height(16.dp)); SectionHeader("Sample record")
                 Column(Modifier.padding(horizontal = 16.dp).fillMaxWidth().background(DVColors.SurfaceVariant, RoundedCornerShape(10.dp)).padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    source.sampleRecord.forEach { (k, v) -> Row { Text(k, fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = heroColor); Text(": ", fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = DVColors.TextTertiary); Text(v, fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = if (v.startsWith("\"")) DVColors.TextPrimary else DVColors.Accent) } }
+                    source.sampleRecord.forEach { (k, v) -> Row { Text(k, fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = heroColor); Text(": ", fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = DVColors.TextTertiary); Text(v, fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = if (v.startsWith("\"")) DVColors.TextPrimary else DVColors.AccentDark) } }
                 }
             }
         }
@@ -158,7 +158,7 @@ fun SourceDetailScreen(source: ExploreSource, onBack: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable private fun AddLocalSheet(isVisible: Boolean, onDismiss: () -> Unit, onFolder: () -> Unit) {
     if (!isVisible) return
-    val opts = listOf(AddLocalOption("📁", "Folder", "Index all files in a folder. Subfolders included.", DVColors.Local.copy(0.12f)), AddLocalOption("📄", "Files", "Pick individual PDFs, CSVs, text files.", Color(0xFF78B4DC).copy(0.12f)), AddLocalOption("📷", "Photo or scan", "Take a photo or scan. OCR extracts text.", Color(0xFFC878C8).copy(0.12f)), AddLocalOption("🔗", "URL or web page", "Paste a URL to crawl and index.", DVColors.Accent.copy(0.12f)))
+    val opts = listOf(AddLocalOption("📁", "Folder", "Index all files in a folder. Subfolders included.", DVColors.Local.copy(0.12f)), AddLocalOption("📄", "Files", "Pick individual PDFs, CSVs, text files.", DVColors.Apify.copy(0.12f)), AddLocalOption("📷", "Photo or scan", "Take a photo or scan. OCR extracts text.", DVColors.HuggingFace.copy(0.12f)), AddLocalOption("🔗", "URL or web page", "Paste a URL to crawl and index.", DVColors.Accent.copy(0.12f)))
     val actions = listOf(onFolder, onDismiss, onDismiss, onDismiss)
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true), containerColor = DVColors.Surface, shape = RoundedCornerShape(topStart = DVShapes.BottomSheetRadius, topEnd = DVShapes.BottomSheetRadius),
         dragHandle = { Box(Modifier.padding(top = 12.dp, bottom = 8.dp).size(40.dp, 4.dp).background(DVColors.TextHint, RoundedCornerShape(2.dp))) }) {

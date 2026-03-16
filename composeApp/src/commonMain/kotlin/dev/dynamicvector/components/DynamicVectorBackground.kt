@@ -67,7 +67,7 @@ private const val CAM_LOOK_Y = 0.5f   // vertical offset of the look-at target
 private const val FOV = 500f          // projection scale factor (pseudo field-of-view)
 
 private const val STAR_COUNT = 180    // number of static background stars
-private val BG = Color(0xFF080406)    // near-black background with a warm Swiss undertone
+private val BG = Color(0xFF8B1A1A)    // deep crimson — Swiss flag red field
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // STAR — a single static background dot, positioned in normalized coords (0–1)
@@ -113,7 +113,7 @@ private class Buffers {
     val sinPx08 = FloatArray(GRID)  // sin(px * 0.8 - t*1.1) * 0.5 — wave term 2
     val sinPx15 = FloatArray(GRID)  // sin(px * 1.5 + t*1.8) — used in wave term 5
 
-    // Per-row base colors (indexed by xi) — burgundy on left, Swiss red in center, coral on right
+    // Per-row base colors (indexed by xi) — shades of Swiss red across the mesh
     val baseR = FloatArray(GRID)
     val baseG = FloatArray(GRID)
     val baseB = FloatArray(GRID)
@@ -124,7 +124,7 @@ private class Buffers {
     val cosPz12 = FloatArray(GRID)  // cos(pz * 1.2 - t) — used in wave term 5
 
     // Per-column rendering params (indexed by zi) — only depend on depth, not X
-    val fog = FloatArray(GRID)        // fog multiplier (1.0 = near/clear, 0.1 = far/dim)
+    val fog = FloatArray(GRID)        // fog multiplier (1.0 = near/clear, 0.0 = far/faded)
     val depthAlpha = FloatArray(GRID) // alpha falloff with distance
     val radScale = FloatArray(GRID)   // perspective size scaling (larger when closer)
 }
@@ -133,10 +133,10 @@ private class Buffers {
 // MAIN COMPOSABLE
 //
 // Renders a full-screen animated background with:
-//   1. A dark space background with 180 static star dots
+//   1. A warm white background with 180 static red star dots
 //   2. A 50×50 3D wave mesh with perspective projection
-//   3. A subtle wireframe connecting grid points
-//   4. Colored point particles with depth-based fog and alpha
+//   3. A subtle red wireframe connecting grid points
+//   4. Red-toned point particles with depth-based fog and alpha
 //
 // The animation runs via withFrameNanos, which ties updates to the display
 // refresh rate (typically 60 Hz). The `time` state variable drives all
@@ -148,8 +148,8 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
     // ── STARS ──
     // Generated once with a fixed seed (42) for deterministic layout.
     // Positions are in normalized 0–1 coords, scaled to screen size at draw time.
-    // Radii vary from 0.4–1.4 px, alpha from 0.15–0.60 for depth variety.
-    // No per-frame math — completely static.
+    // Radii vary from 0.4–1.4 px, alpha from 0.08–0.30 for depth variety.
+    // No per-frame math — completely static. Red-tinted on white bg.
     val stars = remember {
         val rng = kotlin.random.Random(42)
         Array(STAR_COUNT) {
@@ -157,11 +157,11 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
                 x = rng.nextFloat(),
                 y = rng.nextFloat(),
                 radius = 0.4f + rng.nextFloat() * 1.0f,
-                alpha = 0.15f + rng.nextFloat() * 0.45f,
+                alpha = 0.08f + rng.nextFloat() * 0.22f,
             )
         }
     }
-    // Pre-compute Color objects so we don't call Color.copy() 180 times per frame
+    // Pre-compute Color objects — white dots on red bg
     val starColors = remember {
         Array(STAR_COUNT) { Color.White.copy(alpha = stars[it].alpha) }
     }
@@ -194,11 +194,11 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
         val screenCx = w * 0.5f
         val screenCy = h * 0.38f
 
-        // Clear to dark background
+        // Clear to warm white background
         drawRect(BG)
 
         // ── STARS ──
-        // Draw 180 static white dots. No math per frame — just position × screen size.
+        // Draw 180 static red dots. No math per frame — just position × screen size.
         for (i in 0 until STAR_COUNT) {
             val s = stars[i]
             drawCircle(starColors[i], s.radius, Offset(s.x * w, s.y * h))
@@ -228,9 +228,9 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
         // them for every point in that row (50× savings = 2,500 → 50 LUT reads).
         //
         // We also pre-compute the base color per row. The color gradient goes:
-        //   Left edge  (cB < 0.4) → deep emerald   (R:0.05–0.15, G:0.30–0.55, B:0.20–0.40)
-        //   Center     (cB 0.4–0.6) → brand teal    (R:0.31, G:0.80, B:0.77)
-        //   Right edge (cB > 0.6) → bright mint     (R:0.20–0.35, G:0.85–0.95, B:0.65–0.80)
+        //   Left edge  (cB < 0.4) → warm cream     (R:0.90–0.95, G:0.82–0.88, B:0.78–0.84)
+        //   Center     (cB 0.4–0.6) → pure white   (R:1.0, G:1.0, B:1.0)
+        //   Right edge (cB > 0.6) → cool pink-white (R:1.0, G:0.88–0.95, B:0.88–0.92)
         // ═════════════════════════════════════════════════════════════════════
         for (xi in 0 until GRID) {
             val px = xi * SEP - HALF     // world X position (centered at 0)
@@ -245,23 +245,23 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
             val cB = (nx + 1f) / 2f
             when {
                 cB < 0.4f -> {
-                    // Left side: deep burgundy/wine
-                    buf.baseR[xi] = 0.25f + cB * 0.50f
-                    buf.baseG[xi] = 0.03f + cB * 0.08f
-                    buf.baseB[xi] = 0.05f + cB * 0.08f
+                    // Left side: warm cream/ivory
+                    buf.baseR[xi] = 0.90f + cB * 0.12f
+                    buf.baseG[xi] = 0.82f + cB * 0.15f
+                    buf.baseB[xi] = 0.78f + cB * 0.15f
                 }
                 cB < 0.6f -> {
-                    // Center: Swiss Red (#DC2626)
-                    buf.baseR[xi] = 0.86f
-                    buf.baseG[xi] = 0.15f
-                    buf.baseB[xi] = 0.15f
+                    // Center: pure white
+                    buf.baseR[xi] = 1.0f
+                    buf.baseG[xi] = 1.0f
+                    buf.baseB[xi] = 1.0f
                 }
                 else -> {
-                    // Right side: warm coral/rose
+                    // Right side: cool pink-white
                     val t = (cB - 0.6f) / 0.4f
-                    buf.baseR[xi] = 0.85f + t * 0.10f
-                    buf.baseG[xi] = 0.20f + t * 0.25f
-                    buf.baseB[xi] = 0.15f + t * 0.15f
+                    buf.baseR[xi] = 1.0f
+                    buf.baseG[xi] = 0.95f - t * 0.07f
+                    buf.baseB[xi] = 0.92f - t * 0.04f
                 }
             }
         }
@@ -273,8 +273,8 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
         // We also pre-compute depth-dependent rendering params here since
         // they're constant across all points in the same column:
         //
-        //   fog       — linear approximation of exponential fog; dims points
-        //               that are far from the camera (zDist > 6).
+        //   fog       — linear approximation of exponential fog; fades points
+        //               that are far from the camera (zDist > 6) toward white.
         //   depthAlpha — alpha transparency that fades with distance, matching
         //               the Three.js vAlpha shader uniform.
         //   radScale  — perspective size: closer points appear larger.
@@ -299,7 +299,7 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
         //   1. Compute the wave height (Y displacement) by summing 5 terms
         //   2. Project the 3D world position onto 2D screen coords
         //   3. Cull points behind the camera or outside the viewport
-        //   4. Apply fog to the base color
+        //   4. Apply fog to the base color (blending toward white bg)
         //
         // WAVE FUNCTION (5 terms, adapted from the Three.js 8-term version):
         //   Term 1: sin(px×0.5+t×0.7) × cos(pz×0.5+t×0.7) × 0.8
@@ -359,11 +359,11 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
                 buf.sy[idx] = projY
                 buf.ok[idx] = true
 
-                // Multiply base color by pre-computed fog (dims distant points)
+                // Fog blends base color toward red bg for distant points
                 val fog = buf.fog[zi]
-                buf.cr[idx] = buf.baseR[xi] * fog
-                buf.cg[idx] = buf.baseG[xi] * fog
-                buf.cb[idx] = buf.baseB[xi] * fog
+                buf.cr[idx] = buf.baseR[xi] * fog + (1f - fog) * 0.545f
+                buf.cg[idx] = buf.baseG[xi] * fog + (1f - fog) * 0.102f
+                buf.cb[idx] = buf.baseB[xi] * fog + (1f - fog) * 0.102f
             }
         }
 
@@ -406,8 +406,8 @@ fun QuantumWaveFabric(modifier: Modifier = Modifier) {
                 }
             }
         }
-        // Single draw call for the entire wireframe — Swiss red, very low opacity
-        drawPath(wirePath, Color(0.86f, 0.15f, 0.15f, 0.04f), style = Stroke(0.5f))
+        // Single draw call for the entire wireframe — white on red, subtle
+        drawPath(wirePath, Color(1f, 1f, 1f, 0.05f), style = Stroke(0.5f))
 
         // ═════════════════════════════════════════════════════════════════════
         // PHASE 5: POINT PARTICLES (BACK-TO-FRONT)

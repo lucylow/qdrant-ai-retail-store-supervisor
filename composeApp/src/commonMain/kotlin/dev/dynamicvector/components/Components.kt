@@ -167,7 +167,7 @@ fun EventCard(event: QueryEvent, onClick: () -> Unit, onToggleStar: () -> Unit, 
             }
             if (event.status == QueryStatus.STALE) { Spacer(Modifier.height(10.dp)); StaleNudge(onRerun) }
             Spacer(Modifier.height(12.dp))
-            HorizontalDivider(thickness = 1.dp, color = Color.White.copy(0.04f))
+            HorizontalDivider(thickness = 1.dp, color = DVColors.Accent.copy(0.08f))
             Spacer(Modifier.height(10.dp))
             Row(Modifier.fillMaxWidth(), Arrangement.SpaceBetween, Alignment.CenterVertically) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {

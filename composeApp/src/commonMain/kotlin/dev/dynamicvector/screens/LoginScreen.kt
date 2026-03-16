@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.dynamicvector.components.QuantumWaveFabric
 import dev.dynamicvector.data.ApiClient
+import dev.dynamicvector.theme.DVColors
 import kotlinx.coroutines.launch
 
 @Composable
@@ -82,7 +83,7 @@ fun LoginScreen(
                         .fillMaxHeight()
                         .drawBehind {
                             val sw = 3.dp.toPx()
-                            val c = Color(0xFFF0E8E0).copy(alpha = 0.5f)
+                            val c = Color.White.copy(alpha = 0.4f)
                             drawLine(c, Offset(sw / 2, 0f), Offset(sw / 2, size.height), sw)
                             drawLine(c, Offset(0f, sw / 2), Offset(size.width, sw / 2), sw)
                             drawLine(c, Offset(0f, size.height - sw / 2), Offset(size.width, size.height - sw / 2), sw)
@@ -100,7 +101,7 @@ fun LoginScreen(
                         fontWeight = FontWeight.ExtraBold,
                         fontFamily = FontFamily.Monospace,
                         letterSpacing = (-1).sp,
-                        color = Color(0xFFF0E8E0),
+                        color = DVColors.TextPrimary,
                         textAlign = TextAlign.Start,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -110,7 +111,7 @@ fun LoginScreen(
                         fontWeight = FontWeight.Bold,
                         fontFamily = FontFamily.Monospace,
                         letterSpacing = 2.sp,
-                        color = Color(0xFFDC2626),
+                        color = DVColors.Accent,
                         textAlign = TextAlign.Start,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -123,7 +124,7 @@ fun LoginScreen(
                         .fillMaxHeight()
                         .drawBehind {
                             val sw = 3.dp.toPx()
-                            val c = Color(0xFFF0E8E0).copy(alpha = 0.5f)
+                            val c = Color.White.copy(alpha = 0.4f)
                             drawLine(c, Offset(size.width - sw / 2, 0f), Offset(size.width - sw / 2, size.height), sw)
                             drawLine(c, Offset(0f, sw / 2), Offset(size.width, sw / 2), sw)
                             drawLine(c, Offset(0f, size.height - sw / 2), Offset(size.width, size.height - sw / 2), sw)
@@ -139,18 +140,18 @@ fun LoginScreen(
                 onValueChange = { username = it; error = null },
                 label = { Text("Username", fontFamily = FontFamily.Monospace) },
                 singleLine = true,
-                textStyle = TextStyle(fontFamily = FontFamily.Monospace, color = Color.White),
+                textStyle = TextStyle(fontFamily = FontFamily.Monospace, color = DVColors.TextPrimary),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
-                    focusedBorderColor = Color(0xFFDC2626),
-                    unfocusedLabelColor = Color.White.copy(alpha = 0.5f),
-                    focusedLabelColor = Color(0xFFDC2626),
-                    cursorColor = Color(0xFFDC2626),
-                    unfocusedTextColor = Color.White,
-                    focusedTextColor = Color.White,
+                    unfocusedBorderColor = DVColors.TextHint,
+                    focusedBorderColor = DVColors.Accent,
+                    unfocusedLabelColor = DVColors.TextTertiary,
+                    focusedLabelColor = DVColors.Accent,
+                    cursorColor = DVColors.Accent,
+                    unfocusedTextColor = DVColors.TextPrimary,
+                    focusedTextColor = DVColors.TextPrimary,
                 ),
             )
 
@@ -162,7 +163,7 @@ fun LoginScreen(
                 onValueChange = { password = it; error = null },
                 label = { Text("Password", fontFamily = FontFamily.Monospace) },
                 singleLine = true,
-                textStyle = TextStyle(fontFamily = FontFamily.Monospace, color = Color.White),
+                textStyle = TextStyle(fontFamily = FontFamily.Monospace, color = DVColors.TextPrimary),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { doLogin() }),
@@ -171,20 +172,20 @@ fun LoginScreen(
                         Icon(
                             imageVector = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
                             contentDescription = if (passwordVisible) "Hide password" else "Show password",
-                            tint = Color.White.copy(alpha = 0.5f),
+                            tint = DVColors.IconMuted,
                         )
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
-                    focusedBorderColor = Color(0xFFDC2626),
-                    unfocusedLabelColor = Color.White.copy(alpha = 0.5f),
-                    focusedLabelColor = Color(0xFFDC2626),
-                    cursorColor = Color(0xFFDC2626),
-                    unfocusedTextColor = Color.White,
-                    focusedTextColor = Color.White,
+                    unfocusedBorderColor = DVColors.TextHint,
+                    focusedBorderColor = DVColors.Accent,
+                    unfocusedLabelColor = DVColors.TextTertiary,
+                    focusedLabelColor = DVColors.Accent,
+                    cursorColor = DVColors.Accent,
+                    unfocusedTextColor = DVColors.TextPrimary,
+                    focusedTextColor = DVColors.TextPrimary,
                 ),
             )
 
@@ -208,10 +209,10 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFDC2626),
-                    contentColor = Color(0xFF080406),
-                    disabledContainerColor = Color(0xFFDC2626).copy(alpha = 0.3f),
-                    disabledContentColor = Color(0xFF080406).copy(alpha = 0.4f),
+                    containerColor = Color.White,
+                    contentColor = Color(0xFF8B1A1A),
+                    disabledContainerColor = Color.White.copy(alpha = 0.3f),
+                    disabledContentColor = Color(0xFF8B1A1A).copy(alpha = 0.4f),
                 ),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
             ) {
@@ -219,7 +220,7 @@ fun LoginScreen(
                     CircularProgressIndicator(
                         modifier = Modifier.size(20.dp),
                         strokeWidth = 2.dp,
-                        color = Color(0xFF080406),
+                        color = Color(0xFF8B1A1A),
                     )
                 } else {
                     Text(
@@ -237,7 +238,7 @@ fun LoginScreen(
             Text(
                 text = "v${dev.dynamicvector.BuildConfig.VERSION}",
                 fontSize = 12.sp,
-                color = Color.White.copy(alpha = 0.4f),
+                color = DVColors.TextHint,
                 modifier = Modifier.padding(bottom = 24.dp),
             )
         }

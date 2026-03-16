@@ -76,7 +76,7 @@ fun NewQueryScreen(onBack: () -> Unit) {
                 Text("DESCRIBE WHAT YOU WANT", style = DVTypography.SectionLabel.copy(color = DVColors.Accent.copy(0.5f)), modifier = Modifier.padding(bottom = 10.dp))
                 OutlinedTextField(value = text, onValueChange = { text = it },
                     placeholder = { Text("e.g. Find eco-friendly outdoor gear under CHF 200 near Bern...", color = DVColors.Accent.copy(0.3f), fontSize = 14.sp) },
-                    minLines = 3, colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.Black.copy(0.2f), unfocusedContainerColor = Color.Black.copy(0.2f),
+                    minLines = 3, colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = DVColors.Accent.copy(0.04f), unfocusedContainerColor = DVColors.Accent.copy(0.04f),
                         focusedBorderColor = DVColors.Accent.copy(0.08f), unfocusedBorderColor = DVColors.Accent.copy(0.08f), cursorColor = DVColors.Accent, focusedTextColor = DVColors.TextPrimary, unfocusedTextColor = DVColors.TextPrimary),
                     shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth())
                 Spacer(Modifier.height(12.dp))
@@ -96,7 +96,7 @@ fun NewQueryScreen(onBack: () -> Unit) {
 @Composable private fun GenPreview() {
     data class S(val color: Color, val text: String)
     val steps = listOf(S(DVColors.Qdrant, "Search products for \"outdoor gear\""), S(DVColors.Apify, "Scrape prices with price_tracker"), S(DVColors.LiveMap, "Filter within 30 km of Bern"), S(DVColors.StatusStale, "Set budget max CHF 200"), S(DVColors.Accent, "Suggest top 10 by sustainability"))
-    Column(Modifier.fillMaxWidth().background(Color.Black.copy(0.15f), RoundedCornerShape(12.dp)).border(1.dp, DVColors.Accent.copy(0.08f), RoundedCornerShape(12.dp)).padding(12.dp)) {
+    Column(Modifier.fillMaxWidth().background(DVColors.Accent.copy(0.05f), RoundedCornerShape(12.dp)).border(1.dp, DVColors.Accent.copy(0.12f), RoundedCornerShape(12.dp)).padding(12.dp)) {
         Text("GENERATED PIPELINE", fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = DVColors.Accent.copy(0.4f), letterSpacing = 0.8.sp, modifier = Modifier.padding(bottom = 8.dp))
         steps.forEachIndexed { i, s ->
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(vertical = 4.dp)) {

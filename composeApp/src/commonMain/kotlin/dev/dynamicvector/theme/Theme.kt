@@ -8,62 +8,62 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// ── Design system: Space-black Swiss Red ──
+// ── Design system: Swiss Flag — red field, white elements ──
 
 object DVColors {
-    // Core backgrounds — warm dark (Swiss-themed undertone)
-    val Background        = Color(0xFF080406)
-    val Surface           = Color(0xFF0A0606)
-    val SurfaceVariant    = Color(0x0AFFFFFF)
-    val CardGradientStart = Color(0x0DFFFFFF)
-    val CardGradientEnd   = Color(0x05FFFFFF)
-    val CardBorder        = Color(0x0FFFFFFF)
-    val CardTopEdge       = Color(0x40DC2626) // Swiss red at 25%
+    // Core backgrounds — deep Swiss red
+    val Background        = Color(0xFF8B1A1A)   // deep crimson
+    val Surface           = Color(0xFF7A1616)   // slightly darker red
+    val SurfaceVariant    = Color(0x0FFFFFFF)   // white at 6%
+    val CardGradientStart = Color(0x0DFFFFFF)   // white at 5%
+    val CardGradientEnd   = Color(0x05FFFFFF)   // white at 2%
+    val CardBorder        = Color(0x0FFFFFFF)   // white at 6%
+    val CardTopEdge       = Color(0x40FFFFFF)   // white at 25%
 
-    // Primary accent — Swiss Red
-    val Accent       = Color(0xFFDC2626)
-    val AccentDim    = Color(0x1ADC2626) // 10%
-    val AccentBorder = Color(0x40DC2626) // 25%
-    val AccentDark   = Color(0xFFB91C1C) // darker red for gradients
+    // Primary accent — White (inverted from red)
+    val Accent       = Color(0xFFFFFFFF)
+    val AccentDim    = Color(0x1AFFFFFF) // 10%
+    val AccentBorder = Color(0x40FFFFFF) // 25%
+    val AccentDark   = Color(0xFFE8D8D8) // warm off-white
 
-    // Text
-    val TextPrimary   = Color(0xFFF0F0F5)
-    val TextSecondary = Color(0x73FFFFFF)
-    val TextTertiary  = Color(0x4DFFFFFF)
-    val TextHint      = Color(0x26FFFFFF)
+    // Text — light on red
+    val TextPrimary   = Color(0xFFF5F0F0)   // near-white
+    val TextSecondary = Color(0xA6FFFFFF)   // white at 65%
+    val TextTertiary  = Color(0x66FFFFFF)   // white at 40%
+    val TextHint      = Color(0x33FFFFFF)   // white at 20%
 
     // Icons — explicit, never currentColor
-    val IconMuted      = Color(0xFF7A7A90)
-    val IconMutedLight = Color(0xFF8A8A9E)
+    val IconMuted      = Color(0xFFCC9090)  // muted pink on red
+    val IconMutedLight = Color(0xFFDDA0A0)  // slightly brighter
 
-    // Status
-    val StatusLive   = Color(0xFFDC2626) // Swiss red for Live
-    val StatusDone   = Color(0xFF7AB87A)
-    val StatusStale  = Color(0xFFF0B43C)
-    val StatusFailed = Color(0xFFDC5050)
+    // Status — white/pink shades on red bg
+    val StatusLive   = Color(0xFFFFFFFF) // bright white
+    val StatusDone   = Color(0xFFD4BCBC) // muted warm gray
+    val StatusStale  = Color(0xFFFFD5D5) // pinkish white
+    val StatusFailed = Color(0xFF3A0808) // very dark red (almost black)
 
-    // Source badges
-    val Qdrant       = Color(0xFFA98AEF)
-    val QdrantBg     = Color(0x267850DC)
-    val QdrantBd     = Color(0x337850DC)
-    val Apify        = Color(0xFF4CD9A0)
-    val ApifyBg      = Color(0x1F00B478)
-    val ApifyBd      = Color(0x2600B478)
-    val LiveMap      = Color(0xFF6CB0F0)
-    val LiveMapBg    = Color(0x1F3C8CF0)
-    val LiveMapBd    = Color(0x263C8CF0)
-    val Local        = Color(0xFFC8A850)
-    val LocalBg      = Color(0x1FC8A050)
-    val LocalBd      = Color(0x26C8A050)
-    val HuggingFace  = Color(0xFFF0C840)
-    val HuggingFaceBg = Color(0x1AFFC83C)
-    val HuggingFaceBd = Color(0x26FFC83C)
-    val Git          = Color(0xFFF07850)
-    val GitBg        = Color(0x1AF07850)
-    val GitBd        = Color(0x26F07850)
+    // Source badges — subtle white/cream variants to distinguish on red
+    val Qdrant       = Color(0xFFFFFFFF) // pure white
+    val QdrantBg     = Color(0x1AFFFFFF)
+    val QdrantBd     = Color(0x26FFFFFF)
+    val Apify        = Color(0xFFFFE8E0) // warm peach-white
+    val ApifyBg      = Color(0x1AFFF0E8)
+    val ApifyBd      = Color(0x26FFF0E8)
+    val LiveMap      = Color(0xFFFFD8D0) // rose-white
+    val LiveMapBg    = Color(0x1AFFD8D0)
+    val LiveMapBd    = Color(0x26FFD8D0)
+    val Local        = Color(0xFFE8D0C8) // muted cream
+    val LocalBg      = Color(0x1AE8D0C8)
+    val LocalBd      = Color(0x26E8D0C8)
+    val HuggingFace  = Color(0xFFFFF0F0) // cool pink-white
+    val HuggingFaceBg = Color(0x1AFFF0F0)
+    val HuggingFaceBd = Color(0x26FFF0F0)
+    val Git          = Color(0xFFD8C0C0) // silver-rose
+    val GitBg        = Color(0x1AD8C0C0)
+    val GitBd        = Color(0x26D8C0C0)
 
     // Star
-    val StarActive = Color(0xFFF0B43C)
+    val StarActive = Color(0xFFFFFFFF)
 }
 
 object DVTypography {
@@ -91,25 +91,25 @@ object DVElevation {
     val CardShadowElevation = 8.dp
 }
 
-// Keep MaterialTheme wrapper for LoginScreen and any M3 components that need it
-private val DarkColorScheme = darkColorScheme(
+// Dark Swiss flag color scheme — red surfaces, white elements
+private val SwissRedScheme = darkColorScheme(
     primary = DVColors.Accent,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFF1A0808),
-    onPrimaryContainer = DVColors.Accent,
-    secondary = Color(0xFF0C0A0A),
-    onSecondary = Color(0xFFBEB0B0),
+    onPrimary = Color(0xFF8B1A1A),
+    primaryContainer = Color(0xFF5A1010),
+    onPrimaryContainer = Color.White,
+    secondary = Color(0xFF6B1515),
+    onSecondary = Color(0xFFE0C8C8),
     background = DVColors.Background,
-    onBackground = Color(0xFFF0E8E8),
+    onBackground = DVColors.TextPrimary,
     surface = DVColors.Surface,
-    onSurface = Color(0xFFECE0E0),
-    surfaceVariant = Color(0xFF140C0C),
-    onSurfaceVariant = Color(0xFF988A8A),
-    outline = Color(0xFF3A2828),
-    outlineVariant = Color(0xFF181010),
+    onSurface = DVColors.TextPrimary,
+    surfaceVariant = Color(0xFF6B1515),
+    onSurfaceVariant = Color(0xFFCCA0A0),
+    outline = Color(0xFFAA6060),
+    outlineVariant = Color(0xFF5A1010),
     surfaceTint = Color.Transparent,
-    error = Color(0xFFFF6B6B),
-    onError = Color.White,
+    error = Color(0xFFFFB4B4),
+    onError = Color(0xFF3A0808),
 )
 
 @Composable
@@ -117,7 +117,7 @@ fun DynamicVectorTheme(
     content: @Composable () -> Unit,
 ) {
     MaterialTheme(
-        colorScheme = DarkColorScheme,
+        colorScheme = SwissRedScheme,
         typography = Typography(),
         content = content,
     )

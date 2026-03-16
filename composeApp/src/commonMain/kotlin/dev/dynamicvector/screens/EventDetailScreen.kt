@@ -63,7 +63,7 @@ fun EventDetailScreen(event: QueryEvent, onBack: () -> Unit) {
                     Text("%.2f".format(result.relevance), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = DVColors.Accent)
                 }
                 if (result.explanation.isNotBlank()) {
-                    HorizontalDivider(Modifier.padding(vertical = 10.dp), thickness = 1.dp, color = Color.White.copy(0.04f))
+                    HorizontalDivider(Modifier.padding(vertical = 10.dp), thickness = 1.dp, color = DVColors.Accent.copy(0.08f))
                     Text(result.explanation, style = DVTypography.Caption.copy(color = DVColors.TextTertiary, lineHeight = 16.sp, fontStyle = FontStyle.Italic))
                 }
             }

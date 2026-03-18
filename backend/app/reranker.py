@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, List, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple, Dict
 
 from sentence_transformers import CrossEncoder
 
@@ -12,17 +12,17 @@ from app.config import MODELS
 class RerankItem:
     id: str
     text: str
-    meta: dict[str, object]
+    meta: Dict[str, object]
 
 
 @dataclass(frozen=True)
 class RerankResult:
     id: str
     score: float
-    meta: dict[str, object]
+    meta: Dict[str, object]
 
 
-_cross_encoder: CrossEncoder | None = None
+_cross_encoder: Optional[CrossEncoder] = None
 
 
 def _get_cross_encoder() -> CrossEncoder:
@@ -33,41 +33,19 @@ def _get_cross_encoder() -> CrossEncoder:
     return _cross_encoder
 
 
-def rerank(query: str, items: Sequence[RerankItem], top_k: int) -> list[RerankResult]:
+def rerank(query: str, items: Sequence[RerankItem], top_k: int) -> List[RerankResult]:
     if not items:
         return []
     ce = _get_cross_encoder()
-    pairs: list[tuple[str, str]] = [(query, item.text) for item in items]
+    pairs: List[Tuple[str, str]] = [(query, item.text) for item in items]
     scores: List[float] = ce.predict(pairs).tolist()  # type: ignore[assignment]
     scored = [
         RerankResult(id=item.id, score=float(score), meta=item.meta)
-        for item, score in zip(items, scores, strict=True)
+        for item, score in zip(items, scores)
     ]
     scored.sort(key=lambda r: r.score, reverse=True)
     return scored[: min(top_k, len(scored))]
 
 
 __all__ = ["RerankItem", "RerankResult", "rerank"]
-
-from sentence_transformers import CrossEncoder
-from typing import List, Tuple
-from app.config import CROSS_ENCODER_MODEL
-import logging
-
-logger = logging.getLogger(__name__)
-_reranker = CrossEncoder(CROSS_ENCODER_MODEL)
-
-
-def rerank(query: str, candidates: List[str]) -> List[Tuple[int, float]]:
-    """
-    candidates: list of passage strings
-    returns: list of (orig_index, score) sorted descending
-    """
-    if not candidates:
-        return []
-    pairs = [(query, c) for c in candidates]
-    scores = _reranker.predict(pairs, batch_size=8)
-    indexed = list(enumerate(scores))
-    indexed.sort(key=lambda x: x[1], reverse=True)
-    return indexed
 

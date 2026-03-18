@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Mapping, Sequence
+from typing import List, Mapping, Sequence, Any, Dict, Optional
 
 from qdrant_client.http import models as rest
 
 from app.config import COLLECTIONS, CONTEXT
 from app.context_manager import ContextChunk, ManagedContext, build_context
-from app.embeddings import as_list, embed_single
+from app.embeddings import embed_single
 from app.qdrant_client import get_qdrant_client
 from app.reranker import RerankItem, rerank
 
@@ -23,12 +23,12 @@ class RetrievedDoc:
 @dataclass(frozen=True)
 class RetrievalResult:
     query: str
-    docs: list[RetrievedDoc]
+    docs: List[RetrievedDoc]
     context: ManagedContext
 
 
-def _to_retrieved(points: Sequence[rest.ScoredPoint]) -> list[RetrievedDoc]:
-    docs: list[RetrievedDoc] = []
+def _to_retrieved(points: Sequence[rest.ScoredPoint]) -> List[RetrievedDoc]:
+    docs: List[RetrievedDoc] = []
     for p in points:
         text = (p.payload or {}).get("text", "")  # type: ignore[assignment]
         docs.append(
@@ -73,7 +73,7 @@ def _qdrant_search_with_fallback_vector_name(
             params=params,
         )
     except Exception:
-        last_exc: Exception | None = None
+        last_exc: Optional[Exception] = None
         for name in vector_name_candidates:
             try:
                 return client.search(
@@ -116,7 +116,7 @@ def hybrid_retrieve_products(query: str, top_k: int = 20) -> RetrievalResult:
         for d in initial_docs
     ]
     reranked = rerank(query, rerank_items, top_k=top_k)
-    top_docs: list[RetrievedDoc] = []
+    top_docs: List[RetrievedDoc] = []
     for r in reranked:
         payload = r.meta.get("payload", {})  # type: ignore[assignment]
         top_docs.append(
@@ -143,50 +143,56 @@ def hybrid_retrieve_products(query: str, top_k: int = 20) -> RetrievalResult:
     return RetrievalResult(query=query, docs=top_docs, context=ctx)
 
 
-__all__ = ["RetrievedDoc", "RetrievalResult", "hybrid_retrieve_products"]
+def search_products(*, text_query: str, limit: int = 12) -> List[Dict[str, Any]]:
+    """
+    Back-compat wrapper used by `app.main`.
 
-import logging
-from typing import Any, Dict
+    Delegates to `app.data.product_search.search_products_filtered` without extra filters.
+    """
+    from app.data.product_search import search_products_filtered
 
-logger = logging.getLogger(__name__)
-
-
-def retrieve(
-    query: str,
-    collection: str = COLL_PRODUCTS,
-    top_k: int = TOP_K_RETRIEVE,
-) -> List[Dict[str, Any]]:
-    client = get_qdrant_client()
-    qvec = embed_texts([query])[0].tolist()
-    hits = _qdrant_search_with_fallback_vector_name(
-        client,
-        collection_name=collection,
-        query_vector=qvec,
-        limit=top_k,
-        with_payload=True,
-        vector_name_candidates=("text_vector", "textvector"),
-    )
-    results = [{"id": h.id, "payload": h.payload, "score": h.score} for h in hits]
-    return results
+    return search_products_filtered(text_query, limit=limit)
 
 
-def retrieve_by_image(
-    image_path: str,
-    collection: str = COLL_PRODUCTS,
-    top_k: int = 10,
-) -> List[Dict[str, Any]]:
-    if not ENABLE_MULTIMODAL:
-        logger.info("Multimodal retrieval disabled")
+def retrieve_similar_goals_by_text(query: str, limit: int = 10) -> List[Dict[str, Any]]:
+    """
+    Back-compat wrapper used by `app.main` for goal-centric retrieval.
+    """
+    from app.data.blackboard import search_similar_goals
+
+    return search_similar_goals(query, top_k=limit)
+
+
+def search_episodes_for_goal(_goal_vector: List[float], limit: int = 5) -> List[Dict[str, Any]]:
+    """
+    Best-effort episodic lookup for `app.main:/demo/query`.
+
+    The project has multiple episodic-memory representations (some are graph-based,
+    others are Qdrant collections with small fixed vectors). To avoid hard-coupling
+    the demo endpoint to a specific representation, this returns an empty list when
+    episodic search isn't configured.
+    """
+    try:
+        # If an episodes collection exists with a compatible vector, this can be
+        # upgraded later; for now keep the endpoint stable.
+        client = get_qdrant_client()
+        hits = client.scroll(
+            collection_name=COLLECTIONS.episodes,
+            limit=limit,
+            with_payload=True,
+            with_vectors=False,
+        )[0]
+        return [{"id": h.id, "payload": h.payload or {}} for h in hits]
+    except Exception:
         return []
-    client = get_qdrant_client()
-    ivec = embed_image(image_path).tolist()
-    hits = _qdrant_search_with_fallback_vector_name(
-        client,
-        collection_name=collection,
-        query_vector=ivec,
-        limit=top_k,
-        with_payload=True,
-        vector_name_candidates=("image_vector", "imagevector"),
-    )
-    return [{"id": h.id, "payload": h.payload, "score": h.score} for h in hits]
+
+
+__all__ = [
+    "RetrievedDoc",
+    "RetrievalResult",
+    "hybrid_retrieve_products",
+    "search_products",
+    "search_episodes_for_goal",
+    "retrieve_similar_goals_by_text",
+]
 

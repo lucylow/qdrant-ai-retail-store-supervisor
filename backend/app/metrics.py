@@ -20,7 +20,7 @@ from typing import Optional
 from qdrant_client import QdrantClient
 from qdrant_client.http import models as rest
 
-from app.config import COLL_EPISODES
+from app.data.collections import COLL_EPISODES
 from app.qdrant_client import get_qdrant_client
 
 

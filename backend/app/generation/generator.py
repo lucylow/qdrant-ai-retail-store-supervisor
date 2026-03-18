@@ -1,14 +1,21 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import re
 import logging
 from difflib import SequenceMatcher
 
 from app.generation.prompt_templates import build_prompt
 from app.llm_client import generate, stream_generate
-from app.config import NUM_CONTEXT_DOCS, MIN_PROVENANCE, HALLUCINATION_CONFIDENCE_THRESHOLD
+from app.config import CONTEXT, GENAI
 from app.generation.safety import filter_answer
 
 logger = logging.getLogger(__name__)
+
+# Backward-compatible knobs (older versions used flat constants in app.config).
+NUM_CONTEXT_DOCS: int = int(getattr(CONTEXT, "max_context_documents", 8))
+MIN_PROVENANCE: int = 1
+HALLUCINATION_CONFIDENCE_THRESHOLD: float = float(
+    getattr(GENAI, "hallucination_block_threshold", 0.25)
+)
 
 
 def _compute_overlap_score(answer: str, contexts: List[str]) -> float:
@@ -32,7 +39,9 @@ def extract_citations(text: str) -> List[int]:
     return sorted(set(int(x) for x in found))
 
 
-def generate_answer(question: str, retrieved: List[Dict[str, Any]], max_contexts: int | None = None) -> Dict[str, Any]:
+def generate_answer(
+    question: str, retrieved: List[Dict[str, Any]], max_contexts: Optional[int] = None
+) -> Dict[str, Any]:
     """
     retrieved: list of {id, payload, text, score, reranker_score?}
     returns: {answer, provenance: [{index, id, source, score}], confidence, flag_hallucination, safety_reasons}
@@ -81,7 +90,9 @@ def stream_answer(question: str, retrieved: List[Dict[str, Any]]):
     """
     Yields chunks from stream_generate, and yields final 'meta' dict at the end with provenance & confidence.
     """
-    contexts = [r.get("payload", {}).get("text", "") for r in retrieved[:NUM_CONTEXT_DOCS]]
+    contexts = [
+        r.get("payload", {}).get("text", "") for r in retrieved[:NUM_CONTEXT_DOCS]
+    ]
     prompt = build_prompt(question, contexts)
     buffer = ""
     for chunk in stream_generate(prompt):

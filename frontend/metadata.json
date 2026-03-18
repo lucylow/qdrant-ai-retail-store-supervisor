@@ -1,0 +1,5 @@
+{
+  "name": "DynamicVector",
+  "description": "A professional AI assistant platform for enterprise research, document analysis, and custom agent building.",
+  "requestFramePermissions": ["microphone"]
+}

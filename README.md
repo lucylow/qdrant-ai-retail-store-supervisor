@@ -51,7 +51,7 @@ If you only have 5 minutes: run **root Docker Compose**, log in with the demo ac
 │   └── app/
 │       ├── main.py          #   FastAPI entrypoint
 │       └── auth.py          #   JWT auth (hardcoded demo accounts)
-├── backend/                 # Full multi-agent system (requires API keys)
+├── backend/                 # Full multi-agent system (some demos require API keys)
 │   ├── app/                 #   FastAPI application + agents
 │   │   ├── agents/          #   Shopper, Inventory, Pricing, Merchandising, Audit
 │   │   └── routers/         #   Multilingual, voice, geospatial, checkout
@@ -184,14 +184,15 @@ Accounts can be added/removed in `server/app/auth.py`.
 
 The `server/` module requires no environment variables.
 
-The `backend/` module requires API keys. Copy `.env.example` to `.env` and fill in:
+The `backend/` module can run in a “local-only” mode (pointing at a local Qdrant). Some advanced features require API keys. Copy `.env.example` to `.env` and set what you need:
 
-- `QDRANT_URL` / `QDRANT_API_KEY` — Qdrant Cloud connection
-- `HF_TOKEN` — HuggingFace embeddings
-- `OPENAI_API_KEY` — Whisper voice transcription
-- `GROQ_API_KEY` — Agent reasoning (Mixtral)
-- `REPLICATE_API_TOKEN` — Video keyframe embeddings
-- `ELEVENLABS_API_KEY` — German TTS
+- `QDRANT_URL` — Qdrant connection (local or cloud)
+- `QDRANT_API_KEY` — Qdrant Cloud (optional)
+- `HF_TOKEN` — HuggingFace embeddings (optional, depending on embedding path)
+- `OPENAI_API_KEY` — Whisper / voice features (optional)
+- `GROQ_API_KEY` — hosted LLM reasoning (optional)
+- `REPLICATE_API_TOKEN` — video/image embedding demos (optional)
+- `ELEVENLABS_API_KEY` — TTS (optional)
 
 ## Tech Stack
 

@@ -1,8 +1,19 @@
 # Dynamic Vector
 
-A multi-agent shopping assistant powered by Qdrant vector search. Built for the GenAI Zurich Hackathon 2026.
+Dynamic Vector is a **hackathon-scale monorepo** for a multi-agent shopping / retail assistant built around **Qdrant** (vector search + “shared memory”). Built for the GenAI Zurich Hackathon 2026.
 
-Dynamic Vector uses a conversational flow to understand customer needs, then searches across configured data sources using hybrid RAG to find personalized product matches.
+This repository intentionally contains **multiple runnable tracks** (from “no API keys” to “full multi-agent backend”) plus several research/demo pipelines. The previous root README also had two different drafts merged together; this version keeps the length, but makes the story consistent.
+
+## TL;DR (what should I run?)
+
+| Goal | What to run | Needs API keys? | What you get |
+|---|---|---:|---|
+| Try the UI quickly | `docker compose up --build` (repo root) | No | `server/` (JWT demo auth) + `web/` (React UI) |
+| Run the multi-agent backend API | `uvicorn app.main:app ...` inside `backend/` | Sometimes (depends on features) | Full FastAPI app with hybrid retrieval + multilingual/voice/geospatial/checkout demos |
+| Run Streamlit “judge demos” | `streamlit run ...` inside `backend/` | Usually no (local Qdrant) | Live orchestration dashboards + dataset demos |
+| Run the mobile/desktop client | `./gradlew :composeApp:run` | No (auth only) | KMP app (Android/iOS/Desktop) hitting the same auth endpoint |
+
+If you only have 5 minutes: run **root Docker Compose**, log in with the demo account, and explore the UI. If you want the multi-agent/Qdrant work, jump to **“Running the full backend (`backend/`)”** below.
 
 ## Architecture
 
@@ -20,10 +31,10 @@ Dynamic Vector uses a conversational flow to understand customer needs, then sea
          │  FastAPI + JWT       │
          └─────────────────────┘
                     │
-                    ▼ (future)
+                    ▼ (optional)
          ┌─────────────────────┐
-         │  backend/            │  ← Full multi-agent system (requires API keys)
-         │  Qdrant + RAG       │
+         │  backend/            │  ← Full multi-agent system (Qdrant + hybrid RAG demos)
+         │  FastAPI + agents    │
          └──┬──────────┬──────┘
             ▼          ▼
       ┌─────────┐ ┌─────────┐
@@ -48,6 +59,7 @@ Dynamic Vector uses a conversational flow to understand customer needs, then sea
 │   └── data/                #   Datasets
 ├── web/                     # React/TypeScript frontend
 │   └── src/                 #   Pages, components, hooks
+├── frontend/                # Older/alternate web app scaffold (AI Studio export)
 ├── docker-compose.yml       # Run server + web with one command
 └── .env.example             # Environment variables template (for backend/)
 ```
@@ -86,7 +98,7 @@ npm run dev
 
 ### Running the full backend (optional)
 
-The `backend/` module contains the full multi-agent system with Qdrant, RAG, and voice. It requires API keys configured in `.env` (see `.env.example`). It is not needed for frontend development.
+The `backend/` module contains the full multi-agent system: hybrid retrieval on Qdrant, multi-agent orchestration patterns, and several “judge demo” apps (FastAPI + Streamlit). Some features can run with **local Qdrant only**; some require API keys (voice, certain hosted models).
 
 ```shell
 cp .env.example .env
@@ -95,6 +107,8 @@ cd backend
 pip install -r requirements.txt
 uvicorn app.main:app --port 8000 --reload
 ```
+
+For all `backend/` demos (datasets, Streamlit dashboards, performance stacks, Neo4j knowledge-graph stacks, etc.), see `backend/README.md` and `backend/Makefile`.
 
 ## KMP Mobile App
 
@@ -192,17 +206,17 @@ The `backend/` module requires API keys. Copy `.env.example` to `.env` and fill 
 
 
 
-# DYNAMIC VECTOR – Qdrant AI Retail Store Supervisor 🇨🇭
-
-> Multi‑agent, Qdrant‑powered AI supervisor for **Swiss retail** (Coop/Migros class) with holiday‑aware inventory, TWINT/Stripe checkout, Swiss‑natural‑language scheduling, and production‑grade governance.
-
-This README is intentionally long and detailed (~15+ “pages” of content) so it can double as:
-
-- A **technical spec** for contributors.
-- A **hackathon judging document**.
-- A **deployment guide** for real stores.
-
 ---
+
+## Appendix A — Long-form “Swiss Retail Supervisor” spec (kept on purpose)
+
+The section below is the original long-form narrative/spec that came with this project.
+
+- **Why it’s here**: it doubles as a hackathon “judging doc” and a contributor-facing design reference.
+- **How to read it**: treat it as a *reference architecture*. Parts map directly to the existing `backend/app/routers/*` and agent patterns; other parts are *roadmap / placeholders* (e.g., real TWINT/Stripe integrations).
+- **If you want runnable instructions**: use the sections above, plus `backend/README.md` + `backend/Makefile`.
+
+With that framing, here is the long-form spec (kept intentionally long).
 
 ## 1. Overview
 

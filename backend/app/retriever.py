@@ -42,18 +42,69 @@ def _to_retrieved(points: Sequence[rest.ScoredPoint]) -> list[RetrievedDoc]:
     return docs
 
 
+def _qdrant_search_with_fallback_vector_name(
+    client,
+    *,
+    collection_name: str,
+    query_vector: List[float],
+    limit: int,
+    with_payload: bool = True,
+    with_vectors: bool = False,
+    query_filter=None,
+    params=None,
+    vector_name_candidates: Sequence[str] = (),
+):
+    """
+    Qdrant collections can be configured as:
+    - single unnamed vector
+    - multiple named vectors (e.g. text_vector/image_vector or textvector/imagevector)
+
+    We first try without `vector_name`. If that fails (common when a collection
+    has multiple vectors), retry with the provided candidate names.
+    """
+    try:
+        return client.search(
+            collection_name=collection_name,
+            query_vector=query_vector,
+            limit=limit,
+            with_payload=with_payload,
+            with_vectors=with_vectors,
+            query_filter=query_filter,
+            params=params,
+        )
+    except Exception:
+        last_exc: Exception | None = None
+        for name in vector_name_candidates:
+            try:
+                return client.search(
+                    collection_name=collection_name,
+                    query_vector=query_vector,
+                    vector_name=name,
+                    limit=limit,
+                    with_payload=with_payload,
+                    with_vectors=with_vectors,
+                    query_filter=query_filter,
+                    params=params,
+                )
+            except Exception as exc:  # noqa: BLE001
+                last_exc = exc
+        if last_exc is not None:
+            raise last_exc
+        raise
+
+
 def hybrid_retrieve_products(query: str, top_k: int = 20) -> RetrievalResult:
     client = get_qdrant_client()
     emb = embed_single(query)
-    search_res = client.search(
+    search_res = _qdrant_search_with_fallback_vector_name(
+        client,
         collection_name=COLLECTIONS.products,
         query_vector=emb.vectors[0].tolist(),
         limit=top_k * 3,
         with_payload=True,
         with_vectors=False,
-        params=rest.SearchParams(
-            hnsw_ef=CONTEXT.max_context_documents * 16,
-        ),
+        params=rest.SearchParams(hnsw_ef=CONTEXT.max_context_documents * 16),
+        vector_name_candidates=("text_vector", "textvector"),
     )
     initial_docs = _to_retrieved(search_res)
     rerank_items = [
@@ -94,11 +145,8 @@ def hybrid_retrieve_products(query: str, top_k: int = 20) -> RetrievalResult:
 
 __all__ = ["RetrievedDoc", "RetrievalResult", "hybrid_retrieve_products"]
 
-from typing import List, Dict, Any
-from app.qdrant_client import get_qdrant_client
-from app.embeddings import embed_texts, embed_image
-from app.config import TOP_K_RETRIEVE, COLL_PRODUCTS, ENABLE_MULTIMODAL
 import logging
+from typing import Any, Dict
 
 logger = logging.getLogger(__name__)
 
@@ -110,11 +158,13 @@ def retrieve(
 ) -> List[Dict[str, Any]]:
     client = get_qdrant_client()
     qvec = embed_texts([query])[0].tolist()
-    hits = client.search(
+    hits = _qdrant_search_with_fallback_vector_name(
+        client,
         collection_name=collection,
         query_vector=qvec,
         limit=top_k,
         with_payload=True,
+        vector_name_candidates=("text_vector", "textvector"),
     )
     results = [{"id": h.id, "payload": h.payload, "score": h.score} for h in hits]
     return results
@@ -130,12 +180,13 @@ def retrieve_by_image(
         return []
     client = get_qdrant_client()
     ivec = embed_image(image_path).tolist()
-    hits = client.search(
+    hits = _qdrant_search_with_fallback_vector_name(
+        client,
         collection_name=collection,
         query_vector=ivec,
-        vector_name="image_vector",
         limit=top_k,
         with_payload=True,
+        vector_name_candidates=("image_vector", "imagevector"),
     )
     return [{"id": h.id, "payload": h.payload, "score": h.score} for h in hits]
 
